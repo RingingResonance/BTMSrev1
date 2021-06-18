@@ -1,0 +1,39 @@
+Command Set and basic usage.
+
+After each return signal receaved an "a" will be sent. If
+there is faults logged in the fault code handler the "a" will
+be followed by "!"
+
+# - Resets the whole microcontroller.
+
+H - Enables auto calibration check and Manually runs heater calibration.
+
+h - Disable heater calibration and check.
+
+E - Local echo on or off using "y" or "n"
+
+R - Reads analog inputs 100 times and prints them.
+
+r - Reads analog inputs only one time.
+
+S - Low power shutdown test. Can only be waken back up through pluggin in the charger or the command set.
+
+F - Read fault codes.
+
+C - Clears fault codes and errors.
+
+M - Toggles Battery safety monitor. On by default.
+
+P - Toggles main power output.
+
+Z - Overide partial charge and set to fully charge battery.
+
+V - Shows Voltage Percentage
+
+B - Read battery calculated ratings.
+
+O - Use POS display for HUD
+
+o - Disable POS display for HUD
+
+u - increase v_test

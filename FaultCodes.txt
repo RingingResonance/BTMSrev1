@@ -1,4 +1,4 @@
-Fault Codes for battery controller. When SD proceeds error code, the system has been shutdown to prevent damage or fire as well as a 0x0B (Fault Shutdown Event) error code.
+Fault Codes for battery controller. When SD proceeds error code, the system has been shutdown to prevent damage or fire. A 0x0B (Fault Shutdown Event) error code will also be logged in this scenario.
 
 0x01	Heater is too small for the watts you want.
 
@@ -24,7 +24,7 @@ Fault Codes for battery controller. When SD proceeds error code, the system has 
 
 0x0C	TRAP: PWM Fault Event. SD.
 
-0x0D	TRAP: Oscillator Fail Event. 
+0x0D	TRAP: Oscillator Fail Event. (This may not always cause system wide errors, so for now I have disabled the shutdown function when this error occures for debugging purposes)
 
 0x0E	TRAP: Address Error Event. SD.
 
@@ -34,7 +34,7 @@ Fault Codes for battery controller. When SD proceeds error code, the system has 
 
 0x11	TRAP: Reserved Trap 7 Event. SD.
 
-0x12	TRAP: PLL out of lock. Also causes an Osc Fail Event. Can be caused by elecrical noise or bad power supply section. System can usually recover from these as long as they aren't too severe or frequent.
+0x12	TRAP: PLL out of lock. Also causes an Osc Fail Event. Can be caused by elecrical noise or failing power supply section. System can usually recover from these as long as they aren't too severe or frequent.
 
 0x13	CPU: Brown Out Event. SD.
 
@@ -52,31 +52,31 @@ Fault Codes for battery controller. When SD proceeds error code, the system has 
 
 0x1A	Invalid serial port. User error or bad code.
 
-0x1B	Insufficient current from charger. SD.
+0x1B	Insufficient current from charger. Is the battery voltage detection calibrated? SD.
 
 0x1C	Partial charge voltage was set higher than 100%. User error or bad code.
 
-0x1D	VHigh on Battery voltage input. SD.
+0x1D	Voltage High on Battery voltage input pin of dsPIC. SD.
 
-0x1E	VLow on Battery voltage input. SD.
+0x1E	Voltage Low on Battery voltage input pin of dsPIC. SD.
 
-0x1F	VHigh on Battery current input. SD.
+0x1F	Voltage High on Battery current input pin of dsPIC. SD.
 
-0x20	VLow on Battery current input. SD.
+0x20	Voltage Low on Battery current input pin of dsPIC. SD.
 
-0x21	VHigh on Battery temp input. SD.
+0x21	Voltage High on Battery temp input pin of dsPIC. SD.
 
-0x22	VLow on Battery temp input. SD.
+0x22	Voltage Low on Battery temp input pin of dsPIC. SD.
 
-0x23	VHigh on motor control temp input. SD.
+0x23	Voltage High on motor control temp input pin of dsPIC. SD.
 
-0x24	VLow on motor control temp input. SD.
+0x24	Voltage Low on motor control temp input pin of dsPIC. SD.
 
-0x25	VHigh on snowman's temp input. SD.
+0x25	Voltage High on snowman's temp input pin of dsPIC. SD.
 
-0x26	VLow on snowman's temp input. SD.
+0x26	Voltage Low on snowman's temp input pin of dsPIC. SD.
 
-0x27	
+0x27	Spare error code.
 
-0x28	
+0x28	Spare error code.
 

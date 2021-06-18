@@ -2,7 +2,7 @@
 
   (general
     (thickness 1.6)
-    (drawings 252)
+    (drawings 251)
     (tracks 2484)
     (zones 0)
     (modules 304)
@@ -11803,9 +11803,6 @@
     )
   )
 
-  (gr_text Fuse (at 39.116 102.362 90) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.25)))
-  )
   (gr_line (start 31.75 127.254) (end 31.75 126.492) (layer F.SilkS) (width 0.12) (tstamp 602083CB))
   (gr_line (start 156.718 130.048) (end 156.718 131.064) (layer F.SilkS) (width 0.12))
   (gr_line (start 86.36 80.01) (end 88.646 80.01) (layer F.SilkS) (width 0.12))
@@ -12015,7 +12012,7 @@
   (gr_text "My First Four Layer Board!" (at 153.67 110.49 90) (layer F.SilkS)
     (effects (font (size 0.8 0.8) (thickness 0.125)))
   )
-  (gr_text "All Weather Lithium battery protection system\nand Power Control Rev. 5\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021 - May 18, 2021" (at 62.484 127) (layer F.SilkS) (tstamp 5FB341FF)
+  (gr_text "All Weather Lithium battery protection system\nand Power Control Rev. 1\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021 - Jun 18, 2021" (at 62.484 127) (layer F.SilkS) (tstamp 5FB341FF)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (dimension 137.414 (width 0.15) (layer Dwgs.User) (tstamp 6020A7F2)
@@ -12092,7 +12089,7 @@
   (gr_line (start 92.202 139.954) (end 92.202 140.97) (layer B.SilkS) (width 0.12) (tstamp 5ED5F14C))
   (gr_poly (pts (xy 97.536 131.572) (xy 96.266 131.572) (xy 96.266 132.588) (xy 94.488 132.588) (xy 94.488 131.572) (xy 95.25 131.572) (xy 95.25 130.81) (xy 96.266 130.81) (xy 96.266 129.54) (xy 97.536 129.54)) (layer B.SilkS) (width 0.1) (tstamp 5ED5F14B))
   (gr_poly (pts (xy 91.186 130.81) (xy 92.202 130.81) (xy 92.202 131.572) (xy 92.964 131.572) (xy 92.964 132.588) (xy 91.186 132.588) (xy 91.186 131.572) (xy 89.916 131.572) (xy 89.916 129.54) (xy 91.186 129.54)) (layer B.SilkS) (width 0.1) (tstamp 5ED5F14A))
-  (gr_text "All Weather Lithium battery protection system\nand Battery Control Rev. 5\n\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021" (at 124.206 141.224) (layer B.SilkS) (tstamp 5ED5F148)
+  (gr_text "All Weather Lithium battery protection system\nand Power Control Rev. 1\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021 - Jun 18, 2021" (at 124.206 141.224) (layer B.SilkS) (tstamp 5ED5F148)
     (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
   )
   (gr_text "An abomination of EE..." (at 78.486 139.954) (layer B.SilkS) (tstamp 5ED5F147)

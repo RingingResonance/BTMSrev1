@@ -2342,7 +2342,7 @@ Wire Wire Line
 	1700 3100 1400 3100
 Connection ~ 1400 3100
 $Comp
-L ir2104power:IR2104Power U3
+L BTMS-rescue:IR2104Power-ir2104power U3
 U 1 1 5EB473C3
 P 4100 5700
 F 0 "U3" H 4050 6350 50  0000 C CNN
@@ -2494,7 +2494,7 @@ Connection ~ 13600 6200
 Connection ~ 13400 6200
 Connection ~ 13400 8800
 $Comp
-L dspic:dsPIC30F3011-PT U8
+L BTMS-rescue:dsPIC30F3011-PT-dspic U8
 U 1 1 5E12A7C4
 P 13550 7500
 F 0 "U8" H 12650 8600 50  0000 C CNN
@@ -4004,7 +4004,7 @@ Wire Wire Line
 Wire Wire Line
 	1650 5400 1650 5750
 $Comp
-L a4series:A4series U10
+L BTMS-rescue:A4series-a4series U10
 U 1 1 5FB8A273
 P 2100 8350
 F 0 "U10" V 2146 8072 50  0000 R CNN
@@ -4017,7 +4017,7 @@ F 5 "2449-A41AS12VDC-ND" H 2100 8350 50  0001 C CNN "Digi-Key_PN"
 	0    -1   -1   0   
 $EndComp
 $Comp
-L a4series:A4series U11
+L BTMS-rescue:A4series-a4series U11
 U 1 1 5FB8C6D2
 P 2100 9500
 F 0 "U11" V 2146 9222 50  0000 R CNN
@@ -4030,7 +4030,7 @@ F 5 "2449-A41AS12VDC-ND" H 2100 9500 50  0001 C CNN "Digi-Key_PN"
 	0    -1   -1   0   
 $EndComp
 $Comp
-L a4series:A4series U12
+L BTMS-rescue:A4series-a4series U12
 U 1 1 5FB8DA7B
 P 2100 10700
 F 0 "U12" V 2146 10422 50  0000 R CNN
@@ -4043,7 +4043,7 @@ F 5 "2449-A41AS12VDC-ND" H 2100 10700 50  0001 C CNN "Digi-Key_PN"
 	0    -1   -1   0   
 $EndComp
 $Comp
-L a4series:A4series U14
+L BTMS-rescue:A4series-a4series U14
 U 1 1 5FB8F1EB
 P 5050 10150
 F 0 "U14" V 5096 9872 50  0000 R CNN
@@ -4057,7 +4057,7 @@ F 5 "2449-A41AS12VDC-ND" H 5050 10150 50  0001 C CNN "Digi-Key_PN"
 $EndComp
 Connection ~ 5200 9700
 $Comp
-L a4series:A4series U13
+L BTMS-rescue:A4series-a4series U13
 U 1 1 5FB905AA
 P 5050 8600
 F 0 "U13" V 5096 8322 50  0000 R CNN
@@ -6642,7 +6642,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 6850 5350 6850
 $Comp
-L nl17sz74usg:NL17SZ74USG U15
+L BTMS-rescue:NL17SZ74USG-nl17sz74usg U15
 U 1 1 6056CB7B
 P 5500 5800
 F 0 "U15" H 5500 5875 50  0000 C CNN

@@ -2,8 +2,8 @@
 
   (general
     (thickness 1.6)
-    (drawings 251)
-    (tracks 2530)
+    (drawings 248)
+    (tracks 2531)
     (zones 0)
     (modules 314)
     (nets 158)
@@ -36,7 +36,7 @@
   )
 
   (setup
-    (last_trace_width 0.25)
+    (last_trace_width 0.5)
     (user_trace_width 0.5)
     (user_trace_width 1)
     (user_trace_width 1.5)
@@ -11544,7 +11544,7 @@
     (model ${KISYS3DMOD}/TO_SOT_Packages_SMD.3dshapes/SOT-23.wrl
       (at (xyz 0 0 0))
       (scale (xyz 1 1 1))
-      (rotate (xyz 0 0 0))
+      (rotate (xyz 0 0 90))
     )
   )
 
@@ -12181,16 +12181,7 @@
   (gr_line (start 155.702 40.386) (end 155.702 85.852) (layer B.SilkS) (width 0.12) (tstamp 5FEFED3C))
   (gr_line (start 49.022 40.386) (end 49.022 85.598) (layer B.SilkS) (width 0.12))
   (gr_line (start 155.702 40.386) (end 49.022 40.386) (layer B.SilkS) (width 0.12))
-  (gr_text "Huh, I don't remember making this part a radio?" (at 93.726 47.244) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
   (gr_text Maybe? (at 88.646 42.926) (layer F.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)))
-  )
-  (gr_text "I'm sick and tired of this circuit not working because of EMI" (at 74.676 174.498) (layer B.SilkS)
-    (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
-  )
-  (gr_text ESD (at 89.662 51.308) (layer F.SilkS)
     (effects (font (size 1 1) (thickness 0.15)))
   )
   (gr_text HOT (at 83.82 42.926) (layer F.SilkS)
@@ -13208,6 +13199,7 @@
   (via (at 77.724 87.63) (size 1) (drill 0.5) (layers F.Cu B.Cu) (net 1))
   (via (at 85.09 82.55) (size 1) (drill 0.5) (layers F.Cu B.Cu) (net 1))
   (via (at 85.09 78.994) (size 1) (drill 0.5) (layers F.Cu B.Cu) (net 1))
+  (via (at 84.328 150.876) (size 0.8) (drill 0.4) (layers F.Cu B.Cu) (net 1))
   (segment (start 42.672 48.006) (end 40.386 48.006) (width 0.5) (layer F.Cu) (net 2) (status 10))
   (segment (start 109.22 76.708) (end 112.522 76.708) (width 0.5) (layer F.Cu) (net 2) (tstamp 5FD1DFD0) (status 10))
   (segment (start 112.522 76.708) (end 114.3 74.93) (width 0.5) (layer F.Cu) (net 2))

@@ -135,8 +135,8 @@ F 0 "C8" H 5115 3996 50  0000 L CNN
 F 1 "0.1uf film" H 5115 3905 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 5038 3800 50  0001 C CNN
 F 3 "~" H 5000 3950 50  0001 C CNN
-F 4 "" H 5000 3950 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 5000 3950 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 5000 3950 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 5000 3950 50  0001 C CNN "Digi-Key_PN"
 	1    5000 3950
 	1    0    0    -1  
 $EndComp
@@ -676,8 +676,8 @@ F 0 "C17" H 12650 6150 50  0000 L CNN
 F 1 "0.1uf film" H 12600 5800 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 12638 5900 50  0001 C CNN
 F 3 "~" H 12600 6050 50  0001 C CNN
-F 4 "" H 12600 6050 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 12600 6050 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 12600 6050 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 12600 6050 50  0001 C CNN "Digi-Key_PN"
 	1    12600 6050
 	1    0    0    -1  
 $EndComp
@@ -689,8 +689,8 @@ F 0 "C18" H 12900 6150 50  0000 L CNN
 F 1 "0.1uf film" H 12900 6300 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 12888 5900 50  0001 C CNN
 F 3 "~" H 12850 6050 50  0001 C CNN
-F 4 "" H 12850 6050 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 12850 6050 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 12850 6050 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 12850 6050 50  0001 C CNN "Digi-Key_PN"
 	1    12850 6050
 	1    0    0    -1  
 $EndComp
@@ -702,8 +702,8 @@ F 0 "C16" H 12400 6150 50  0000 L CNN
 F 1 "0.1uf film" H 12400 6300 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 12388 5900 50  0001 C CNN
 F 3 "~" H 12350 6050 50  0001 C CNN
-F 4 "" H 12350 6050 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 12350 6050 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 12350 6050 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 12350 6050 50  0001 C CNN "Digi-Key_PN"
 	1    12350 6050
 	1    0    0    -1  
 $EndComp
@@ -715,8 +715,8 @@ F 0 "C15" H 12150 6150 50  0000 L CNN
 F 1 "0.1uf film" H 11900 6400 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 12138 5900 50  0001 C CNN
 F 3 "~" H 12100 6050 50  0001 C CNN
-F 4 "" H 12100 6050 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 12100 6050 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 12100 6050 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 12100 6050 50  0001 C CNN "Digi-Key_PN"
 	1    12100 6050
 	1    0    0    -1  
 $EndComp
@@ -1051,8 +1051,8 @@ F 0 "C19" H 11165 8346 50  0000 L CNN
 F 1 "0.1uf film" H 11165 8255 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 11088 8150 50  0001 C CNN
 F 3 "~" H 11050 8300 50  0001 C CNN
-F 4 "" H 11050 8300 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 11050 8300 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 11050 8300 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 11050 8300 50  0001 C CNN "Digi-Key_PN"
 	1    11050 8300
 	1    0    0    -1  
 $EndComp
@@ -1328,8 +1328,8 @@ F 0 "C20" H 10665 1746 50  0000 L CNN
 F 1 "0.1uf film" H 10665 1655 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 10588 1550 50  0001 C CNN
 F 3 "~" H 10550 1700 50  0001 C CNN
-F 4 "" H 10550 1700 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 10550 1700 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 10550 1700 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 10550 1700 50  0001 C CNN "Digi-Key_PN"
 	1    10550 1700
 	1    0    0    -1  
 $EndComp
@@ -1384,8 +1384,8 @@ F 0 "C21" H 10665 2446 50  0000 L CNN
 F 1 "0.1uf film" H 10665 2355 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 10588 2250 50  0001 C CNN
 F 3 "~" H 10550 2400 50  0001 C CNN
-F 4 "" H 10550 2400 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 10550 2400 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 10550 2400 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 10550 2400 50  0001 C CNN "Digi-Key_PN"
 	1    10550 2400
 	1    0    0    -1  
 $EndComp
@@ -1499,8 +1499,8 @@ F 0 "C22" H 7715 1896 50  0000 L CNN
 F 1 "0.1uf film" H 7715 1805 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 7638 1700 50  0001 C CNN
 F 3 "~" H 7600 1850 50  0001 C CNN
-F 4 "" H 7600 1850 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 7600 1850 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 7600 1850 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 7600 1850 50  0001 C CNN "Digi-Key_PN"
 	1    7600 1850
 	1    0    0    -1  
 $EndComp
@@ -1512,8 +1512,8 @@ F 0 "C23" H 8365 1896 50  0000 L CNN
 F 1 "0.1uf film" H 8365 1805 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 8288 1700 50  0001 C CNN
 F 3 "~" H 8250 1850 50  0001 C CNN
-F 4 "" H 8250 1850 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 8250 1850 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 8250 1850 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 8250 1850 50  0001 C CNN "Digi-Key_PN"
 	1    8250 1850
 	1    0    0    -1  
 $EndComp
@@ -2062,8 +2062,8 @@ F 0 "C65" H 10450 3000 50  0000 L CNN
 F 1 "0.1uf film" H 10350 3600 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 10488 3150 50  0001 C CNN
 F 3 "~" H 10450 3300 50  0001 C CNN
-F 4 "" H 10450 3300 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 10450 3300 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 10450 3300 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 10450 3300 50  0001 C CNN "Digi-Key_PN"
 	1    10450 3300
 	1    0    0    -1  
 $EndComp
@@ -2494,7 +2494,7 @@ Connection ~ 13600 6200
 Connection ~ 13400 6200
 Connection ~ 13400 8800
 $Comp
-L dspic:dsPIC30F3011-PT U8
+L BTMS-rescue:dsPIC30F3011-PT-dspic U8
 U 1 1 5E12A7C4
 P 13550 7500
 F 0 "U8" H 12650 8600 50  0000 C CNN
@@ -4262,8 +4262,8 @@ F 0 "C75" H 10765 1246 50  0000 L CNN
 F 1 "0.1uf film" H 10765 1155 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 10688 1050 50  0001 C CNN
 F 3 "~" H 10650 1200 50  0001 C CNN
-F 4 "" H 10650 1200 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 10650 1200 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 10650 1200 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 10650 1200 50  0001 C CNN "Digi-Key_PN"
 	1    10650 1200
 	1    0    0    -1  
 $EndComp
@@ -4330,8 +4330,8 @@ F 0 "C76" H 6800 900 50  0000 L CNN
 F 1 "0.1uf film" H 6700 1500 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 6838 1050 50  0001 C CNN
 F 3 "~" H 6800 1200 50  0001 C CNN
-F 4 "" H 6800 1200 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 6800 1200 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 6800 1200 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 6800 1200 50  0001 C CNN "Digi-Key_PN"
 	1    6800 1200
 	1    0    0    -1  
 $EndComp
@@ -5943,8 +5943,8 @@ F 0 "C36" H 5800 5050 50  0000 L CNN
 F 1 "0.1uf film" H 5800 5200 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 5788 4800 50  0001 C CNN
 F 3 "~" H 5750 4950 50  0001 C CNN
-F 4 "" H 5750 4950 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 5750 4950 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 5750 4950 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 5750 4950 50  0001 C CNN "Digi-Key_PN"
 	1    5750 4950
 	1    0    0    -1  
 $EndComp
@@ -5962,8 +5962,8 @@ F 0 "C13" H 4600 5050 50  0000 L CNN
 F 1 "0.1uf film" H 4600 5200 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 4588 4800 50  0001 C CNN
 F 3 "~" H 4550 4950 50  0001 C CNN
-F 4 "" H 4550 4950 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 4550 4950 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 4550 4950 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 4550 4950 50  0001 C CNN "Digi-Key_PN"
 	1    4550 4950
 	1    0    0    -1  
 $EndComp
@@ -5976,8 +5976,8 @@ F 0 "C2" H 2800 6750 50  0000 L CNN
 F 1 "0.1uf film" H 2800 6900 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 2788 6500 50  0001 C CNN
 F 3 "~" H 2750 6650 50  0001 C CNN
-F 4 "" H 2750 6650 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 2750 6650 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 2750 6650 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 2750 6650 50  0001 C CNN "Digi-Key_PN"
 	1    2750 6650
 	1    0    0    -1  
 $EndComp
@@ -6757,8 +6757,8 @@ F 0 "C110" H 6415 6196 50  0000 L CNN
 F 1 "0.1uf film" H 6415 6105 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 6338 6000 50  0001 C CNN
 F 3 "~" H 6300 6150 50  0001 C CNN
-F 4 "" H 6300 6150 50  0001 C CNN "DK_Detail_Page"
-F 5 "" H 6300 6150 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ECP-U1C104MA5/285446?s=N4IgTCBcDaIIxzANgCIGkBKBaAcikAugL5A" H 6300 6150 50  0001 C CNN "DK_Detail_Page"
+F 5 "PCF1126CT-ND" H 6300 6150 50  0001 C CNN "Digi-Key_PN"
 	1    6300 6150
 	1    0    0    -1  
 $EndComp

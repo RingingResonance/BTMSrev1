@@ -42,6 +42,7 @@ int eeprom_erase(int addrs){
         return 0;
     }
 }
+/** Write a Byte to EEPROM **/
 int eeprom_write(int addrs, int data){
     int adrfinal = 0;
     if (addrs > 0x1FF){
@@ -54,7 +55,7 @@ int eeprom_write(int addrs, int data){
         //DO NOT TOUCH THIS, EVERYTHING MUST BE DONE IN THIS EXACT ORDER OR IT WILL NOT WORK PROPERLY!!!
         WREG1 = 0x7F;     //ADDRESS UPPER
         __asm__ ("MOV W1,TBLPAG");
-        WREG2 = data; //Test data pattern.
+        WREG2 = data; //data pattern.
         WREG0 = adrfinal;   //ADDRESS LOWER
         //ESPECIALLY DON'T TOUCH THE ORDER THAT THE WREGs GET WRITTEN TO.
         __asm__ ("TBLWTL w2,[w0]");
@@ -87,7 +88,7 @@ int eeprom_read(int addrs){
 
 //Error code stuff, prepares error codes to be sent to PORT2's Display Buffer.
 //TODO: Not Finished. What's not finished here? I don't remember.
-void smpl_err_send(int serial_port){    
+void smpl_err_send(int serial_port){
     if (serial_port == PORT1){
         U1TXREG = four_bit_hex_cnvt((fault_codes[err_scroll] & 0xF0) / 16);
         U1TXREG = four_bit_hex_cnvt(fault_codes[err_scroll] & 0x0F);
@@ -117,7 +118,7 @@ char four_bit_hex_cnvt(int numb){
     char asci_hex = 0;
     int temp = 0;
     temp = 0x0F & numb;
-    
+
     if(temp < 10){
         asci_hex = temp + 48;
     }
@@ -188,7 +189,7 @@ void send_string(int nl, char *string_point, int serial_port){
 
 /* Sends a float through the UART or buffer */
 void float_send(float f_data, int serial_port){
-    
+
     int x = 0;
     float tx_float = 0;
     int tx_temp = 0;

@@ -167,4 +167,5 @@
   (lib (name ir2104power)(type Legacy)(uri C:/Users/User/Desktop/BikeBatteryController/BTMSrev1/KICAD/customKICADdata/ir2104power.lib)(options "")(descr ""))
   (lib (name nl17sz74usg)(type Legacy)(uri C:/Users/User/Desktop/BikeBatteryController/BTMSrev1/KICAD/customKICADdata/nl17sz74usg.lib)(options "")(descr ""))
   (lib (name BTMS-rescue)(type Legacy)(uri ${KIPRJMOD}/BTMS-rescue.lib)(options "")(descr ""))
+  (lib (name ucc27201ddar)(type Legacy)(uri ${KIPRJMOD}/customKICADdata/ucc27201ddar.lib)(options "")(descr ""))
 )

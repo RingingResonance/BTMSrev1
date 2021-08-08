@@ -327,8 +327,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 4250 7200 50  0001 C CNN "Digi-Key_PN"
 $EndComp
 Wire Wire Line
 	3950 7200 4100 7200
-Wire Wire Line
-	4500 7200 4400 7200
 $Comp
 L dk_PMIC-Gate-Drivers:FAN3111ESX U4
 U 1 1 5E1BCECA
@@ -2288,8 +2286,8 @@ $Comp
 L Device:C C1
 U 1 1 5EE1AACE
 P 3600 5600
-F 0 "C1" H 3715 5646 50  0000 L CNN
-F 1 "1uf 25v" H 3715 5555 50  0000 L CNN
+F 0 "C1" H 3450 5700 50  0000 L CNN
+F 1 "1uf 25v" H 3600 5350 50  0000 L CNN
 F 2 "Capacitors_SMD:C_0603" H 3638 5450 50  0001 C CNN
 F 3 "~" H 3600 5600 50  0001 C CNN
 F 4 "https://www.digikey.com/en/products/detail/samsung-electro-mechanics/CL10A105KA8NNNC/3886760" H 3600 5600 50  0001 C CNN "DK_Detail_Page"
@@ -2309,7 +2307,7 @@ L Device:R R5
 U 1 1 5EB07628
 P 2400 5650
 F 0 "R5" V 2300 5650 50  0000 L CNN
-F 1 "8" V 2400 5600 50  0000 L CNN
+F 1 "6" V 2400 5600 50  0000 L CNN
 F 2 "Resistors_SMD:R_0603" V 2330 5650 50  0001 C CNN
 F 3 "~" H 2400 5650 50  0001 C CNN
 F 4 "https://www.digikey.com/en/products/detail/vishay-dale/CRCW06038R06FKEAHP/2225948" H 2400 5650 50  0001 C CNN "DK_Detail_Page"
@@ -2341,37 +2339,21 @@ Wire Wire Line
 Wire Wire Line
 	1700 3100 1400 3100
 Connection ~ 1400 3100
-$Comp
-L BTMS-rescue:IR2104Power-ir2104power U3
-U 1 1 5EB473C3
-P 4100 5700
-F 0 "U3" H 4050 6350 50  0000 C CNN
-F 1 "UCC27201DDAR" H 3700 6150 50  0000 C CNN
-F 2 "Housings_SOIC:TI_SO-PowerPAD-8_ThermalVias" H 4100 5700 50  0001 C CIN
-F 3 "https://www.infineon.com/dgdl/ir2104.pdf?fileId=5546d462533600a4015355c7c1c31671" H 4100 5700 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/texas-instruments/UCC27201DDAR/1911333" H 4100 5700 50  0001 C CNN "DK_Detail_Page"
-F 5 "296-31998-1-ND" H 4100 5700 50  0001 C CNN "Digi-Key_PN"
-	1    4100 5700
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	3600 5400 3600 5450
 Wire Wire Line
 	3600 5750 3600 5900
 Wire Wire Line
-	3600 5900 3800 5900
-Wire Wire Line
 	3600 5900 3450 5900
-Connection ~ 3600 5900
 $Comp
 L power:GND #PWR015
 U 1 1 5ECF520D
-P 4100 6200
-F 0 "#PWR015" H 4100 5950 50  0001 C CNN
-F 1 "GND" H 4000 6250 50  0000 C CNN
-F 2 "" H 4100 6200 50  0001 C CNN
-F 3 "" H 4100 6200 50  0001 C CNN
-	1    4100 6200
+P 3750 5650
+F 0 "#PWR015" H 3750 5400 50  0001 C CNN
+F 1 "GND" H 3850 5700 50  0000 C CNN
+F 2 "" H 3750 5650 50  0001 C CNN
+F 3 "" H 3750 5650 50  0001 C CNN
+	1    3750 5650
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -2684,7 +2666,7 @@ F 3 "" H 4550 4800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4550 4800 4100 4800
+	4550 4800 4450 4800
 Connection ~ 4550 4800
 $Comp
 L power:GND #PWR06
@@ -5076,13 +5058,6 @@ Wire Wire Line
 	3300 500  3300 600 
 Connection ~ 2450 650 
 Connection ~ 3300 600 
-Wire Wire Line
-	4250 6300 4150 6300
-Wire Wire Line
-	4150 6300 4150 6200
-Wire Wire Line
-	4150 6200 4100 6200
-Connection ~ 4100 6200
 $Comp
 L Device:R R51
 U 1 1 600D45F1
@@ -5131,15 +5106,11 @@ F 5 "511-1769-1-ND" H 2400 5800 50  0001 C CNN "Digi-Key_PN"
 	1    2400 5800
 	0    -1   -1   0   
 $EndComp
-Wire Wire Line
-	3800 5400 3600 5400
 Connection ~ 3600 5400
 Wire Wire Line
 	3450 5600 3450 5400
 Wire Wire Line
 	3450 5400 3600 5400
-Wire Wire Line
-	3800 5500 3350 5500
 $Comp
 L Device:Q_PNP_BEC Q14
 U 1 1 5FD93D39
@@ -5184,10 +5155,6 @@ Connection ~ 2850 4500
 Connection ~ 2850 4850
 Wire Wire Line
 	2850 4850 2850 5200
-Wire Wire Line
-	2850 5200 3350 5200
-Wire Wire Line
-	3350 5200 3350 5500
 Connection ~ 2850 5200
 Wire Wire Line
 	2250 4850 2250 5000
@@ -5219,9 +5186,6 @@ Wire Wire Line
 Connection ~ 2250 6200
 Wire Wire Line
 	2850 5650 2850 6000
-Wire Wire Line
-	2850 6000 3800 6000
-Connection ~ 2850 6000
 Wire Wire Line
 	3450 5900 3250 5900
 Wire Wire Line
@@ -6379,9 +6343,6 @@ F 5 "MBR0580-TPMSCT-ND" H 3950 5050 50  0001 C CNN "Digi-Key_PN"
 	1    3950 5050
 	1    0    0    -1  
 $EndComp
-Connection ~ 4100 5050
-Wire Wire Line
-	4100 5050 4100 5200
 Wire Wire Line
 	3600 5050 3800 5050
 Wire Wire Line
@@ -6724,23 +6685,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 4700 6850 50  0001 C CNN "Digi-Key_PN"
 	0    1    1    0   
 $EndComp
 Wire Wire Line
-	5350 5500 4850 5500
-Wire Wire Line
-	5350 5400 4750 5400
-Wire Wire Line
-	4750 5400 4750 5700
-Wire Wire Line
-	4750 5700 4400 5700
-Wire Wire Line
-	4400 6150 4650 6150
-Wire Wire Line
-	4400 5800 4400 6150
-Wire Wire Line
-	4400 5800 4850 5800
-Wire Wire Line
-	4850 5500 4850 5800
-Connection ~ 4400 5800
-Wire Wire Line
 	5250 6400 6100 6400
 Wire Wire Line
 	6100 6400 6100 6150
@@ -6814,7 +6758,7 @@ L Device:D_Schottky D60
 U 1 1 608ADE8D
 P 4800 6150
 F 0 "D60" H 4850 6250 50  0000 L CNN
-F 1 "D_Schottky100V" H 4700 6000 50  0000 L CNN
+F 1 "D_Schottky100V" H 4700 6300 50  0000 L CNN
 F 2 "Diodes_SMD:D_SOD-123" H 4800 6150 50  0001 C CNN
 F 3 "~" H 4800 6150 50  0001 C CNN
 F 4 "https://www.digikey.com/en/products/detail/micro-commercial-co/MBR0580-TP/2423323" H 4800 6150 50  0001 C CNN "DK_Detail_Page"
@@ -6992,4 +6936,78 @@ Wire Wire Line
 Wire Wire Line
 	6200 9950 6000 9950
 Connection ~ 6000 9950
+$Comp
+L ucc27201ddar:UCC27201DDAR U3
+U 1 1 61187C6B
+P 4350 5600
+F 0 "U3" V 4000 5950 50  0000 L CNN
+F 1 "UCC27201DDAR" V 4100 5750 50  0000 L CNN
+F 2 "Housings_SOIC:TI_SO-PowerPAD-8_ThermalVias" H 4350 5600 50  0001 C CNN
+F 3 "https://www.ti.com/lit/ds/symlink/ucc27200.pdf?HQS=dis-dk-null-digikeymode-dsf-pf-null-wwe&ts=1628373640405&ref_url=https%253A%252F%252Fwww.ti.com%252Fgeneral%252Fdocs%252Fsuppproductinfo.tsp%253FdistId%253D10%2526gotoUrl%253Dhttps%253A%252F%252Fwww.ti.com%252Flit%252Fgpn%252Fucc27200" H 4350 5600 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/texas-instruments/UCC27201DDAR/1911333" H 4350 5600 50  0001 C CNN "DK_Detail_Page"
+F 5 "296-31998-1-ND" H 4350 5600 50  0001 C CNN "Digi-Key_PN"
+	1    4350 5600
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4450 5250 4450 4800
+Wire Wire Line
+	4400 7200 4500 7200
+Connection ~ 4450 4800
+Wire Wire Line
+	4450 4800 4100 4800
+Wire Wire Line
+	4300 5250 4300 5150
+Wire Wire Line
+	4300 5150 3800 5150
+Wire Wire Line
+	3800 5150 3800 5050
+Wire Wire Line
+	4150 5250 4150 5200
+Wire Wire Line
+	2850 5200 4150 5200
+Wire Wire Line
+	4000 5250 3050 5250
+Wire Wire Line
+	3050 5250 3050 5400
+Connection ~ 3050 5400
+Wire Wire Line
+	2850 6000 3200 6000
+Wire Wire Line
+	3200 6000 3200 6650
+Wire Wire Line
+	3200 6650 4450 6650
+Wire Wire Line
+	4450 6650 4450 6000
+Connection ~ 2850 6000
+$Comp
+L power:GND #PWR0153
+U 1 1 6142815F
+P 4300 6000
+F 0 "#PWR0153" H 4300 5750 50  0001 C CNN
+F 1 "GND" H 4400 6050 50  0000 C CNN
+F 2 "" H 4300 6000 50  0001 C CNN
+F 3 "" H 4300 6000 50  0001 C CNN
+	1    4300 6000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4150 6000 4150 6100
+Wire Wire Line
+	4150 6100 4650 6100
+Wire Wire Line
+	4650 6100 4650 5500
+Wire Wire Line
+	4650 5500 5350 5500
+Wire Wire Line
+	4550 5400 4550 6150
+Wire Wire Line
+	4550 6150 4000 6150
+Wire Wire Line
+	4000 6150 4000 6000
+Wire Wire Line
+	4550 5400 5350 5400
+Wire Wire Line
+	4650 6150 4650 6100
+Connection ~ 4650 6100
 $EndSCHEMATC

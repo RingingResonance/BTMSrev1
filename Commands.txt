@@ -4,19 +4,19 @@ After each return signal received an "a" for acknowledge will be sent. If
 there is faults logged in the fault code handler the "a" will
 be followed by "!"
 
-# - Resets the whole microcontroller.
+# - Resets the microcontroller.
 
 H - Enables auto heater calibration check and Manually runs heater calibration.
 
 h - Disable heater calibration and check.
 
-E - Local echo on or off using "y" or "n" (default 'y')
+E - Local echo on or off using "y" or "n" as args. (default 'y')
 
-R - Reads analog inputs 100 times and prints them. (warning, this currently causes charge/discharge regulator services to hang)
+R - Reads analog inputs 100 times and prints them. (warning, this currently causes charge/discharge regulator services to hang) --fixme, probably just need to remove this command.
 
-r - Reads analog inputs only one time. (warning, this currently causes charge/discharge regulator services to hang)
+r - Reads analog inputs only one time. (warning, this currently causes charge/discharge regulator services to hang for a moment)
 
-S - Low power shutdown test. Can only be waken back up through pluggin in the charger or the command set.
+S - Low power shutdown test. Can only be waken back up through pluggin in the charger or resetting through the command set.
 
 F - Read fault codes.
 
@@ -24,16 +24,16 @@ C - Clears fault codes and errors.
 
 M - Toggles Battery safety monitor. On by default.
 
-P - Toggles main power output. A software power switch.
+P - Toggles main power output. A software power switch. -- Need to use p and P for off and on instead of it being a toggle.
 
 Z - Overide partial charge and set to fully charge battery one time.
 
 V - Shows Voltage Percentage
 
-B - Read battery calculated ratings.
+B - Read battery's calculated current capacity.
 
 O - Use POS display for HUD (default)
 
 o - Disable POS display for HUD
 
-u - increase v_test (I forget what this does)
+u - increase v_test (I forget what this does) -- this is a debug command. It increases the PWM duty cycle for the main output by one tick.

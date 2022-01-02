@@ -252,6 +252,7 @@ void volt_percent(void){
 }
 
 //Find current compensation value.
+//This code dances around like spaghetti
 void current_cal(void){
     float signswpd_avg_cnt = 0;
     signswpd_avg_cnt = battery_crnt_average * -1;
@@ -332,17 +333,23 @@ void regulate(void){
 //// Check for Charger.
     if(PORTEbits.RE8 == 1 && first_cal == 9){
         PORTBbits.RB4 = 1;          //charger light on.
+        if(fault_shutdown != 1){
+            PORTFbits.RF6 = 1;          //charger relay on, but only if fault shutdown is 0
+            if(chrg_rly_timer == 3)
+                chrg_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
+        }
         //Charger timeout check. If charger is plugged in but we aren't getting current then we 
         //need to shutdown and log an error code so we don't run down the battery.
         float chk_voltage = 0;
         chk_voltage = chrg_voltage - 0.5;       //Half a volt less than charge voltage.
-        if(chrg_check < 20000 && chrg_current_read == 0 && PORTFbits.RF1 == 1 && battery_voltage < chk_voltage){
+        if(chrg_check < 20000 && chrg_current_read == 0 && PORTFbits.RF1 == 1 && battery_voltage < chk_voltage && chrg_rly_timer == 0){
             chrg_check++;
         }
         else if(chrg_check >= 20000 && PORTFbits.RF1 == 1){
             fault_log(0x1B);            //Log insufficient current from charger.
             fault_shutdown = 1;
             chrg_check = 0;
+            PORTFbits.RF6 = 0;          //charger relay off. Don't waste power on a relay that is doing nothing.
             //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current.
         }
         else if(chrg_check > 0){
@@ -354,9 +361,6 @@ void regulate(void){
             heat_control(chrg_target_temp);
         }
         else if(chrg_current_read == 0 && heat_power > 0){
-            heat_power--;
-        }
-        else if(battery_temp > (chrg_target_temp + 0.5) && heat_power > 0){
             heat_power--;
         }
         
@@ -376,61 +380,46 @@ void regulate(void){
         else{
             input_current = 0;
         }
-        
-        // Charge regulation routine.
-        if((battery_voltage >= battery_rated_voltage - 0.01) || (chrg_current_read > input_current + 0.01)){
-
-            if(charge_power > 0){
+        if(heat_cal_stage != 2 && chrg_rly_timer == 0){
+            // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
+            if(charge_power > 0 && (battery_voltage >= battery_rated_voltage - 0.01) || (chrg_current_read > input_current + 0.01))
                 charge_power--;
-            }
-        }
-        else if((battery_voltage < battery_rated_voltage - 0.07) || (chrg_current_read < input_current)){
-            if(charge_power < 101){
+            else if(charge_power < 101 && (battery_voltage < battery_rated_voltage - 0.07) || (chrg_current_read < input_current))
                 charge_power++;
-            }
         }
-        if(heat_cal_stage == 2){
+        else
             charge_power = 0;       //Inhibit charging if we are in the middle of heater calibration.
-        }
     }
     else{
         PORTBbits.RB4 = 0;          //charger light off.
         charge_power = 0;
+        PDC2 = 0;                   //Set charger output to 0 before turning off relay
+        PORTFbits.RF6 = 0;          //charger relay off.
+        chrg_rly_timer = 3;         //reset charge relay timer.
         chrg_check = 0;
     }
 
 ////Check for key power or command power signal, but not soft power signal.
     if((PORTFbits.RF1 == 0 || cmd_power == 1) && (first_cal == 9 || b_safe == 0x55FF)){
-        PORTDbits.RD3 = 1;          //Enable Output.
+        if(fault_shutdown != 1){
+            PORTFbits.RF1 = 1;          //contactor relay on, but only if fault shutdown is 0
+            if(contact_rly_timer == 3)
+                contact_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
+        }
         //Run heater if needed, but don't run this sub a second time if we are getting charge power while key is on.
         //If we are getting charge power then we need to use it to warm the battery to a higher temp if needed.
+        //So check charge input first.
         if(PORTEbits.RE8 == 0){
             heat_control(dischrg_target_temp);
         }
         //Discharge regulation.
-        if(hunter){
-            //Hunter Mode
-            if(battery_temp > (dischrg_max_temp + 1) || battery_voltage < (dischrg_voltage - 1) 
-            || dischrg_read > (dischrg_current + 0.2) || dischrg_read > (absolute_max_current - 0.1)){
-
-                if(output_power > 0){
-                    output_power--;
-                }
-            }
-            else if(battery_temp < (dischrg_max_temp - 1) && battery_voltage > (dischrg_voltage + 1) 
-            && dischrg_read < (dischrg_current - 0.2)){
-                if(output_power < 95){
-                    output_power++;
-                }
-            }
-        }
-        else if(b_safe == 0x55FF){
+        if(b_safe == 0x55FF){
             output_power = v_test;
             /*if(output_power < 95){
                 output_power++; //RAMP full output power when b_safe is off. For Debugging.
             }*/
         }
-        else{
+        else if(contact_rly_timer == 0){
             //Integral Mode
             //High temp limiting.
             float temp_error = 0;
@@ -477,19 +466,28 @@ void regulate(void){
     }
     else{
         output_power = 0;
+        PDC3 = 0; //set output control to 0 before turning off the relay
+        PORTFbits.RF1 = 0; //Turn off contactor relay
         crnt_integral = 0;
+        contact_rly_timer = 3; //Reset contactor relay timer
     }
     
-    if(main_power == 0 || fault_shutdown == 1){
+    if(main_power == 0){
         heat_power = 0;
+        PDC1 = 0;               //Heater output to 0 before we turn off the relay.
+        PORTCbits.RC15 = 0;     //Heat Relay Off
+        heat_rly_timer = 3;     //Reset heat relay timer
     }
-    PDC1 = heat_power;
-    PDC2 = charge_power;             //set charge control
-    PDC3 = output_power;             //set output control
     
     //Check for fault shutdown.
     if(fault_shutdown == 1){
-        io_off();
+        io_off();               //There was a fault, shut everything down as fast as possible.
+    }
+    else {
+        //Set the PWM output to what the variables are during normal operation.
+        PDC1 = heat_power;               //set heater control
+        PDC2 = charge_power;             //set charge control
+        PDC3 = output_power;             //set output control
     }
 }
 
@@ -531,10 +529,17 @@ void heat_control(float target_temp){
          */
         if(heat_cal_stage == 3){
             if(battery_temp < (target_temp - 0.5) && heat_power < heat_set){
-                heat_power++;
+                if(heat_rly_timer == 0)
+                    heat_power++;
+                PORTCbits.RC15 = 1;     //Heat Relay On
+                if(heat_rly_timer == 3)
+                    heat_rly_timer = 2; //wait two 0.125ms cycles before allowing heat regulation to start.
             }
             else if(battery_temp > (target_temp + 0.5) && heat_power > 0){
                 heat_power--;
+                if(heat_power <= 0)
+                    PORTCbits.RC15 = 0;     //Heat Relay Off
+                    heat_rly_timer = 3;     //Reset heat relay timer
             }
         }
 }
@@ -797,16 +802,21 @@ void general_shutdown(void){
 
 //Turns off all outputs.
 void io_off(void){
-    PORTDbits.RD3 = 0;      //output shutdown.
+//    PORTDbits.RD3 = 0;      //output shutdown. Not Used In current Schematic.
     PDC1 = 0000;            //set heater control
     PDC2 = 0000;            //set charge control
     PDC3 = 0000;            //set output control
-    PORTFbits.RF0 = 0;
-    PORTFbits.RF6 = 0;
-    PORTCbits.RC15 = 0;
-    heat_power = 0;               //set heater control to 0
-    charge_power = 0;             //set charge control to 0
-    output_power = 0;             //set output control to 0
+    PORTDbits.RD1 = 0;      //Main Contactor Relay Off
+    contact_rly_timer = 3;  //reset contactor relay timer
+    PORTFbits.RF0 = 0;      //Fan Relay Off
+    PORTFbits.RF6 = 0;      //Charger Relay Off
+    chrg_rly_timer = 3;     //reset charge relay timer
+    PORTCbits.RC15 = 0;     //Heat Relay Off
+    heat_rly_timer = 3;     //reset heat relay timer
+    PORTBbits.RB8 = 0;      //Aux Power Relay Off
+    heat_power = 0;         //set heater control to 0
+    charge_power = 0;       //set charge control to 0
+    output_power = 0;       //set output control to 0
     current_output = 0;
     crnt_integral = 0;
 }

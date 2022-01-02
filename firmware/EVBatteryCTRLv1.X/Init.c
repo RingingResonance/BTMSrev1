@@ -78,22 +78,19 @@ void Init(void){
     /* Analog inputs and general IO */
     TRISB = 0x008F;              //set portb to mix analog inputs and digital outputs.
     LATB = 0;               //clear portb
-
     /**************************/
     /* PWM outputs and charge detect input. */
-    TRISE = 0xFFFF;              //set porte to all inputs.
-    //LATE = 0;               //set all porte outputs to 0
+    TRISE = 0xFFFF; //set porte to all inputs.
     /**************************/
     /* General IO */
-    /* Pins 27 and 28 should be reserved for AUX com on UART2. What was this for again? pins 27/28 are not any kind of serial comm pins??? */
-    TRISF = 0xFFBE;              //set portf to all inputs and two output.
+    TRISF = 0xFFBE; //set portf to all inputs and two output.
     LATF = 0;
     /**************************/
     /* General IO. */
-    TRISD = 0xFFF3;              //set portd to all inputs except for RD2 and RD3 which is the KEEPALIVE and mShutdown signals.
-    //LATD = 0;
+    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
+    LATD = 0;
     /**************************/
-    /* Brake Light Output */
+    /* General IO */
     TRISC = 0x0000;
     LATC = 0;
 

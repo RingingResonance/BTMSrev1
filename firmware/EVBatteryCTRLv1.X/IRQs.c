@@ -86,13 +86,6 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt (void){
     IFS1bits.INT1IF = 0;
 }
 
-/* Brake Switch IRQ */
-void __attribute__((interrupt, no_auto_psv)) _INT2Interrupt (void){
-    PORTBbits.RB6 = 1;
-
-    IFS1bits.INT2IF = 0;
-}
-
 /* Analog Input IRQ */
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     PORTBbits.RB6 = 1;
@@ -610,7 +603,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         if(PowerOffTimerSec <= 0){
             PowerOffTimerSec = 59;
             if(PowerOffTimer <= 0){
-                power_off(); //power off the system to save power.
+                deep_sleep = 1; //set deep_sleep to 1. Power off the system to save power after all IRQ's are finished.
             }
             else{
                 PowerOffTimer--;
@@ -811,6 +804,13 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     float x = 8;        //Why is this not an int? Because weird things happen when you divide a float by an int. Oh Well.
     float power = 0;
     
+    //Relay On Timers. Wait a little bit after turning on the relays before trying to regulate.
+    if(chrg_rly_timer > 0 && chrg_rly_timer != 3)
+        chrg_rly_timer--;
+    if(contact_rly_timer > 0 && contact_rly_timer != 3)
+        contact_rly_timer--;
+    if(heat_rly_timer > 0 && heat_rly_timer != 3)
+        heat_rly_timer--;
     
     //Get average current.
     if(crnt_avg_cnt >= x){

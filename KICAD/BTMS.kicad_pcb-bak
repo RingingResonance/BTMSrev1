@@ -12529,7 +12529,7 @@
   (gr_line (start 92.202 139.954) (end 92.202 140.97) (layer B.SilkS) (width 0.12) (tstamp 5ED5F14C))
   (gr_poly (pts (xy 97.536 131.572) (xy 96.266 131.572) (xy 96.266 132.588) (xy 94.488 132.588) (xy 94.488 131.572) (xy 95.25 131.572) (xy 95.25 130.81) (xy 96.266 130.81) (xy 96.266 129.54) (xy 97.536 129.54)) (layer B.SilkS) (width 0.1) (tstamp 5ED5F14B))
   (gr_poly (pts (xy 91.186 130.81) (xy 92.202 130.81) (xy 92.202 131.572) (xy 92.964 131.572) (xy 92.964 132.588) (xy 91.186 132.588) (xy 91.186 131.572) (xy 89.916 131.572) (xy 89.916 129.54) (xy 91.186 129.54)) (layer B.SilkS) (width 0.1) (tstamp 5ED5F14A))
-  (gr_text "All Weather Lithium battery protection system\nand Power Control Rev. 1\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021 - Jun 18, 2021\n                            December 23, 2021" (at 125.222 141.986) (layer B.SilkS) (tstamp 5ED5F148)
+  (gr_text "All Weather Lithium battery protection system\nand Power Control Rev. 1\n\nJarrett Cigainero, \nDesigned November 16, 2020 - Feb. 7, 2021 - Jun 18, 2021\nDecember 23, 2021" (at 125.222 141.986) (layer B.SilkS) (tstamp 5ED5F148)
     (effects (font (size 1 1) (thickness 0.15)) (justify mirror))
   )
   (gr_text "An abomination of EE..." (at 68.58 141.478) (layer B.SilkS) (tstamp 5ED5F147)

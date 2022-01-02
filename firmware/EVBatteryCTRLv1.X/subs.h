@@ -182,6 +182,9 @@ double bt_crnt_avg_temp = 0;
 double bt_vltg_avg_temp = 0;
 int adc_sample_burn = 0;            //Burn it. Don't touch this var it will burn you if you do.
 int read_vars = 0;
+int heat_rly_timer = 3;     //3 is resting, setting to 2 starts the countdown, 0 = relay is ready
+int contact_rly_timer = 3;
+int chrg_rly_timer = 3;
 int curnt_cal_stage = 0;     
 /* 0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 
  */

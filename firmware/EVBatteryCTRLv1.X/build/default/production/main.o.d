@@ -7,5 +7,6 @@ subs.h  \
  DataIO.h  \
 Init.h  \
 subs.c  \
+errorCodes.h  \
 DataIO.c  \
 Init.c 

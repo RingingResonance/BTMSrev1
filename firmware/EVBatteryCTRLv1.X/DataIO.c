@@ -150,7 +150,7 @@ void data_send(char data, int serial_port){
 //nl value of 1 sends newline and return signal before text.
 //nl value of 2 sends newline and return signal after text.
 //nl value of 3 sends newline and return signal before and after text.
-void send_string(int nl, char *string_point, int serial_port){
+void send_string(int nl, const char *string_point, int serial_port){
     int x = 0;
     if (nl == 1 || nl == 3){
         nl_send(serial_port);

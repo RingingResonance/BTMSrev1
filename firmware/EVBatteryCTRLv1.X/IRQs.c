@@ -801,7 +801,6 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
 //Used for some critical math timing operations. Cycles through every 1/8 sec.
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     PORTBbits.RB6 = 1;
-    float x = 8;        //Why is this not an int? Because weird things happen when you divide a float by an int. Oh Well.
     float power = 0;
     
     //Relay On Timers. Wait a little bit after turning on the relays before trying to regulate.
@@ -813,8 +812,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
         heat_rly_timer--;
     
     //Get average current.
-    if(crnt_avg_cnt >= x){
-        bt_crnt_avg_temp /= x;
+    if(crnt_avg_cnt >= 8){
+        bt_crnt_avg_temp /= 8;
         battery_crnt_average = bt_crnt_avg_temp;
         bt_crnt_avg_temp = 0;
         crnt_avg_cnt = 0;
@@ -826,8 +825,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     }
     //************************
     ////Get average voltage.
-    if(vltg_avg_cnt >= x){
-        bt_vltg_avg_temp /= x;
+    if(vltg_avg_cnt >= 8){
+        bt_vltg_avg_temp /= 8;
         battery_vltg_average = bt_vltg_avg_temp;
         bt_vltg_avg_temp = 0;
         vltg_avg_cnt = 0;

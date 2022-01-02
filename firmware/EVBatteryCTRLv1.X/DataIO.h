@@ -31,7 +31,7 @@ extern unsigned int BaudCalc(double, double);
 extern void float_send(float, int);
 extern void nl_send(int);
 extern void return_send(int);
-extern void send_string(int, char*, int);
+extern void send_string(int, const char*, int);
 extern void data_send(char, int);
 extern char four_bit_hex_cnvt(int);
 extern int eeprom_erase(int);   //address. 0x00 through 0x1FF.      Returns 0 on success.

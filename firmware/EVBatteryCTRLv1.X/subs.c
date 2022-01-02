@@ -22,6 +22,7 @@
 #include "subs.h"
 #include "DataIO.h"
 #include "Init.h"
+#include "errorCodes.h"
 /* Fun fact, you can comment out these includes and it still compiles even though they are needed!
  * Probably because they are included in main.c IDK mplab is weird.
  * TODO: This file needs to be split up into it's seperate systems.
@@ -382,9 +383,9 @@ void regulate(void){
         }
         if(heat_cal_stage != 2 && chrg_rly_timer == 0){
             // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
-            if(charge_power > 0 && (battery_voltage >= battery_rated_voltage - 0.01) || (chrg_current_read > input_current + 0.01))
+            if(((charge_power > 0) && (battery_voltage >= (battery_rated_voltage - 0.01))) || (chrg_current_read > (input_current + 0.01)))
                 charge_power--;
-            else if(charge_power < 101 && (battery_voltage < battery_rated_voltage - 0.07) || (chrg_current_read < input_current))
+            else if(((charge_power < 101) && (battery_voltage < battery_rated_voltage - 0.07)) || (chrg_current_read < input_current))
                 charge_power++;
         }
         else
@@ -545,141 +546,147 @@ void heat_control(float target_temp){
 }
 
 /* Read fault codes to serial port.
- * This takes up over 10% of program space.
+ * This takes up over 5% of program space.
  */
 void fault_read(int smpl, int serial_port){
     int x = 0;
+    const char *textpointer;
     if(fault_count > 10){
         send_string(NLtxtNL, "Fault Log Is Full. Please clear faults.", serial_port);
     }
-    if(fault_count == 0){
+    else if(fault_count == 0){
         send_string(NLtxtNL, "No fault codes to report.", serial_port);
     }
     else{
-        while (x < fault_count){
-            if(fault_codes[x] == 0x01){
-                send_string(NLtxt, "Heater load too small.", serial_port);
+        while(x < fault_count){
+            for(;;){
+                switch(fault_codes[x]){
+                    case 0x01:
+                        textpointer = code01;
+                    break;
+                    case 0x02:
+                        textpointer = code02;
+                    break;
+                    case 0x03:
+                        textpointer = code03;
+                    break;
+                    case 0x04:
+                        textpointer = code04;
+                    break;
+                    case 0x05:
+                        textpointer = code05;
+                    break;
+                    case 0x06:
+                        textpointer = code06;
+                    break;
+                    case 0x07:
+                        textpointer = code07;
+                    break;
+                    case 0x08:
+                        textpointer = code08;
+                    break;
+                    case 0x09:
+                        textpointer = code09;
+                    break;
+                    case 0x0A:
+                        textpointer = code0A;
+                    break;
+                    case 0x0B:
+                        textpointer = code0B;
+                    break;
+                    case 0x0C:
+                        textpointer = code0C;
+                    break;
+                    case 0x0D:
+                        textpointer = code0D;
+                    break;
+                    case 0x0E:
+                        textpointer = code0E;
+                    break;
+                    case 0x0F:
+                        textpointer = code0F;
+                    break;
+                    case 0x10:
+                        textpointer = code10;
+                    break;
+                    case 0x11:
+                        textpointer = code11;
+                    break;
+                    case 0x12:
+                        textpointer = code12;
+                    break;
+                    case 0x13:
+                        textpointer = code13;
+                    break;
+                    case 0x14:
+                        textpointer = code14;
+                    break;
+                    case 0x15:
+                        textpointer = code15;
+                    break;
+                    case 0x16:
+                        textpointer = code16;
+                    break;
+                    case 0x17:
+                        textpointer = code17;
+                    break;
+                    case 0x18:
+                        textpointer = code18;
+                    break;
+                    case 0x19:
+                        textpointer = code19;
+                    break;
+                    case 0x1A:
+                        textpointer = code1A;
+                    break;
+                    case 0x1B:
+                        textpointer = code1B;
+                    break;
+                    case 0x1C:
+                        textpointer = code1C;
+                    break;
+                    case 0x1D:
+                        textpointer = code1D;
+                    break;
+                    case 0x1E:
+                        textpointer = code1E;
+                    break;
+                    case 0x1F:
+                        textpointer = code1F;
+                    break;
+                    case 0x20:
+                        textpointer = code20;
+                    break;
+                    case 0x21:
+                        textpointer = code21;
+                    break;
+                    case 0x22:
+                        textpointer = code22;
+                    break;
+                    case 0x23:
+                        textpointer = code23;
+                    break;
+                    case 0x24:
+                        textpointer = code24;
+                    break;
+                    case 0x25:
+                        textpointer = code25;
+                    break;
+                    case 0x26:
+                        textpointer = code26;
+                    break;
+                    default:
+                        textpointer = codeDefault;
+                    break;
+                }
             }
-            else if(fault_codes[x] == 0x02){
-                send_string(NLtxt, "No heater detected.", serial_port);
-            }
-            else if(fault_codes[x] == 0x03){
-                send_string(NLtxt, "Heater load too large.", serial_port);
-            }
-            else if(fault_codes[x] == 0x04){
-                send_string(NLtxt, "Low battery shutdown.", serial_port);
-            }
-            else if(fault_codes[x] == 0x05){
-                send_string(NLtxt, "Discharge over current.", serial_port);
-            }
-            else if(fault_codes[x] == 0x06){
-                send_string(NLtxt, "Charge over current.", serial_port);
-            }
-            else if(fault_codes[x] == 0x07){
-                send_string(NLtxt, "High battery voltage.", serial_port);
-            }
-            else if(fault_codes[x] == 0x08){
-                send_string(NLtxt, "Battery over temp.", serial_port);
-            }
-            else if(fault_codes[x] == 0x09){
-                send_string(NLtxt, "Motor controller over temp.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0A){
-                send_string(NLtxt, "Abominable Snow Monster over temp.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0B){
-                send_string(NLtxt, "Shutdown Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0C){
-                send_string(NLtxt, "TRAP: PWM Fault Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0D){
-                send_string(NLtxt, "TRAP: Oscillator Fail Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0E){
-                send_string(NLtxt, "TRAP: Address Error Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x0F){
-                send_string(NLtxt, "TRAP: Stack Error Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x10){
-                send_string(NLtxt, "TRAP: Math Error Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x11){
-                send_string(NLtxt, "TRAP: Reserved Trap 7 Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x12){
-                send_string(NLtxt, "TRAP: PLL out of lock.", serial_port);
-            }
-            else if(fault_codes[x] == 0x13){
-                send_string(NLtxt, "RESET: Brown Out Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x14){
-                send_string(NLtxt, "RESET: WDT Reset Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x15){
-                send_string(NLtxt, "RESET: TRAP Conflict Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x16){
-                send_string(NLtxt, "RESET: Illegal opcode or uninitialized W register access Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x17){
-                send_string(NLtxt, "RESET: External Reset Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x18){
-                send_string(NLtxt, "RESET: Instruction Reset Event.", serial_port);
-            }
-            else if(fault_codes[x] == 0x19){
-                send_string(NLtxt, "CPU: Reset.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1A){
-                send_string(NLtxt, "Invalid serial port.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1B){
-                send_string(NLtxt, "NO current from charger.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1C){
-                send_string(NLtxt, "Partial charge set higher than 100%. Clamping.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1D){
-                send_string(NLtxt, "VHigh on Battery voltage input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1E){
-                send_string(NLtxt, "VLow on Battery voltage input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x1F){
-                send_string(NLtxt, "VHigh on Battery current input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x20){
-                send_string(NLtxt, "VLow on Battery current input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x21){
-                send_string(NLtxt, "VHigh on Battery temp input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x22){
-                send_string(NLtxt, "VLow on Battery temp input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x23){
-                send_string(NLtxt, "VHigh on motor control temp input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x24){
-                send_string(NLtxt, "VLow on motor control temp input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x25){
-                send_string(NLtxt, "VHigh on snowman's temp input.", serial_port);
-            }
-            else if(fault_codes[x] == 0x26){
-                send_string(NLtxt, "VLow on snowman's temp input.", serial_port);
-            }
-            else{
-                send_string(NLtxt, "Unknown Fault code.", serial_port);
-            }
+            send_string(NLtxt, textpointer, serial_port);
             x++;
         }
     }
 }
 
-//Used to log fault codes. Simple eh? Just call it with the code you want.
+//Used to log fault codes. Simple eh? Just call it with the code you want to log.
 void fault_log(int f_code){
     if (fault_count < 10){
         fault_codes[fault_count] = f_code;

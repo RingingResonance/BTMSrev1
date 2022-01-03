@@ -10,9 +10,7 @@ H - Enables auto heater calibration check and Manually runs heater calibration.
 
 h - Disable heater calibration and check.
 
-E - Local echo on or off using "y" or "n" as args. (default 'y')
-
-R - Reads analog inputs 100 times and prints them. (warning, this currently causes charge/discharge regulator services to hang) --fixme, probably just need to remove this command.
+E - Local echo on or off using "y" or "n" as args with no space in between. (default 'y') Examples: 'Ey' or 'En'
 
 r - Reads analog inputs only one time. (warning, this currently causes charge/discharge regulator services to hang for a moment)
 
@@ -22,9 +20,13 @@ F - Read fault codes.
 
 C - Clears fault codes and errors.
 
-M - Toggles Battery safety monitor. On by default.
+M - Turns on Battery safety monitor. On by default.
 
-P - Toggles main power output. A software power switch. -- Need to use p and P for off and on instead of it being a toggle.
+m - Turns off Battery safety monitor. On by default.
+
+P - Turns on main power output. Software power switch.
+
+p - Turns off main power output. Software power switch.
 
 Z - Overide partial charge and set to fully charge battery one time.
 
@@ -36,4 +38,6 @@ O - Use POS display for HUD (default)
 
 o - Disable POS display for HUD
 
-u - increase v_test (I forget what this does) -- this is a debug command. It increases the PWM duty cycle for the main output by one tick.
+U - increase v_test -- this is a debug command. It increases the PWM duty cycle for the main output by one tick.
+
+u - decrease v_test -- this is a debug command. It decreases the PWM duty cycle for the main output by one tick.

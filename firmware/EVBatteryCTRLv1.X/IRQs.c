@@ -223,123 +223,93 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
 /* Data and Command input and processing IRQ for Port 1 */
 void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
     PORTBbits.RB6 = 1;
-    while (U1STAbits.URXDA && cmdRDY == 0){       //Data ready?
+    while (U1STAbits.URXDA && cmdRDY == 0){       //Data ready? Keep reading the whole buffer.
         cmd[cmdPoint] = U1RXREG;
-        if (Lecho){
+        if (Lecho && ((cmd[cmdPoint] != 0x0D) || (cmd[cmdPoint] != 0x0A))){
             U1TXREG = cmd[cmdPoint];
         }
         if (cmd[cmdPoint] == 0x0D){     //Check for a RETURN
             if (Lecho){
-                U1TXREG = 0x0A;             //Send NewLine
+                //U1TXREG = 0x0A;             //Send NewLine
+                U1TXREG = 0x0D;             //Send Return
             }
             bufsize = cmdPoint;
             cmdPoint = 0;
             cmdRDY = 1;                 //Tell our command handler to process.
         }
-        else if (cmdPoint > cdmd){      //Check for buffer overflow.
-            cmdPoint = 0;
-            cmdOVFL = 1;
-        }
-        else {
+        else if(cmdPoint < cdmd) {
             cmdPoint++;
         }
     }
     //Command Handler.
     if (cmdRDY == 1){
         int tempPoint = 0;
-        U1TXREG = 0x61;                 //Send command receive "a"
+        U1TXREG = '@';                 //Send command receive "@"
         //Check for faults.
         if(fault_count > 0){
-            U1TXREG = 0x21;             //Send fault alert "!"
+            U1TXREG = '!';             //Send fault alert "!"
         }
-        
-        while (tempPoint < bufsize){
-            if (cmd[tempPoint] == 0x0D){    //Enter Key.
-                if (Lecho){
-                    U1TXREG = 0x0A;             //Send NewLine
-                }
-                break;                      //Used as a test, do nothing.
-            }
-            else if (cmd[tempPoint] == 0x23){   // "#" Reset.
+        switch(cmd[tempPoint]){
+            case 0x0D:
+            break;
+            case '#':
                 cmdPoint = 0;
                 cmdRDY = 0;
                 asm("reset");
-            }
-            else if (cmd[tempPoint] == 'H'){   //Enable and Run heater calibration. "H"
-                tempPoint++;
+            break;
+            case 'H':
                 heat_cal_stage = 1;
-            }
-            else if (cmd[tempPoint] == 'E'){   //Local Echo. "E"
+            break;
+            case 'E':
                 tempPoint++;
-                if (cmd[tempPoint] == 0x79){
+                if (cmd[tempPoint] == 'y'){
                     Lecho = 1;
                 }
-                else if (cmd[tempPoint] == 0x6E){
+                else if (cmd[tempPoint] == 'n'){
                     Lecho = 0;
                 }
                 else {
                     Terr = -1;
                 }
-            }
-            else if (cmd[tempPoint] == 'R'){   //Read Vars "R"
-                tempPoint++;
-                if (read_vars == 0){
-                    read_vars = 100;    //Read 100 vars before stopping.
-                }
-                else {
-                    read_vars = 0;
-                }
-            }
-            else if (cmd[tempPoint] == 'S'){    //Low Power Shutdown Test. "S"
-                tempPoint++;
+            break;
+            case 'S':
                 deep_sleep = 1;
-            }
-            else if (cmd[tempPoint] == 'r'){    //Read Var Once. "r"
-                tempPoint++;
+            break;
+            case 'r':
                 if (read_vars == 0){
                     read_vars = 1;    //Read vars once before stopping.
                 }
                 else {
                     read_vars = 0;
                 }
-            }
-            else if (cmd[tempPoint] == 'F'){    //Fault Code Read. "F"
-                tempPoint++;
-                fault_read(full, PORT1);          //Read full fault codes.
-            }
-            else if (cmd[tempPoint] == 'P'){    //Toggle main power. "P"
-                tempPoint++;
-                if(cmd_power == 0){
-                    send_string(NLtxtNL, "Power On", PORT1);
-                    cmd_power = 1;
-                    
-                }
-                else{
-                    send_string(NLtxtNL, "Power Off", PORT1);
-                    cmd_power = 0;
-                    
-                }
-            }
-            else if (cmd[tempPoint] == 'M'){    //Toggle Battery Safety Monitor. "M"
-                tempPoint++;
-                if(b_safe == 0x55FF){
-                    b_safe = 0;
-                    send_string(NLtxtNL, "Battery Monitor On", PORT1);
-                }
-                else{
-                    b_safe = 0x55FF;
-                    send_string(NLtxtNL, "Battery Monitor Off", PORT1);
-                }
-            }
-            else if (cmd[tempPoint] == 'C'){    //Clear Codes and reset fault_shutdown. "C"
-                tempPoint++;
+            break;
+            case 'F':
+                fault_read(full, PORT1);          //Read all fault codes.
+            break;
+            case 'P':
+                send_string(NLtxtNL, "Power On", PORT1);
+                cmd_power = 1;
+            break;
+            case 'p':
+                send_string(NLtxtNL, "Power Off", PORT1);
+                cmd_power = 0;
+            break;
+            case 'M':
+                b_safe = 0;
+                send_string(NLtxtNL, "Battery Monitor On :D", PORT1);
+            break;
+            case 'm':
+                b_safe = 0x55FF;
+                send_string(NLtxtNL, "!!!Battery Monitor Off!!!", PORT1);
+            break;
+            case 'C':
                 fault_count = 0;
                 fault_shutdown = 0;
                 heat_cal_stage = 0;
                 osc_fail_event = 0;
-            }
-            else if (cmd[tempPoint] == 'Z'){    //Set to fully charge the battery. "Z"
-                tempPoint++;
+                send_string(NLtxtNL, "Fault Codes Cleared.", PORT1);
+            break;
+            case 'Z':
                 p_charge = 0;
                 chrg_voltage = battery_rated_voltage;
                 if(PORTEbits.RE8 == 1){
@@ -348,19 +318,16 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
                 else{
                     partial_chrg_cnt = 10;
                 }
-            }
-            else if (cmd[tempPoint] == 'h'){    //Disable auto heater calibration. "h"
-                tempPoint++;
+            break;
+            case 'h':
                 heat_cal_stage = 5;
-            }
-            else if (cmd[tempPoint] == 'V'){    //Send Voltage Percentage. "V"
-                tempPoint++;
+            break;
+            case 'V':
                 send_string(NLtxt, "Battery charge voltage is at ", PORT1);
                 float_send(voltage_percentage, PORT1);
                 send_string(txtNL, "%. ", PORT1);
-            }
-            else if (cmd[tempPoint] == 'B'){    //Read battery calculated ratings. "B"
-                tempPoint++;
+            break;
+            case 'B':
                 send_string(NLtxt, "Rated Battery capacity ", PORT1);
                 float_send(amp_hour_rating, PORT1);
                 send_string(txtNL, "Ah. ", PORT1);
@@ -370,30 +337,29 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
                 send_string(NLtxt, "Remaining Battery capacity ", PORT1);
                 float_send(battery_remaining, PORT1);
                 send_string(txtNL, "Ah. ", PORT1);
-            }
-            else if (cmd[tempPoint] == 'O'){           // Use POS display for HUD.
-                tempPoint++;
+            break;
+            case 'O':
                 use_POS_display = 1;
-            }
-            else if (cmd[tempPoint] == 'o'){           // Disable POS display for HUD.
-                tempPoint++;
+            break;
+            case 'o':
                 use_POS_display = 0;
-            }
-            else if (cmd[tempPoint] == 'u'){           // increase v_test
-                tempPoint++;
+            break;
+            case 'U':
                 if(v_test < 99){
                     v_test++;
                 }
-            }
-            else if (cmd[tempPoint] == 0x20){           // Space.
-                tempPoint++;
-            }
-            else {
-                send_string(NLtxt, "Unknown Command.", PORT1);     //Print "S" for Syntax Error.
+            break;
+            case 'u':
+                if(v_test > 0){
+                    v_test--;
+                }
+            break;
+            default:
+                send_string(NLtxt, "Unknown Command.", PORT1);
                 Terr = -1;
-                break;
-            }
+            break;
         }
+
         cmdPoint = 0;
         cmdRDY = 0;
         if (Terr == -1){
@@ -411,156 +377,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
 /* Data and Command input and processing IRQ for Port 2. */
 void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt (void){
     PORTBbits.RB6 = 1;
-    /*
-    while (U2STAbits.URXDA && cmdRDY == 0){       //Data ready?
-        cmd2[cmdPoint2] = U2RXREG;
-        if (Lecho2){
-            U2TXREG = cmd2[cmdPoint2];
-        }
-        if (cmd2[cmdPoint2] == 0x0D){     //Check for a RETURN
-            if (Lecho2){
-                U2TXREG = 0x0A;             //Send NewLine
-            }
-            bufsize2 = cmdPoint2;
-            cmdPoint2 = 0;
-            cmdRDY2 = 1;                 //Tell our command handler to process.
-        }
-        else if (cmdPoint2 > cdmd2){      //Check for buffer overflow.
-            cmdPoint2 = 0;
-            cmdOVFL2 = 1;
-        }
-        else {
-            cmdPoint2++;
-        }
-    }
-    //Command Handler.
-    if (cmdRDY2 == 1){
-        int tempPoint2 = 0;
-        U2TXREG = 0x61;                 //Send command receive "a"
-        //Check for faults.
-        if(fault_count > 0){
-            U2TXREG = 0x21;             //Send fault alert "!"
-        }
-        
-        while (tempPoint2 < bufsize2){
-            if (cmd2[tempPoint2] == 0x0D){    //Enter Key.
-                if (Lecho2){
-                    U2TXREG = 0x0A;             //Send NewLine
-                }
-                break;                      //Used as a test, do nothing.
-            }
-            else if (cmd2[tempPoint2] == 0x23){   // "#" Reset.
-                cmdPoint2 = 0;
-                cmdRDY2 = 0;
-                asm("reset");
-            }
-            else if (cmd2[tempPoint2] == 'H'){   //Enable and Run heater calibration. "H"
-                tempPoint2++;
-                heat_cal_stage = 1;
-            }
-            else if (cmd2[tempPoint2] == 'E'){   //Local Echo. "E"
-                tempPoint2++;
-                if (cmd2[tempPoint2] == 0x79){
-                    Lecho2 = 1;
-                }
-                else if (cmd2[tempPoint2] == 0x6E){
-                    Lecho2 = 0;
-                }
-                else {
-                    Terr2 = -1;
-                }
-            }
-            else if (cmd2[tempPoint2] == 'S'){    //Low Power Shutdown Test. "S" Might also be useful for security shutdown/lockout.
-                tempPoint2++;
-                deep_sleep = 1;
-            }
-            else if (cmd2[tempPoint2] == 'F'){    //Fault Code Read. "F"
-                tempPoint2++;
-                fault_read(simple, PORT2);          //Read simple fault codes.
-            }
-            else if (cmd2[tempPoint2] == 'P'){    //Toggle main power. "P"
-                tempPoint2++;
-                if(cmd_power == 0){
-                    send_string(NLtxtNL, "P On", PORT2);
-                    cmd_power = 1;
-                    
-                }
-                else{
-                    send_string(NLtxtNL, "P Off", PORT2);
-                    cmd_power = 0;
-                    
-                }
-            }
-            else if (cmd2[tempPoint2] == 'M'){    //Toggle Battery Safety Monitor. "M"
-                tempPoint2++;
-                if(b_safe == 0x55FF){
-                    b_safe = 0;
-                    send_string(NLtxtNL, "M On", PORT2);
-                }
-                else{
-                    b_safe = 0x55FF;
-                    send_string(NLtxtNL, "M Off", PORT2);
-                }
-            }
-            else if (cmd2[tempPoint2] == 'C'){    //Clear Codes and reset fault_shutdown. "C"
-                tempPoint2++;
-                fault_count = 0;
-                fault_shutdown = 0;
-                heat_cal_stage = 0;
-                osc_fail_event = 0;
-            }
-            else if (cmd[tempPoint2] == 'Z'){    //Set to fully charge the battery. "Z"
-                tempPoint2++;
-                p_charge = 0;
-                chrg_voltage = battery_rated_voltage;
-                if(PORTEbits.RE8 == 1){
-                    partial_chrg_cnt = 0;
-                }
-                else{
-                    partial_chrg_cnt = 10;
-                }
-            }
-            else if (cmd2[tempPoint2] == 'h'){    //Disable auto heater calibration. "h"
-                tempPoint2++;
-                heat_cal_stage = 5;
-            }
-            else if (cmd2[tempPoint2] == 'V'){    //Send Voltage Percentage. "V"
-                tempPoint2++;
-                send_string(NLtxt, "BV is ", PORT2);
-                float_send(voltage_percentage, PORT2);
-                send_string(txtNL, "%. ", PORT2);
-            }
-            else if (cmd2[tempPoint2] == 'B'){    //Read battery calculated ratings. "B"
-                tempPoint2++;
-                //send_hud_vars(PORT2);             //Send simple battery stats.
-            }
-            else if (cmd2[tempPoint2] == 'O'){           // Use POS display for HUD.
-                tempPoint2++;
-                use_POS_display = 1;
-            }
-            else if (cmd2[tempPoint2] == 'o'){           // Disable POS display for HUD.
-                tempPoint2++;
-                use_POS_display = 0;
-            }
-            else if (cmd2[tempPoint2] == 0x20){           // Space.
-                tempPoint2++;
-            }
-            else {
-                send_string(NLtxt, "UC.", PORT2);     //Print "S" for Syntax Error.
-                Terr = -1;
-                break;
-            }
-        }
-        cmdPoint2 = 0;
-        cmdRDY2 = 0;
-        if (Terr2 == -1){
-            Terr2 = 0;
-            cmdPoint2 = 0;
-            tempPoint2 = 0;
-            U2TXREG = 0x45;     //Print "E" for Error.
-        }
-    }
-     */
+
 /****************************************/
     /* End the IRQ. */
     IFS1bits.U2RXIF = 0;

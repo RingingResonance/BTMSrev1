@@ -17,7 +17,6 @@
 #ifndef IRQS_C
 #define IRQS_C
 
-
 #include <p30f3011.h>
 #include "IRQs.h"
 #include "subs.h"
@@ -98,8 +97,6 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     /* I have left commented out code in this section for showing the process
      * of converting analog inputs into voltages, currents, and temps.
      */
-    
-    
     //Get 8 samples for averaging.
     if (analog_avg_cnt >= 8){
         //Battery voltage.
@@ -149,7 +146,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         my_temp = adctemp4 / 0.0156;    //Convert to Degrees C
         adctemp4 = 0;       //Clear average.
         
-        //Copy board temp to battery temp and controler temp for now.
+        //Copy board temp to battery temp and controller temp for now.
         motor_ctrl_temp = my_temp;
 //        battery_temp = my_temp;
         
@@ -159,7 +156,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         //Do a battery check after each valid sample.
         //Check to make sure the battery and other systems are within safe operating conditions.
         //Shutdown and log the reason why if they aren't safe.
-        if(b_safe != 0x55FF && adc_sample_burn == 1 && fault_shutdown == 0){
+        if((b_safe != 0x55FF) && (adc_sample_burn == 1) && (fault_shutdown == 0)){
             explody_preventy_check();
         }
         
@@ -210,8 +207,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             adctemp4 = 0;
         }
         analog_avg_cnt++;
-    }
-    
+    } 
     //End IRQ
     IFS0bits.ADIF = 0;
 }
@@ -407,7 +403,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
      * The dsPIC30F3011 is a power hog even in Idle and Sleep modes.
      * For future people, KEEP USING IRQs FOR STUFF!!! Don't make the CPU wait
      * for anything! The dsPIC30F3011 is an impatient hog and will consume all
-     * your electrons and burn your lunch from the heat that it generates!
+     * your electrons and burn your lunch and house down from the heat that it generates!
      */
 
     if(main_power){

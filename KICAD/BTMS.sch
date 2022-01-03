@@ -2310,8 +2310,8 @@ F 0 "R5" V 2300 5650 50  0000 L CNN
 F 1 "6" V 2400 5600 50  0000 L CNN
 F 2 "Resistors_SMD:R_0603" V 2330 5650 50  0001 C CNN
 F 3 "~" H 2400 5650 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/vishay-dale/CRCW06038R06FKEAHP/2225948" H 2400 5650 50  0001 C CNN "DK_Detail_Page"
-F 5 "541-8.06SCT-ND" H 2400 5650 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/yageo/RC0603FR-076R04L/727316" H 2400 5650 50  0001 C CNN "DK_Detail_Page"
+F 5 "311-6.04HRCT-ND" H 2400 5650 50  0001 C CNN "Digi-Key_PN"
 	1    2400 5650
 	0    1    1    0   
 $EndComp

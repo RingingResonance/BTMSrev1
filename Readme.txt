@@ -6,4 +6,4 @@ cooling fan control. Works with lithium ion batteries, but does not provide cell
 dedicated BMS. The circuit provided should handle up to 30 amps with proper cooling. It also does basic error logging and will
 shut down the system on events such as under/over voltage, over current, temps out of range, internal CPU errors, etc. with room to expand.
 
-The firmware has yet to be fully updated to work with this schematic, though, it should mostly work at this time. Jun, 2021
+At this time, January 6, 2022, I am waiting for parts to finish assembly of this new design in order to test.

@@ -27,7 +27,7 @@ void default_sets(void){
     config_start[0] = 0x4567;
     R1_resistance = 200;            //R1 resistance in Kohms
     R2_resistance = 16;             //R2 resistance in Kohms
-    bt_vlt_adjst = 0;               //battery voltage input compensation in volts.
+    bt_vlt_adjst = -3.971;               //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
     partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
@@ -61,7 +61,7 @@ void default_sets(void){
     batt_fan_start = 30;
     //Some other stuff.
     max_heat = 50;              //Heater watts that you want to use.
-    travel_dist = 1200;         //Travel Distance in CM per tire rotation.
+    travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
     circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
     PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
 }
@@ -74,10 +74,19 @@ void Init(void){
     OSCCONbits.NOSC = 1;
     OSCCONbits.OSWEN = 1;
     OSCCONbits.LPOSCEN = 0;
-
+    /**************************/
+    /* General IO. */
+    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
+    LATD = 0;
+    PORTDbits.RD2 = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
+    /**************************/
     /* Analog inputs and general IO */
     TRISB = 0x008F;              //set portb to mix analog inputs and digital outputs.
     LATB = 0;               //clear portb
+    /**************************/
+    /* General IO */
+    TRISC = 0x0000;
+    LATC = 0;
     /**************************/
     /* PWM outputs and charge detect input. */
     TRISE = 0xFFFF; //set porte to all inputs.
@@ -85,16 +94,9 @@ void Init(void){
     /* General IO */
     TRISF = 0xFFBE; //set portf to all inputs and two output.
     LATF = 0;
-    /**************************/
-    /* General IO. */
-    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
-    LATD = 0;
-    /**************************/
-    /* General IO */
-    TRISC = 0x0000;
-    LATC = 0;
 
-/*****************************/
+/***************
+**************/
 /* Configure PWM */
 /*****************************/
     PTCON = 0x0006;     //Set the PWM module and set to up/down mode for center aligned PWM. 6 = 37khz
@@ -150,7 +152,7 @@ void Init(void){
 /* Configure Timer 3 */
 /*For speed calculation. */
 /*****************************/
-/* For 1 second timing operations. */
+/* For exactly 1 second timing operations. */
     PR3 = 0xE0EA;   //57,578
     //PR3 = 0x7271;     //29,297
     TMR3 = 0x0000;
@@ -158,7 +160,7 @@ void Init(void){
     T3CONbits.TCKPS = 3;        //1:256 prescale
 
 /*****************************/
-/* Enable analog inputs */
+/* Configure and Enable analog inputs */
 /*****************************/
     ADCON3upper8 = 0x0F;
     ADCON3lower8 = 0x0F;
@@ -201,7 +203,7 @@ void Init(void){
     IEC1bits.INT1IE = 1;    //Wheel rotate IRQ
     IEC1bits.INT2IE = 0;  //Disable irq for INT2, not used.
     IEC0bits.T2IE = 1;	// Enable interrupts for timer 2
-    IEC0bits.T3IE = 0;	// Disable interrupts for timer 3
+    IEC0bits.T3IE = 1;	// Enable interrupts for timer 3
     IEC0bits.ADIE = 1;  // Enable ADC IRQs.
     INTCON2bits.INT0EP = 0;
     INTCON2bits.INT2EP = 0;

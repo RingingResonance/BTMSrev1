@@ -81,10 +81,21 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
 /* Wheel Rotate IRQ. */
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt (void){
     PORTBbits.RB6 = 1;
-
+    wheelTime = TMR3;
+    TMR3 = 0;
+    if (wheelSpin)
+        speed = 3600 * (travel_dist / (wheelTime / 65,535)); //This gives us KM per hour.
+    wheelSpin = 1;
     IFS1bits.INT1IF = 0;
 }
-
+/* Wheel Rotate Timer 3 IRQ */
+void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void){
+    PORTBbits.RB6 = 1;
+    speed = 0;
+    wheelSpin = 0;
+    //End IRQ
+    IFS0bits.T3IF = 0;
+}
 /* Analog Input IRQ */
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     PORTBbits.RB6 = 1;
@@ -692,8 +703,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
 /* CPU TRAPS, log erros here and shut down if needed.*/
 void __attribute__((interrupt, no_auto_psv)) _FLTAInterrupt (void){
     PORTBbits.RB6 = 1;
-    fault_log(0x0C);        //PWM fault??? What fault is this?
-    //INTCON1bits.COVTE = 0;
+    fault_log(0x0C);        //PWM fault. External.
+    IFS2bits.FLTAIF = 0;
 }
 void __attribute__((interrupt, no_auto_psv)) _OscillatorFail (void){
     //Check the PLL lock bit as fast as possible before anything else because it doesn't stay set for long.
@@ -703,9 +714,6 @@ void __attribute__((interrupt, no_auto_psv)) _OscillatorFail (void){
         }
     }
     PORTBbits.RB6 = 1;
-    //io_off();
-    //fault_shutdown = 1;
-    //send_string(0x03, "Oscillator Fail Event.");
     if(osc_fail_event == 0){
         fault_log(0x0D);
     }
@@ -740,7 +748,6 @@ void __attribute__((interrupt, no_auto_psv)) _ReservedTrap7 (void){
     PORTBbits.RB6 = 1;
     io_off();
     fault_shutdown = 1;
-    //send_string(0x03, "Reserved Trap 7 Event.");
     fault_log(0x11);
     //INTCON1bits.DMACERR = 0;
 }

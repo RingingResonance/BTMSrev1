@@ -96,7 +96,7 @@ void power_off(void){
     voltage_percentage_old = voltage_percentage;    //Save a copy of voltage percentage before we shut down.
     // Enough time should have passed by now that the open circuit voltage should be stabilized enough to get an accurate reading.
     var_save((cfg_space / 2) + 1);      //Save variables before power off.
-    PORTDbits.RD2 = 0; //Disable Keep Alive signal. Arg! I'm Dead now.
+    PORTDbits.RD2 = 0; //Disable Keep Alive signal.
 }
 
 //Warm start and reset check.
@@ -403,7 +403,8 @@ void regulate(void){
 ////Check for key power or command power signal, but not soft power signal.
     if((PORTFbits.RF1 == 0 || cmd_power == 1) && (first_cal == 9 || b_safe == 0x55FF)){
         if(fault_shutdown != 1){
-            PORTFbits.RF1 = 1;          //contactor relay on, but only if fault shutdown is 0
+            PORTDbits.RD1 = 1;          //contactor relay on, but only if fault shutdown is 0
+            PORTBbits.RB8 = 1; //Turn on AUX 
             if(contact_rly_timer == 3)
                 contact_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
         }
@@ -468,7 +469,8 @@ void regulate(void){
     else{
         output_power = 0;
         PDC3 = 0; //set output control to 0 before turning off the relay
-        PORTFbits.RF1 = 0; //Turn off contactor relay
+        PORTDbits.RD1 = 0; //Turn off contactor relay
+        PORTBbits.RB8 = 0; //Turn off AUX 
         crnt_integral = 0;
         contact_rly_timer = 3; //Reset contactor relay timer
     }
@@ -549,6 +551,7 @@ void heat_control(float target_temp){
  * This takes up over 5% of program space.
  */
 void fault_read(int smpl, int serial_port){
+    send_string(NLtxtNL, "Reading Codes...", serial_port);
     int x = 0;
     const char *textpointer;
     if(fault_count > 10){
@@ -559,7 +562,6 @@ void fault_read(int smpl, int serial_port){
     }
     else{
         while(x < fault_count){
-            for(;;){
                 switch(fault_codes[x]){
                     case 0x01:
                         textpointer = code01;
@@ -679,7 +681,6 @@ void fault_read(int smpl, int serial_port){
                         textpointer = codeDefault;
                     break;
                 }
-            }
             send_string(NLtxt, textpointer, serial_port);
             x++;
         }
@@ -703,39 +704,53 @@ void heater_calibration(void){
             float watts = 0;
             watts = (battery_voltage * battery_current) * -1;
             if (watts < max_heat){
-                heat_set++;
-                PDC1 = heat_set;
-                if (heat_set > 95){
-                    fault_log(0x0001);      //Log fault, heater is too small for the watts you want.
-                    heat_cal_stage = 4;
-                    float_send(watts, PORT1);
+            PORTCbits.RC15 = 1;     //Heat Relay On
+                if(heat_rly_timer == 0){
+                    heat_set++;
+                    PDC1 = heat_set;
+                    if (heat_set > 95){
+                        fault_log(0x0001);      //Log fault, heater is too small for the watts you want.
+                        heat_cal_stage = 4;
+                        float_send(watts, PORT1);
+                        PORTCbits.RC15 = 0;     //Heat Relay Off
+                        heat_rly_timer = 3;     //Reset heat relay timer
+                    }
+                    if (heat_set > 50 && watts < 2){
+                        fault_log(0x0002);      //Log fault, no heater detected.
+                        heat_cal_stage = 4;
+                        float_send(watts, PORT1);
+                        PORTCbits.RC15 = 0;     //Heat Relay Off
+                        heat_rly_timer = 3;     //Reset heat relay timer
+                    }
+                    if (heat_set < 5 && watts > 10){
+                        fault_log(0x0003);      //Log fault, short circuit on heater.
+                        heat_cal_stage = 4;
+                        float_send(watts, PORT1);
+                        PORTCbits.RC15 = 0;     //Heat Relay Off
+                        heat_rly_timer = 3;     //Reset heat relay timer
+                    }
                 }
-                if (heat_set > 50 && watts < 2){
-                    fault_log(0x0002);      //Log fault, no heater detected.
-                    heat_cal_stage = 4;
-                    float_send(watts, PORT1);
-                }
-                if (heat_set < 5 && watts > 10){
-                    fault_log(0x0003);      //Log fault, short circuit on heater.
-                    heat_cal_stage = 4;
-                    float_send(watts, PORT1);
-                }
+                if(heat_rly_timer == 3)
+                    heat_rly_timer = 2; //wait two 0.125ms cycles before allowing heat regulation to start.
             }
             else{
                 heat_cal_stage = 3; // Heater calibration completed.
-                PDC1 = 0000;
+                PDC1 = 0000;        //Heater PWM output off.
                 soft_power = 0; //Go back to normal operation.
+                PORTCbits.RC15 = 0;     //Heat Relay Off
+                heat_rly_timer = 3;     //Reset heat relay timer
             }
     }
     
     if (heat_cal_stage == 1 && curnt_cal_stage == 5){
-        PDC1 = 0000;
+        PDC1 = 0000;    //Heater PWM output off.
         Init();         //Re-init.
         io_off();    //Turn off all inputs and outputs.
         soft_power = 1; //Force device to run in power mode.
         heat_set = 0;
         heat_power = 0;
         heat_cal_stage = 2; //If heat_cal_stage is 2 then a calibration is in progress.
+        heat_rly_timer = 3;     //Reset heat relay timer
     }
     
 

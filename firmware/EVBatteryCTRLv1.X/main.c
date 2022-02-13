@@ -79,7 +79,7 @@ int main(void){
              * nearly a quarter of a watt! WTF Microchip? Why did I choose 
              * this microcontroller again?
              * It's what I had on hand when I first started developing this.
-             * Oh well, we have ways of getting around it so it works now.
+             * Oh well, we have ways of getting around it so it works for now.
              */
             Sleep();
             deep_sleep = 0;

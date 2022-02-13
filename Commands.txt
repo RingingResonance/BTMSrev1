@@ -14,7 +14,7 @@ E - Local echo on or off using "y" or "n" as args with no space in between. (def
 
 r - Reads analog inputs only one time. (warning, this currently causes charge/discharge regulator services to hang for a moment)
 
-S - Low power shutdown test. Can only be waken back up through pluggin in the charger or resetting through the command set.
+S - Low power shutdown test. Can only be waken back up through pluggin in the charger, turning the key, or resetting through the command set if not using the power managment circuit.
 
 F - Read fault codes.
 

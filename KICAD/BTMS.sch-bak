@@ -6787,11 +6787,11 @@ L Device:CP C111
 U 1 1 60FBDB5C
 P 2900 8300
 F 0 "C111" V 2950 8400 50  0000 L CNN
-F 1 "10uf 25v" V 2750 8100 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 2938 8150 50  0001 C CNN
+F 1 "100uf 16v" V 2750 8100 50  0000 L CNN
+F 2 "Capacitors_SMD:CP_Elec_6.3x5.7" H 2938 8150 50  0001 C CNN
 F 3 "~" H 2900 8300 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM21BR61E106MA73L/5251352" H 2900 8300 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-10748-1-ND" H 2900 8300 50  0001 C CNN "Digi-Key_PN"
+F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 2900 8300 50  0001 C CNN "DK_Detail_Page"
+F 5 "1572-1239-1-ND" H 2900 8300 50  0001 C CNN "Digi-Key_PN"
 	1    2900 8300
 	0    -1   -1   0   
 $EndComp
@@ -6816,19 +6816,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 2900 9300 50  0001 C CNN "Digi-Key_PN"
 	1    2900 9300
 	0    1    1    0   
 $EndComp
-$Comp
-L Device:CP C112
-U 1 1 611D0654
-P 2900 9450
-F 0 "C112" V 2950 9550 50  0000 L CNN
-F 1 "10uf 25v" V 2750 9250 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 2938 9300 50  0001 C CNN
-F 3 "~" H 2900 9450 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM21BR61E106MA73L/5251352" H 2900 9450 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-10748-1-ND" H 2900 9450 50  0001 C CNN "Digi-Key_PN"
-	1    2900 9450
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	3050 9300 3050 9450
 Wire Wire Line
@@ -6850,19 +6837,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 2900 10500 50  0001 C CNN "Digi-Key_PN"
 	1    2900 10500
 	0    1    1    0   
 $EndComp
-$Comp
-L Device:CP C113
-U 1 1 61467AFD
-P 2900 10650
-F 0 "C113" V 2950 10750 50  0000 L CNN
-F 1 "10uf 25v" V 2750 10450 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 2938 10500 50  0001 C CNN
-F 3 "~" H 2900 10650 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM21BR61E106MA73L/5251352" H 2900 10650 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-10748-1-ND" H 2900 10650 50  0001 C CNN "Digi-Key_PN"
-	1    2900 10650
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	3050 10500 3050 10650
 Wire Wire Line
@@ -6883,19 +6857,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 5850 8400 50  0001 C CNN "Digi-Key_PN"
 	1    5850 8400
 	0    1    1    0   
 $EndComp
-$Comp
-L Device:CP C114
-U 1 1 615F924D
-P 5850 8550
-F 0 "C114" V 5900 8650 50  0000 L CNN
-F 1 "10uf 25v" V 5700 8350 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 5888 8400 50  0001 C CNN
-F 3 "~" H 5850 8550 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM21BR61E106MA73L/5251352" H 5850 8550 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-10748-1-ND" H 5850 8550 50  0001 C CNN "Digi-Key_PN"
-	1    5850 8550
-	0    -1   -1   0   
-$EndComp
 Wire Wire Line
 	6000 8400 6000 8550
 Wire Wire Line
@@ -6915,19 +6876,6 @@ F 4 "https://www.digikey.com/en/products/detail/stackpole-electronics-inc/RNCP06
 F 5 "RNCP0603FTD499RCT-ND" H 5850 9950 50  0001 C CNN "Digi-Key_PN"
 	1    5850 9950
 	0    1    1    0   
-$EndComp
-$Comp
-L Device:CP C115
-U 1 1 6178E7F0
-P 5850 10100
-F 0 "C115" V 5900 10200 50  0000 L CNN
-F 1 "10uf 25v" V 5700 9900 50  0000 L CNN
-F 2 "Capacitors_SMD:C_0805" H 5888 9950 50  0001 C CNN
-F 3 "~" H 5850 10100 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM21BR61E106MA73L/5251352" H 5850 10100 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-10748-1-ND" H 5850 10100 50  0001 C CNN "Digi-Key_PN"
-	1    5850 10100
-	0    -1   -1   0   
 $EndComp
 Wire Wire Line
 	6000 9950 6000 10100
@@ -7051,5 +6999,57 @@ F 4 "https://www.digikey.com/en/products/detail/stackpole-electronics-inc/RNCP06
 F 5 "RNCP0603FTD499RCT-ND" H 5200 5700 50  0001 C CNN "Digi-Key_PN"
 	1    5200 5700
 	0    1    1    0   
+$EndComp
+$Comp
+L Device:CP C112
+U 1 1 62113170
+P 2900 9450
+F 0 "C112" V 2950 9550 50  0000 L CNN
+F 1 "100uf 16v" V 2750 9250 50  0000 L CNN
+F 2 "Capacitors_SMD:CP_Elec_6.3x5.7" H 2938 9300 50  0001 C CNN
+F 3 "~" H 2900 9450 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 2900 9450 50  0001 C CNN "DK_Detail_Page"
+F 5 "1572-1239-1-ND" H 2900 9450 50  0001 C CNN "Digi-Key_PN"
+	1    2900 9450
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:CP C113
+U 1 1 62113BDC
+P 2900 10650
+F 0 "C113" V 2950 10750 50  0000 L CNN
+F 1 "100uf 16v" V 2750 10450 50  0000 L CNN
+F 2 "Capacitors_SMD:CP_Elec_6.3x5.7" H 2938 10500 50  0001 C CNN
+F 3 "~" H 2900 10650 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 2900 10650 50  0001 C CNN "DK_Detail_Page"
+F 5 "1572-1239-1-ND" H 2900 10650 50  0001 C CNN "Digi-Key_PN"
+	1    2900 10650
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:CP C115
+U 1 1 62114193
+P 5850 10100
+F 0 "C115" V 5900 10200 50  0000 L CNN
+F 1 "100uf 16v" V 5700 9900 50  0000 L CNN
+F 2 "Capacitors_SMD:CP_Elec_6.3x5.7" H 5888 9950 50  0001 C CNN
+F 3 "~" H 5850 10100 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 5850 10100 50  0001 C CNN "DK_Detail_Page"
+F 5 "1572-1239-1-ND" H 5850 10100 50  0001 C CNN "Digi-Key_PN"
+	1    5850 10100
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:CP C114
+U 1 1 62114F09
+P 5850 8550
+F 0 "C114" V 5900 8650 50  0000 L CNN
+F 1 "100uf 16v" V 5700 8350 50  0000 L CNN
+F 2 "Capacitors_SMD:CP_Elec_6.3x5.7" H 5888 8400 50  0001 C CNN
+F 3 "~" H 5850 8550 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 5850 8550 50  0001 C CNN "DK_Detail_Page"
+F 5 "1572-1239-1-ND" H 5850 8550 50  0001 C CNN "Digi-Key_PN"
+	1    5850 8550
+	0    -1   -1   0   
 $EndComp
 $EndSCHEMATC

@@ -27,7 +27,7 @@ void default_sets(void){
     config_start[0] = 0x4567;
     R1_resistance = 200;            //R1 resistance in Kohms
     R2_resistance = 16;             //R2 resistance in Kohms
-    bt_vlt_adjst = -3.971;               //battery voltage input compensation in volts.
+    bt_vlt_adjst = -0.231;               //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
     partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.

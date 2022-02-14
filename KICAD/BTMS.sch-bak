@@ -4527,19 +4527,6 @@ F 3 "" H 8600 1000 50  0001 C CNN
 $EndComp
 Connection ~ 5350 1300
 $Comp
-L Device:R R27
-U 1 1 6036EF53
-P 5650 1300
-F 0 "R27" H 5400 1350 50  0000 L CNN
-F 1 "200K" H 5350 1250 50  0000 L CNN
-F 2 "Resistors_SMD:R_0603" V 5580 1300 50  0001 C CNN
-F 3 "~" H 5650 1300 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ERJ-PA3F2003V/5035886" H 5650 1300 50  0001 C CNN "DK_Detail_Page"
-F 5 "P200KBYCT-ND" H 5650 1300 50  0001 C CNN "Digi-Key_PN"
-	1    5650 1300
-	0    -1   -1   0   
-$EndComp
-$Comp
 L power:+5C #PWR0116
 U 1 1 6036F5E3
 P 5900 1000
@@ -7050,5 +7037,18 @@ F 4 "https://www.digikey.com/en/products/detail/toshiba-semiconductor-and-storag
 F 5 "CCS15S40L3FCT-ND" H 5900 1450 50  0001 C CNN "Digi-Key_PN"
 	1    5900 1450
 	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 62134C51
+P 5650 1300
+F 0 "R?" H 5720 1346 50  0000 L CNN
+F 1 "1K" H 5720 1255 50  0000 L CNN
+F 2 "Resistors_SMD:R_0603" V 5580 1300 50  0001 C CNN
+F 3 "~" H 5650 1300 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/te-connectivity-passive-product/CRGP0603F1K0/8577018" H 5650 1300 50  0001 C CNN "DK_Detail_Page"
+F 5 "A130416CT-ND" H 5650 1300 50  0001 C CNN "Digi-Key_PN"
+	1    5650 1300
+	0    -1   -1   0   
 $EndComp
 $EndSCHEMATC

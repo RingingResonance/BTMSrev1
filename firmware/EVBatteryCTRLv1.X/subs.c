@@ -685,6 +685,7 @@ void heater_calibration(void){
                         float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
+                        heat_set = 0;
                     }
                     if (heat_set > 50 && watts < 2){
                         fault_log(0x0002);      //Log fault, no heater detected.
@@ -692,6 +693,7 @@ void heater_calibration(void){
                         float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
+                        heat_set = 0;
                     }
                     if (heat_set < 5 && watts > 10){
                         fault_log(0x0003);      //Log fault, short circuit on heater.
@@ -699,6 +701,7 @@ void heater_calibration(void){
                         float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
+                        heat_set = 0;
                     }
                 }
                 if(heat_rly_timer == 3)
@@ -717,7 +720,7 @@ void heater_calibration(void){
         PDC1 = 0000;    //Heater PWM output off.
         Init();         //Re-init.
         io_off();    //Turn off all inputs and outputs.
-        soft_power = 1; //Force device to run in power mode.
+        soft_power = 1; //Force device to run in soft power mode.
         heat_set = 0;
         heat_power = 0;
         heat_cal_stage = 2; //If heat_cal_stage is 2 then a calibration is in progress.

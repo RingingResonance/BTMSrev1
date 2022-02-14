@@ -6463,19 +6463,6 @@ F 5 "RNCP0603FTD499RCT-ND" H 5500 5500 50  0001 C CNN "Digi-Key_PN"
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R R58
-U 1 1 6056FD16
-P 3700 6500
-F 0 "R58" V 3700 6250 50  0000 L CNN
-F 1 "16K" V 3700 6400 50  0000 L CNN
-F 2 "Resistors_SMD:R_0603" V 3630 6500 50  0001 C CNN
-F 3 "~" H 3700 6500 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/vishay-dale/CRCW060316K0FKEAHP/2226306" H 3700 6500 50  0001 C CNN "DK_Detail_Page"
-F 5 "541-CRCW060316K0FKEAHPCT-ND" H 3700 6500 50  0001 C CNN "Digi-Key_PN"
-	1    3700 6500
-	0    1    1    0   
-$EndComp
-$Comp
 L Device:R R56
 U 1 1 6056FD1E
 P 3400 6350
@@ -6487,17 +6474,6 @@ F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/
 F 5 "P200KBYCT-ND" H 3400 6350 50  0001 C CNN "Digi-Key_PN"
 	1    3400 6350
 	0    -1   -1   0   
-$EndComp
-$Comp
-L power:GND #PWR0143
-U 1 1 6056FD24
-P 3850 6500
-F 0 "#PWR0143" H 3850 6250 50  0001 C CNN
-F 1 "GND" H 3950 6400 50  0000 C CNN
-F 2 "" H 3850 6500 50  0001 C CNN
-F 3 "" H 3850 6500 50  0001 C CNN
-	1    3850 6500
-	1    0    0    -1  
 $EndComp
 $Comp
 L Device:R R57
@@ -6536,11 +6512,8 @@ F 5 "MBR0580-TPMSCT-ND" H 3700 6350 50  0001 C CNN "Digi-Key_PN"
 	1    3700 6350
 	1    0    0    -1  
 $EndComp
-Connection ~ 3550 6350
 Wire Wire Line
 	3850 6200 3850 6350
-Wire Wire Line
-	3550 6350 3550 6500
 Wire Wire Line
 	3250 6350 3250 5900
 Connection ~ 3250 5900

@@ -22,6 +22,7 @@ extern void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void);
 extern void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void);
 extern void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void);
 extern void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void);
+extern void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void);
 extern void __attribute__((interrupt, no_auto_psv)) _FLTAInterrupt (void);
 extern void __attribute__((interrupt, no_auto_psv)) _OscillatorFail (void);
 extern void __attribute__((interrupt, no_auto_psv)) _AddressError (void);

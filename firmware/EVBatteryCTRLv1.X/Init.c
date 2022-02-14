@@ -99,13 +99,14 @@ void Init(void){
 **************/
 /* Configure PWM */
 /*****************************/
-    PTCON = 0x0006;     //Set the PWM module and set to up/down mode for center aligned PWM. 6 = 37khz
+    //FBORPOR = 0x82B2;
+    PTCON = 0x0006;     //Set the PWM module and set to up/down mode for center aligned PWM. 6 = 37khz (4 Tcy per bit))
     PTMR = 0;
     PTPER = 49;         //set period. 0% - 99%
     SEVTCMP = 0;
-    PWMCON1 = 0x00F0;       //Set PWM output for complementary mode.
+    PWMCON1 = 0x00FF;       //Set PWM output for complementary mode.
     PWMCON2 = 0x0000;
-    DTCON1 = 0;
+    DTCON1 = 0x8181;        //Dead time is 4Tcy (1 bit)
     FLTACON = 0;
     OVDCON = 0xFF00;
     PDC1 = 0000;            //set output to 0
@@ -238,67 +239,45 @@ DISICNT = 0;
 
 }
 
-
 //Go in to low power mode when not in use.
 void low_power_mode(void){
-
     io_off();
     ADCON1bits.ADON = 0;    // turn ADC off
     T2CONbits.TON = 0;      // Stop Timer 2
     T3CONbits.TON = 0;      // Stop Timer 3
-//    U1MODEbits.UARTEN = 0;  //disable UART
-//    U1STAbits.UTXEN = 0;    //disable UART TX
-
     	// disable interrupts
 	__asm__ volatile ("DISI #0x3FFF");
-
     IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
     IEC0bits.T2IE = 0;	// disable interrupts for timer 2
-
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
     DISICNT = 0;
-
     //Need to reinit on restart
     init_done = 0;
     //Tell everyone we are in low power mode.
     lw_pwr = 1;
     //Turn off Outputs, etc
     PORTBbits.RB6 = 0;
-
 }
 
 /* Turn everything off so we don't waste any more power.
  * Only plugging in the charge will restart the CPU, or yaknow, just restart the CPU... */
 void low_battery_shutdown(void){
-
-    io_off();
     cmd_power = 0;
     soft_power = 0;
-    ADCON1bits.ADON = 0;    // turn ADC off
     PTCONbits.PTEN = 0;     // off PWM
-    T2CONbits.TON = 0;      // Stop Timer 2
     T1CONbits.TON = 0;      // Stop Timer 1
-    T3CONbits.TON = 0;      // Stop Timer 3
-
     // Clear all interrupts flags
     IFS0 = 0;
     IFS1 = 0;
     IFS2 = 0;
-
     	// disable interrupts
 	__asm__ volatile ("DISI #0x3FFF");
 	IEC0bits.T1IE = 0;	// disable interrupts for timer 1
-    IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
-    IEC0bits.T2IE = 0;	// disable interrupts for timer 2
     IEC0bits.ADIE = 0;  //disable ADC IRQs.
-
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
-    DISICNT = 0;
-
-    //Need to reinit on restart
-    init_done = 0;
+    low_power_mode();
     deep_sleep = 1;     //Tell the system to enter a deep sleep after we have completed all tasks one last time.
 }
 

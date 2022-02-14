@@ -294,27 +294,27 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
                 fault_read(full, PORT1);          //Read all fault codes.
             break;
             case 'P':
-                send_string(NLtxtNL, "Power On", PORT1);
+                send_string(NLtxtNL, "P On", PORT1);
                 cmd_power = 1;
             break;
             case 'p':
-                send_string(NLtxtNL, "Power Off", PORT1);
+                send_string(NLtxtNL, "P Off", PORT1);
                 cmd_power = 0;
             break;
             case 'M':
                 b_safe = 0;
-                send_string(NLtxtNL, "Battery Monitor On :D", PORT1);
+                send_string(NLtxtNL, "BMon On :D", PORT1);
             break;
             case 'm':
                 b_safe = 0x55FF;
-                send_string(NLtxtNL, "!!!Battery Monitor Off!!!", PORT1);
+                send_string(NLtxtNL, "!BMon Off!", PORT1);
             break;
             case 'C':
                 fault_count = 0;
                 fault_shutdown = 0;
                 heat_cal_stage = 0;
                 osc_fail_event = 0;
-                send_string(NLtxtNL, "Fault Codes Cleared.", PORT1);
+                send_string(NLtxtNL, "FC Clrd", PORT1);
             break;
             case 'Z':
                 p_charge = 0;
@@ -330,18 +330,18 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
                 heat_cal_stage = 5;
             break;
             case 'V':
-                send_string(NLtxt, "Battery charge voltage is at ", PORT1);
+                send_string(NLtxt, "BV ", PORT1);
                 float_send(voltage_percentage, PORT1);
                 send_string(txtNL, "%. ", PORT1);
             break;
             case 'B':
-                send_string(NLtxt, "Rated Battery capacity ", PORT1);
+                send_string(NLtxt, "RC ", PORT1);
                 float_send(amp_hour_rating, PORT1);
                 send_string(txtNL, "Ah. ", PORT1);
-                send_string(NLtxt, "Calculated Battery capacity ", PORT1);
+                send_string(NLtxt, "CalcC ", PORT1);
                 float_send(battery_capacity, PORT1);
                 send_string(txtNL, "Ah. ", PORT1);
-                send_string(NLtxt, "Remaining Battery capacity ", PORT1);
+                send_string(NLtxt, "RemainC ", PORT1);
                 float_send(battery_remaining, PORT1);
                 send_string(txtNL, "Ah. ", PORT1);
             break;

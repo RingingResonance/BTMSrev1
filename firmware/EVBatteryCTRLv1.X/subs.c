@@ -469,10 +469,10 @@ void regulate(void){
     else{
         output_power = 0;
         PDC3 = 0; //set output control to 0 before turning off the relay
-        PORTDbits.RD1 = 0; //Turn off contactor relay
-        PORTBbits.RB8 = 0; //Turn off AUX 
         crnt_integral = 0;
         contact_rly_timer = 3; //Reset contactor relay timer
+        PORTBbits.RB8 = 0; //Turn off AUX 
+        PORTDbits.RD1 = 0; //Turn off contactor relay
     }
     
     if(main_power == 0){
@@ -494,35 +494,6 @@ void regulate(void){
     }
 }
 
-// Output voltage is Vo = (PWM3/65535) * battery_voltage
-//math test for current regulation algorithm.
-void test(void){
-    float error = 0;
-    float time = 0.001;
-    float integral = 0;
-    float proportion = 100;
-    int output = 0;
-    float dischrg_current = 0;
-    float dischrg_read = 0;
-    
-    
-    error = dischrg_current - dischrg_read;
-    integral += time * (error * proportion);
-    if(integral > 65535){
-        integral = 65535;
-    }
-    else if(integral < 0){
-        integral = 0;
-    }
-    output = integral;
-    /*output = integral + (proportion * error);
-    if(output > 65535){
-        output = 65535;
-    }
-    else if(output < 0){
-        output = 0;
-    }*/
-}
 
 //Heater regulation.
 void heat_control(float target_temp){

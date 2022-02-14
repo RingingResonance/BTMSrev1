@@ -52,7 +52,7 @@ int eeprom_write(int addrs, int data){
         adrfinal = addrs * 2;
         adrfinal += 0xFC00;
         //Write to location.
-        //DO NOT TOUCH THIS, EVERYTHING MUST BE DONE IN THIS EXACT ORDER OR IT WILL NOT WORK PROPERLY!!!
+        //DO NOT TOUCH THIS, EVERYTHING MUST BE DONE IN THIS EXACT ORDER OR IT WILL NOT WORK!!!
         WREG1 = 0x7F;     //ADDRESS UPPER
         __asm__ ("MOV W1,TBLPAG");
         WREG2 = data; //data pattern.

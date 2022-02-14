@@ -4527,31 +4527,16 @@ F 3 "" H 8600 1000 50  0001 C CNN
 $EndComp
 Connection ~ 5350 1300
 $Comp
-L Device:R R27
-U 1 1 6036EF53
-P 5800 1150
-F 0 "R27" H 5550 1200 50  0000 L CNN
-F 1 "200K" H 5500 1100 50  0000 L CNN
-F 2 "Resistors_SMD:R_0603" V 5730 1150 50  0001 C CNN
-F 3 "~" H 5800 1150 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/panasonic-electronic-components/ERJ-PA3F2003V/5035886" H 5800 1150 50  0001 C CNN "DK_Detail_Page"
-F 5 "P200KBYCT-ND" H 5800 1150 50  0001 C CNN "Digi-Key_PN"
-	1    5800 1150
-	-1   0    0    1   
-$EndComp
-$Comp
 L power:+5C #PWR0116
 U 1 1 6036F5E3
-P 5800 1000
-F 0 "#PWR0116" H 5800 850 50  0001 C CNN
-F 1 "+5C" H 5815 1173 50  0000 C CNN
-F 2 "" H 5800 1000 50  0001 C CNN
-F 3 "" H 5800 1000 50  0001 C CNN
-	1    5800 1000
+P 5900 1000
+F 0 "#PWR0116" H 5900 850 50  0001 C CNN
+F 1 "+5C" H 5915 1173 50  0000 C CNN
+F 2 "" H 5900 1000 50  0001 C CNN
+F 3 "" H 5900 1000 50  0001 C CNN
+	1    5900 1000
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	6000 1300 5800 1300
 $Comp
 L Device:CP C84
 U 1 1 6043AEFC
@@ -6317,20 +6302,6 @@ Wire Wire Line
 	11800 1700 11950 1700
 Connection ~ 11800 1700
 $Comp
-L Device:D_Schottky D15
-U 1 1 60390ABA
-P 5650 1300
-F 0 "D15" H 5550 1400 50  0000 L CNN
-F 1 "D_Schottky100V" H 5700 1200 50  0000 L CNN
-F 2 "Diodes_SMD:D_SOD-123" H 5650 1300 50  0001 C CNN
-F 3 "~" H 5650 1300 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/micro-commercial-co/MBR0580-TP/2423323" H 5650 1300 50  0001 C CNN "DK_Detail_Page"
-F 5 "MBR0580-TPMSCT-ND" H 5650 1300 50  0001 C CNN "Digi-Key_PN"
-	1    5650 1300
-	1    0    0    -1  
-$EndComp
-Connection ~ 5800 1300
-$Comp
 L Device:D_Schottky D57
 U 1 1 603AE2E8
 P 3950 5050
@@ -7023,6 +6994,61 @@ F 3 "~" H 5850 8550 50  0001 C CNN
 F 4 "https://www.digikey.com/en/products/detail/illinois-capacitor/107AXZ016MQ5/5964380" H 5850 8550 50  0001 C CNN "DK_Detail_Page"
 F 5 "1572-1239-1-ND" H 5850 8550 50  0001 C CNN "Digi-Key_PN"
 	1    5850 8550
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR07
+U 1 1 621298A5
+P 5900 1600
+F 0 "#PWR07" H 5900 1350 50  0001 C CNN
+F 1 "GND" H 5905 1427 50  0000 C CNN
+F 2 "" H 5900 1600 50  0001 C CNN
+F 3 "" H 5900 1600 50  0001 C CNN
+	1    5900 1600
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:D D15
+U 1 1 6212D514
+P 5900 1150
+F 0 "D15" V 5854 1229 50  0000 L CNN
+F 1 "Diode40V" V 5945 1229 50  0000 L CNN
+F 2 "Diodes_SMD:D_0603" H 5900 1150 50  0001 C CNN
+F 3 "~" H 5900 1150 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/toshiba-semiconductor-and-storage/CCS15S40L3F/5210646" H 5900 1150 50  0001 C CNN "DK_Detail_Page"
+F 5 "CCS15S40L3FCT-ND" H 5900 1150 50  0001 C CNN "Digi-Key_PN"
+	1    5900 1150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	5800 1300 5900 1300
+Connection ~ 5900 1300
+Wire Wire Line
+	5900 1300 6000 1300
+$Comp
+L Device:D D62
+U 1 1 6212F823
+P 5900 1450
+F 0 "D62" V 5854 1529 50  0000 L CNN
+F 1 "Diode40V" V 5945 1529 50  0000 L CNN
+F 2 "Diodes_SMD:D_0603" H 5900 1450 50  0001 C CNN
+F 3 "~" H 5900 1450 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/toshiba-semiconductor-and-storage/CCS15S40L3F/5210646" H 5900 1450 50  0001 C CNN "DK_Detail_Page"
+F 5 "CCS15S40L3FCT-ND" H 5900 1450 50  0001 C CNN "Digi-Key_PN"
+	1    5900 1450
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:R R?
+U 1 1 62134C51
+P 5650 1300
+F 0 "R?" H 5720 1346 50  0000 L CNN
+F 1 "1K" H 5720 1255 50  0000 L CNN
+F 2 "Resistors_SMD:R_0603" V 5580 1300 50  0001 C CNN
+F 3 "~" H 5650 1300 50  0001 C CNN
+F 4 "https://www.digikey.com/en/products/detail/te-connectivity-passive-product/CRGP0603F1K0/8577018" H 5650 1300 50  0001 C CNN "DK_Detail_Page"
+F 5 "A130416CT-ND" H 5650 1300 50  0001 C CNN "Digi-Key_PN"
+	1    5650 1300
 	0    -1   -1   0   
 $EndComp
 $EndSCHEMATC

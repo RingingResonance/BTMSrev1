@@ -89,7 +89,8 @@ void Init(void){
     LATC = 0;
     /**************************/
     /* PWM outputs and charge detect input. */
-    TRISE = 0xFFFF; //set porte to all inputs.
+    TRISE = 0xFFEF; //set porte to all inputs except RE4
+    LATE = 0;
     /**************************/
     /* General IO */
     TRISF = 0xFFBE; //set portf to all inputs and two output.
@@ -104,7 +105,7 @@ void Init(void){
     PTMR = 0;
     PTPER = 49;         //set period. 0% - 99%
     SEVTCMP = 0;
-    PWMCON1 = 0x00FF;       //Set PWM output for complementary mode.
+    PWMCON1 = 0x00FB;       //Set PWM output for complementary mode.
     PWMCON2 = 0x0000;
     DTCON1 = 0x8181;        //Dead time is 4Tcy (1 bit)
     FLTACON = 0;
@@ -176,13 +177,20 @@ void Init(void){
 /* Configure IRQs. */
 /*****************************/
     //Configure Priorities
-    IPC1bits.T2IP = 1;
-    IPC4bits.INT1IP = 2;
-    IPC0bits.T1IP = 3;
-    IPC2bits.ADIP = 4;
-    IPC0bits.INT0IP = 5;
-    IPC2bits.U1RXIP = 6;
-    IPC5bits.INT2IP = 7;
+    IPC2bits.ADIP = 7;      //Analog inputs and regulation routines, Important
+    IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing
+    IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is important.
+    IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh...
+    IPC0bits.INT0IP = 3;    //Charger detect IRQ, need to know basis
+    IPC1bits.T3IP = 2;      //Timer 3 IRQ. Not critical.
+    IPC2bits.U1RXIP = 1;    //RX 1 IRQ, Text can wait
+    IPC2bits.U1TXIP = 1;    //TX 1 IRQ, Text can wait
+    IPC6bits.U2RXIP = 1;    //RX 2 IRQ, Text can wait
+    IPC6bits.U2TXIP = 1;    //TX 2 IRQ, Text can wait
+    IPC5bits.INT2IP = 1;    //Not yet used.
+    
+    //Ensure interrupt nesting is enabled.
+    INTCON1bits.NSTDIS = 0; //This should be the default state on chip reset.
     // Clear all interrupts flags
     IFS0 = 0;
     IFS1 = 0;

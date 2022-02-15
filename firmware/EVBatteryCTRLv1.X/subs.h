@@ -19,6 +19,7 @@
 
 
 extern void explody_preventy_check(void);
+extern void currentCheck(void);
 extern void heater_calibration(void);
 extern void fault_log(int);
 extern void general_shutdown(void);

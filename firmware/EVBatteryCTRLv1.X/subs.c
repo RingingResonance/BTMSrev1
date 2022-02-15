@@ -469,6 +469,8 @@ void regulate(void){
     else{
         output_power = 0;
         PDC3 = 0; //set output control to 0 before turning off the relay
+        LATE = 0;               //Insure all PORTE outputs are off.
+        PWMCON1bits.PEN3L = 0;  //Set PWM3 Low side to standard output so that it can be set to 0
         crnt_integral = 0;
         contact_rly_timer = 3; //Reset contactor relay timer
         PORTBbits.RB8 = 0; //Turn off AUX 
@@ -488,6 +490,7 @@ void regulate(void){
     }
     else {
         //Set the PWM output to what the variables are during normal operation.
+        PWMCON1bits.PEN3L = 1;  //Set PWM3 Low side to PWM output.
         PDC1 = heat_power;               //set heater control
         PDC2 = charge_power;             //set charge control
         PDC3 = output_power;             //set output control
@@ -749,26 +752,6 @@ void explody_preventy_check(void){
         fault_log(0x04);    //Log a low battery shutdown event.
         low_battery_shutdown();
     }
-    //Battery over current check.
-    if(battery_current < 0){
-        dischr_current = battery_current * -1;
-    }
-    else {
-        dischr_current = 0;
-    }
-    if(dischr_current > over_current_shutdown){
-        if(oc_shutdown_timer > 5){
-            fault_log(0x05);    //Log a discharge over current shutdown event.
-            general_shutdown();
-            oc_shutdown_timer = 0;
-        }
-        oc_shutdown_timer++;
-    }
-    //Battery charge over current check.
-    if(battery_current > max_chrg_current){
-        fault_log(0x06);    //Log a charge over current shutdown event.
-        general_shutdown();
-    }
     //Battery temp shutdown check
     if(battery_temp > battery_shutdown_temp){
         fault_log(0x08);    //Log a battery over temp shutdown event.
@@ -786,6 +769,29 @@ void explody_preventy_check(void){
     }
 }
 
+void currentCheck(void){
+        //Battery over current check.
+    if(battery_current < 0){
+        dischr_current = battery_current * -1;
+    }
+    else {
+        dischr_current = 0;
+    }
+    if(dischr_current > over_current_shutdown){
+        if(oc_shutdown_timer > 5){
+            general_shutdown();
+            oc_shutdown_timer = 0;
+            fault_log(0x05);    //Log a discharge over current shutdown event.
+        }
+        oc_shutdown_timer++;
+    }
+    //Battery charge over current check.
+    if(battery_current > max_chrg_current){
+        general_shutdown();
+        fault_log(0x06);    //Log a charge over current shutdown event.
+    }
+}
+
 //Turns off all outputs and logs a general shutdown event.
 void general_shutdown(void){
     io_off();               //Shutdown all IO except Serial Comms.
@@ -799,9 +805,11 @@ void general_shutdown(void){
 //Turns off all outputs.
 void io_off(void){
 //    PORTDbits.RD3 = 0;      //output shutdown. Not Used In current Schematic.
+    PDC3 = 0000;            //set output control
+    LATE = 0;               //Insure all PORTE outputs are off.
+    PWMCON1bits.PEN3L = 0;  //Set PWM3 Low side to standard output so that it can be set to 0
     PDC1 = 0000;            //set heater control
     PDC2 = 0000;            //set charge control
-    PDC3 = 0000;            //set output control
     PORTDbits.RD1 = 0;      //Main Contactor Relay Off
     contact_rly_timer = 3;  //reset contactor relay timer
     PORTFbits.RF0 = 0;      //Fan Relay Off

@@ -110,6 +110,15 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
      */
     //Get 8 samples for averaging.
     if (analog_avg_cnt >= 8){
+        //Battery current.
+        adctemp1 /= 8;      //Sample average.
+        adctemp1 -= 32768;    //Set zero point.
+        adctemp1 /= 32768;    //Convert to signed fractional. -1 to 1
+        adctemp1 *= 2.5;      //Convert to +-2.5'volts'. It's still a 0 - 5 volt signal on the analog input. The zero point is at 2.5v
+        battery_current = (adctemp1 / 0.04) + current_compensate; //Offset for ACS780LLRTR-050B-T Current Sensor.
+        currentCheck();     //Check for over current condition.
+        adctemp1 = 0;       //Clear average.
+
         //Battery voltage.
         //adctemp0 /= x;      //Sample average.
         //adctemp0 /= 65535;  //Convert to unsigned fractional
@@ -118,14 +127,6 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         adctemp0 /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
         battery_voltage = (adctemp0 / vltg_dvid) + bt_vlt_adjst;    //Use resistor divider values to covert to actual voltage.
         adctemp0 = 0;       //Clear average.
-
-        //Battery current.
-        adctemp1 /= 8;      //Sample average.
-        adctemp1 -= 32768;    //Set zero point.
-        adctemp1 /= 32768;    //Convert to signed fractional. -1 to 1
-        adctemp1 *= 2.5;      //Convert to +-2.5'volts'. It's still a 0 - 5 volt signal on the analog input. The zero point is at 2.5v
-        battery_current = (adctemp1 / 0.04) + current_compensate; //Offset for ACS780LLRTR-050B-T Current Sensor.
-        adctemp1 = 0;       //Clear average.
 
         //Battery temperature.
         //adctemp2 /= x;      //Sample average.
@@ -703,6 +704,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
 /* CPU TRAPS, log erros here and shut down if needed.*/
 void __attribute__((interrupt, no_auto_psv)) _FLTAInterrupt (void){
     PORTBbits.RB6 = 1;
+    io_off();
+    fault_shutdown = 1;
     fault_log(0x0C);        //PWM fault. External.
     IFS2bits.FLTAIF = 0;
 }
@@ -714,6 +717,8 @@ void __attribute__((interrupt, no_auto_psv)) _OscillatorFail (void){
         }
     }
     PORTBbits.RB6 = 1;
+    io_off();
+    fault_shutdown = 1;
     if(osc_fail_event == 0){
         fault_log(0x0D);
     }

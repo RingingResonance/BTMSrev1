@@ -8,18 +8,18 @@
 #ifndef ERRORCODES_H
 #define	ERRORCODES_H
 
-const char code01[] = "Heat TS";
-const char code02[] = "No heat";
-const char code03[] = "Heat TL";
-const char code04[] = "LBT SD";
+const char code01[] = "Heat too small";
+const char code02[] = "No heater detected";
+const char code03[] = "Heat too large";
+const char code04[] = "Low Batt";
 const char code05[] = "Dischrg OC";
 const char code06[] = "Chrg OC";
-const char code07[] = "HBV SD";
-const char code08[] = "BT OT";
-const char code09[] = "MC OT";
+const char code07[] = "Batt OV";
+const char code08[] = "Batt OT";
+const char code09[] = "MCtl OT";
 const char code0A[] = "Self OT";
-const char code0B[] = "SD";
-const char code0C[] = "PWM";
+const char code0B[] = "Sys Shutdown";
+const char code0C[] = "PWM Err";
 const char code0D[] = "Osc Fail";
 const char code0E[] = "Addr Err";
 const char code0F[] = "STK Err";
@@ -27,12 +27,12 @@ const char code10[] = "MTH Err";
 const char code11[] = "Res 7";
 const char code12[] = "PLL UL";
 const char code13[] = "BrnOut";
-const char code14[] = "WDT";
-const char code15[] = "TRAP";
-const char code16[] = "Opcode";
-const char code17[] = "MCLR";
-const char code18[] = "Instruct";
-const char code19[] = "Reset";
+const char code14[] = "WDT rst";
+const char code15[] = "TRAP rst";
+const char code16[] = "Opcode inval rst";
+const char code17[] = "MCLR rst";
+const char code18[] = "Illegal Instruct";
+const char code19[] = "Sys Reset";
 const char code1A[] = "Invalid port";
 const char code1B[] = "No chrg crnt";
 const char code1C[] = "PC > 100%";

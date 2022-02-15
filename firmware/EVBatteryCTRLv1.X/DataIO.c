@@ -19,7 +19,6 @@
 
 #include <p30f3011.h>
 #include "DataIO.h"
-#include "subs.h"
 
 //EEPROM functions. Yes, it is faster to write 16 words at a time rather than one at a time. I'm too lazy to implement that.
 int eeprom_erase(int addrs){
@@ -86,33 +85,7 @@ int eeprom_read(int addrs){
 }
 //*************************************************************************************************
 
-//Error code stuff, prepares error codes to be sent to PORT2's Display Buffer.
-//TODO: Not Finished. What's not finished here? I don't remember.
-void smpl_err_send(int serial_port){
-    if (serial_port == PORT1){
-        U1TXREG = four_bit_hex_cnvt((fault_codes[err_scroll] & 0xF0) / 16);
-        U1TXREG = four_bit_hex_cnvt(fault_codes[err_scroll] & 0x0F);
-    }
-    //Transmit on port 2
-    if (serial_port == PORT2){
-        U2TXREG = four_bit_hex_cnvt((fault_codes[err_scroll] & 0xF0) / 16);
-        U2TXREG = four_bit_hex_cnvt(fault_codes[err_scroll] & 0x0F);
-    }
-    //Save to Buffer
-    if (serial_port == BigBuffer){
-        if (CBuff_index < 45){
-            CBuff_index++;
-        }
-        Port2_Buffer[CBuff_index] = four_bit_hex_cnvt((fault_codes[err_scroll] & 0xF0) / 16);
-        if (CBuff_index < 45){
-            CBuff_index++;
-        }
-        Port2_Buffer[CBuff_index] = four_bit_hex_cnvt(fault_codes[err_scroll] & 0x0F);
-    }
-    if (serial_port == 0x00){
-        fault_log(0x1A);        //Log invalid port error.
-    }
-}
+
 //Converts four bit hex numbers to ASCII
 char four_bit_hex_cnvt(int numb){
     char asci_hex = 0;
@@ -128,66 +101,25 @@ char four_bit_hex_cnvt(int numb){
     return asci_hex;
 }
 
-//Raw data send.
-void data_send(char data, int serial_port){
-    while (1){
-        if (U1STAbits.UTXBF == 0 && serial_port == 0x01){
-            U1TXREG = data;     //send data out on UART1
-            break;           //wait until we can send data to the buffer.
+//Send a string of text to a buffer that can then be dispatched to a serial port.
+void send_string(const char *string_point, int serial_port){
+    int x = 0;
+    while (string_point[x] != 0){
+        if (Buff_index[serial_port] < 45){
+            Buff_index[serial_port]++;
         }
-        if (U2STAbits.UTXBF == 0 && serial_port == 0x02){
-            U2TXREG = data;     //send data out on UART2
-            break;           //wait until we can send data to the buffer.
-        }
+        Buffer[serial_port][Buff_index[serial_port]] = string_point[x];
+        x++;
+
         if (serial_port == 0x00){
             fault_log(0x1A);        //Log invalid port error.
+            x = 0;
             break;
         }
     }
 }
 
-//Send a string of text to UART 1 or 2, or to a buffer.
-//nl value of 1 sends newline and return signal before text.
-//nl value of 2 sends newline and return signal after text.
-//nl value of 3 sends newline and return signal before and after text.
-void send_string(int nl, const char *string_point, int serial_port){
-    int x = 0;
-    if (nl == 1 || nl == 3){
-        nl_send(serial_port);
-        return_send(serial_port);
-    }
-    while (string_point[x] != 0){
-            //Transmit on port 1
-            if (U1STAbits.UTXBF == 0 && serial_port == 0x01){
-                U1TXREG = string_point[x];
-                x++;
-            }
-            //Transmit on port 2
-            if (U2STAbits.UTXBF == 0 && serial_port == 0x02){
-                U2TXREG = string_point[x];
-                x++;
-            }
-            //Save to Buffer
-            if (serial_port == BigBuffer){
-                if (CBuff_index < 45){
-                    CBuff_index++;
-                }
-                Port2_Buffer[CBuff_index] = string_point[x];
-                x++;
-            }
-            if (serial_port == 0x00){
-                fault_log(0x1A);        //Log invalid port error.
-                x = 0;
-                break;
-            }
-        }
-    if (nl == 2 || nl == 3){
-        nl_send(serial_port);
-        return_send(serial_port);
-    }
-}
-
-/* Sends a float through the UART or buffer */
+/* Sends a float through to buffer. */
 void float_send(float f_data, int serial_port){
 
     int x = 0;
@@ -195,135 +127,62 @@ void float_send(float f_data, int serial_port){
     int tx_temp = 0;
     //f_data = 0.0010;
 
-    float_out[0] = ' ';        //Put a SPACE in "0"
+    float_out[serial_port][0] = ' ';        //Put a SPACE in "0"
     if (f_data < 0){
         f_data *= -1;
-        float_out[0] = '-';    //Put a - in "0"
+        float_out[serial_port][0] = '-';    //Put a - in "0"
     }
     if (f_data > 9999.999){
         f_data = 9999.999;
-        float_out[0] = '?';    //Put a ? in "0"
+        float_out[serial_port][0] = '?';    //Put a ? in "0"
     }
     tx_float = f_data / 1000;
     x++;
     while (x <= 8){
         if (x == 5){
-            float_out[5] = '.';
+            float_out[serial_port][5] = '.';
             x++;
         }
         tx_temp = tx_float;
-        float_out[x] = tx_temp + 48;
+        float_out[serial_port][x] = tx_temp + 48;
         x++;
         tx_float = (tx_float - tx_temp) * 10;
     }
 
-/* Write to UART 1 or 2 or buffer */
+/* Write to buffer */
     x = 0;
     int ifzero = 1;
     while (x <= 8){
-        if(float_out[x] == 0x30 && ifzero){
+        if(float_out[serial_port][x] == 0x30 && ifzero){
             if(config_space){
-                if (U1STAbits.UTXBF == 0 && serial_port == PORT1){
-                    U1TXREG = 0x20;
-                    x++;
+                if (Buff_index[serial_port] < 45){
+                    Buff_index[serial_port]++;
                 }
-                if (U2STAbits.UTXBF == 0 && serial_port == PORT2){
-                    U2TXREG = 0x20;
-                    x++;
-                }
-                //Save to Buffer
-                if (serial_port == BigBuffer){
-                    if (CBuff_index < 45){
-                        CBuff_index++;
-                    }
-                    Port2_Buffer[CBuff_index] = 0x20;
-                    x++;
-                }
+                Buffer[serial_port][Buff_index[serial_port]] = 0x20;
+                x++;
             }
             else{
                 x++;
             }
         }
         else{
-            if (U1STAbits.UTXBF == 0 && serial_port == PORT1){
-                U1TXREG = float_out[x];
-                x++;
+            if (Buff_index[serial_port] < 45){
+                Buff_index[serial_port]++;
             }
-            if (U2STAbits.UTXBF == 0 && serial_port == PORT2){
-                U2TXREG = float_out[x];
-                x++;
-            }
-            //Save to Buffer
-            if (serial_port == BigBuffer){
-                if (CBuff_index < 45){
-                    CBuff_index++;
-                }
-                Port2_Buffer[CBuff_index] = float_out[x];
-                x++;
-            }
-            if (serial_port == 0x00){
+            Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][x];
+            x++;
+            if (serial_port != 0x00 || serial_port != 0x01){
                 fault_log(0x1A);        //Log invalid port error.
                 x = 0;
                 break;
             }
         }
-        if(float_out[x] != 0x30 && float_out[x] != 0x2D && float_out[x] != 0x20){
+        if(float_out[serial_port][x] != 0x30 && float_out[serial_port][x] != 0x2D && float_out[serial_port][x] != 0x20){
             ifzero = 0;
         }
     }
     config_space = 0;
 }
-
-void nl_send(int serial_port){
-    while (1){
-        if (U1STAbits.UTXBF == 0 && serial_port == 0x01){
-            U1TXREG = 0x0A;     //send new line out on UART1
-            break;           //wait until we can send data to the buffer.
-        }
-        if (U2STAbits.UTXBF == 0 && serial_port == 0x02){
-            U2TXREG = 0x0A;     //send new line out on UART2
-            break;           //wait until we can send data to the buffer.
-        }
-        //Save to Buffer
-        if (serial_port == BigBuffer){
-            if (CBuff_index < 45){
-                CBuff_index++;
-            }
-            Port2_Buffer[CBuff_index] = 0x0A;
-            break;
-        }
-        if (serial_port == 0x00){
-            fault_log(0x1A);        //Log invalid port error.
-            break;
-        }
-    }
-}
-
-void return_send(int serial_port){
-    while (1){
-        if (U1STAbits.UTXBF == 0 && serial_port == 0x01){
-            U1TXREG = 0x0D;     //send return out on UART1
-            break;           //wait until we can send data to the buffer.
-        }
-        if (U2STAbits.UTXBF == 0 && serial_port == 0x02){
-            U2TXREG = 0x0D;     //send return out on UART2
-            break;           //wait until we can send data to the buffer.
-        }
-        //Save to Buffer
-        if (serial_port == BigBuffer){
-            if (CBuff_index < 45){
-                CBuff_index++;
-            }
-            Port2_Buffer[CBuff_index] = 0x0D;
-            break;
-        }
-        if (serial_port == 0x00){
-            fault_log(0x1A);        //Log invalid port error.
-            break;
-        }
-    }
-}
-
 
 unsigned int BaudCalc(double BD, double mlt){
     /* Calculate baud rate. */

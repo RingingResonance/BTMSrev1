@@ -32,6 +32,7 @@
 #include "DataIO.c"
 #include "Init.h"
 #include "Init.c"
+#include "display.c"
 
 /* Program Start */
 /***********************************************************

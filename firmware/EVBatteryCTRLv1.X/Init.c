@@ -20,8 +20,6 @@
 
 #include <p30f3011.h>
 #include "Init.h"
-#include "DataIO.h"
-#include "subs.h"
 
 void default_sets(void){
     config_start[0] = 0x4567;

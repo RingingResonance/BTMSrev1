@@ -41,20 +41,17 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     if(partial_charge == 0){
         chrg_voltage = battery_rated_voltage;
         p_charge = 0;
-        send_string(NLtxtNL,"Regular Charge.", PORT1);
     }
     //Do a full charge every 10 cycles so that we can ballance the cells.
     if(power_plugged != 1 && partial_chrg_cnt < 10){
         partial_chrg_cnt++;
         p_charge = 1;
         chrg_voltage = ((battery_rated_voltage - dischrg_voltage) * partial_charge) + dischrg_voltage;
-        send_string(NLtxtNL,"Partial Charge.", PORT1);
     }
     else if(power_plugged != 1 && partial_chrg_cnt >= 10){
         partial_chrg_cnt = 0;
         p_charge = 0;
         chrg_voltage = battery_rated_voltage;
-        send_string(NLtxtNL,"Full Charge.", PORT1);
     }
     /* If heat_cal is not running, is not disabled, and key switch/cmd_power is off
      * run heater calibration check when charger is plugged in.
@@ -224,159 +221,10 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     IFS0bits.ADIF = 0;
 }
 
-/* This needs to be cleaned up and combined into a sub that
- * works with Port 1 and Port 2 using IRQs to save memory and CPU time. The current system will
- * work for now but it's lazy and takes up too much memory. */
-
 /* Data and Command input and processing IRQ for Port 1 */
 void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
     PORTBbits.RB6 = 1;
-    while (U1STAbits.URXDA && cmdRDY == 0){       //Data ready? Keep reading the whole buffer.
-        cmd[cmdPoint] = U1RXREG;
-        if (Lecho && ((cmd[cmdPoint] != 0x0D) || (cmd[cmdPoint] != 0x0A))){
-            U1TXREG = cmd[cmdPoint];
-        }
-        if (cmd[cmdPoint] == 0x0D){     //Check for a RETURN
-            if (Lecho){
-                //U1TXREG = 0x0A;             //Send NewLine
-                U1TXREG = 0x0D;             //Send Return
-            }
-            bufsize = cmdPoint;
-            cmdPoint = 0;
-            cmdRDY = 1;                 //Tell our command handler to process.
-        }
-        else if(cmdPoint < cdmd) {
-            cmdPoint++;
-        }
-    }
-    //Command Handler.
-    if (cmdRDY == 1){
-        int tempPoint = 0;
-        U1TXREG = '@';                 //Send command receive "@"
-        //Check for faults.
-        if(fault_count > 0){
-            U1TXREG = '!';             //Send fault alert "!"
-        }
-        switch(cmd[tempPoint]){
-            case 0x0D:
-            break;
-            case '#':
-                cmdPoint = 0;
-                cmdRDY = 0;
-                asm("reset");
-            break;
-            case 'H':
-                heat_cal_stage = 1;
-            break;
-            case 'E':
-                tempPoint++;
-                if (cmd[tempPoint] == 'y'){
-                    Lecho = 1;
-                }
-                else if (cmd[tempPoint] == 'n'){
-                    Lecho = 0;
-                }
-                else {
-                    Terr = -1;
-                }
-            break;
-            case 'S':
-                deep_sleep = 1;
-            break;
-            case 'r':
-                if (read_vars == 0){
-                    read_vars = 1;    //Read vars once before stopping.
-                }
-                else {
-                    read_vars = 0;
-                }
-            break;
-            case 'F':
-                fault_read(full, PORT1);          //Read all fault codes.
-            break;
-            case 'P':
-                send_string(NLtxtNL, "P On", PORT1);
-                cmd_power = 1;
-            break;
-            case 'p':
-                send_string(NLtxtNL, "P Off", PORT1);
-                cmd_power = 0;
-            break;
-            case 'M':
-                b_safe = 0;
-                send_string(NLtxtNL, "BMon On :D", PORT1);
-            break;
-            case 'm':
-                b_safe = 0x55FF;
-                send_string(NLtxtNL, "!BMon Off!", PORT1);
-            break;
-            case 'C':
-                fault_count = 0;
-                fault_shutdown = 0;
-                heat_cal_stage = 0;
-                osc_fail_event = 0;
-                send_string(NLtxtNL, "FC Clrd", PORT1);
-            break;
-            case 'Z':
-                p_charge = 0;
-                chrg_voltage = battery_rated_voltage;
-                if(PORTEbits.RE8 == 1){
-                    partial_chrg_cnt = 0;
-                }
-                else{
-                    partial_chrg_cnt = 10;
-                }
-            break;
-            case 'h':
-                heat_cal_stage = 5;
-            break;
-            case 'V':
-                send_string(NLtxt, "BV ", PORT1);
-                float_send(voltage_percentage, PORT1);
-                send_string(txtNL, "%. ", PORT1);
-            break;
-            case 'B':
-                send_string(NLtxt, "RC ", PORT1);
-                float_send(amp_hour_rating, PORT1);
-                send_string(txtNL, "Ah. ", PORT1);
-                send_string(NLtxt, "CalcC ", PORT1);
-                float_send(battery_capacity, PORT1);
-                send_string(txtNL, "Ah. ", PORT1);
-                send_string(NLtxt, "RemainC ", PORT1);
-                float_send(battery_remaining, PORT1);
-                send_string(txtNL, "Ah. ", PORT1);
-            break;
-            case 'O':
-                use_POS_display = 1;
-            break;
-            case 'o':
-                use_POS_display = 0;
-            break;
-            case 'U':
-                if(v_test < 99){
-                    v_test++;
-                }
-            break;
-            case 'u':
-                if(v_test > 0){
-                    v_test--;
-                }
-            break;
-            default:
-                send_string(NLtxt, "Unknown Command.", PORT1);
-                Terr = -1;
-            break;
-        }
 
-        cmdPoint = 0;
-        cmdRDY = 0;
-        if (Terr == -1){
-            Terr = 0;
-            cmdPoint = 0;
-            tempPoint = 0;
-            U1TXREG = 0x45;     //Print "E" for Error.
-        }
-    }
 /****************************************/
     /* End the IRQ. */
     IFS0bits.U1RXIF = 0;
@@ -385,19 +233,32 @@ void __attribute__((interrupt, no_auto_psv)) _U1RXInterrupt (void){
 /* Data and Command input and processing IRQ for Port 2. */
 void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt (void){
     PORTBbits.RB6 = 1;
-
+    
 /****************************************/
     /* End the IRQ. */
     IFS1bits.U2RXIF = 0;
 }
 
-/* Display output IRQ for Port 2 */
+/* Output IRQ for Port 1 */
+void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
+    PORTBbits.RB6 = 1;
+    //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
+    while(U2STAbits.UTXBF == 0 && Buff_index[PORT1] <= Buff_count[PORT1]){
+        U2TXREG = Buffer[PORT1][Buff_index[PORT1]];
+        Buff_index[PORT1]++;
+    }
+    /****************************************/
+    /* End the IRQ. */
+    IFS0bits.U1TXIF = 0;
+}
+
+/* Output IRQ for Port 2 */
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt (void){
     PORTBbits.RB6 = 1;
     //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
-    while(U2STAbits.UTXBF == 0 && CBuff_index <= CBuff_max_data){
-        U2TXREG = Port2_Buffer[CBuff_index];
-        CBuff_index++;
+    while(U2STAbits.UTXBF == 0 && Buff_index[PORT2] <= Buff_count[PORT2]){
+        U2TXREG = Buffer[PORT2][Buff_index[PORT2]];
+        Buff_index[PORT2]++;
     }
     /****************************************/
     /* End the IRQ. */
@@ -449,31 +310,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         charge_power = 0;
         chrg_check = 0;
     }
-    //***************************************
-    //What display are we using?
-    if(diag_count >= 9){
-        diagmode = 1;
-        diag_count = 0;
-    }
-    else if(diag_count > 0){
-        diag_count--;
-    }
-    else if(main_power == 0){
-        diagmode = 0;
-    }
-    //Initialize display if we are going to use it.
-    if(use_POS_display && main_power){
-        POS_disp_init();
-        if(diagmode){
-            POS_diag_display();      //Update Diag display.
-        }
-        else{
-            POS_dash_display();      //Update Dash display.
-        }
-    }
-    else{
-        dispinit = 0;
-    }
+
     //Fan control
     if(main_power && (battery_temp > batt_fan_start || my_temp > ctrlr_fan_start || motor_ctrl_temp > ctrlr_fan_start)){
         PORTFbits.RF0 = 1;
@@ -484,21 +321,13 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     
     //Main power check
     main_power_check();
-    
-    //Print vars in plain text once every second if the user requests.
-    //This needs to not exist. Need to implement another IRQ driven request system like the one used for the HUD.
-    //Uses too much CPU time while waiting for the serial port to send data. System cannot regulate power while this is running!!!
-    if (read_vars >= 1){
-        read_vars--;
-        print_vars(PORT1);      //Only allow printing these vars on port 1
-    }
-    
+
     //Clear fault_shutdown if all power modes are turned off.
     if(PORTEbits.RE8 == 0 && PORTFbits.RF1 == 1 && soft_power == 0 && cmd_power == 0 && shutdown_timer == 0){
         shutdown_timer = 1;     //Acts like a resettable circuit breaker.
     }
     
-    //Blink Check Engine Light if any faults are logged and any power modes are on regardless of what fault_shutdown says.
+    //Blink Check Light if any faults are logged and any power modes are on regardless of what fault_shutdown says.
     if(pwr_detect){
         if(error_blink == 1){
             error_blink = 0;
@@ -543,7 +372,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         soft_power = 0;
         //We have our starting variables, now check for a charger manually this one time. 
         //Do this here because plugging in a charger on a power off state might cause the charger IRQ to do things
-        //while the rest of the system isn't ready if it even trigger it at all.
+        //while the rest of the system isn't ready if it even triggers it at all.
         //Enable Charger IRQ.
         IFS0bits.INT0IF = 0;    //Make sure we don't trigger an IRQ just yet.
         __asm__ volatile ("DISI #0x3FFF");

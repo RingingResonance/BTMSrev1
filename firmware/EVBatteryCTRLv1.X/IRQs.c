@@ -245,16 +245,16 @@ void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt (void){
 void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
     PORTBbits.RB6 = 1;
     //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
-    while(U1STAbits.UTXBF == 0 && Buff_index[PORT1] <= Buff_count[PORT1]){
+    while(U1STAbits.UTXBF == 0 && (Buff_index[PORT1] < Buff_count[PORT1])){
         U1TXREG = Buffer[PORT1][Buff_index[PORT1]];
         Buff_index[PORT1]++;
     }
     //Reset the buffer index and count when done sending.
-    if (Buff_index[PORT1] > Buff_count[PORT1]){
+    if (Buff_index[PORT1] >= Buff_count[PORT1]){
         Buff_index[PORT1] = 0;
         Buff_count[PORT1] = 0;
         portBSY[PORT1] = 0;
-        IEC0bits.U1TXIE = 0; //Disable interrupt for UART when done.
+        //IEC0bits.U1TXIE = 0; //Disable interrupt for UART when done.
     }
     /****************************************/
     /* End the IRQ. */
@@ -265,16 +265,16 @@ void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt (void){
     PORTBbits.RB6 = 1;
     //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
-    while(U2STAbits.UTXBF == 0 && Buff_index[PORT2] <= Buff_count[PORT2]){
+    while(U2STAbits.UTXBF == 0 && (Buff_index[PORT2] < Buff_count[PORT2])){
         U2TXREG = Buffer[PORT2][Buff_index[PORT2]];
         Buff_index[PORT2]++;
     }
     //Reset the buffer index and count when done sending.
-    if (Buff_index[PORT2] > Buff_count[PORT2]){
+    if (Buff_index[PORT2] >= Buff_count[PORT2]){
         Buff_index[PORT2] = 0;
         Buff_count[PORT2] = 0;
         portBSY[PORT2] = 0;
-        IEC1bits.U2TXIE = 0; //Disable interrupt for UART when done.
+        //IEC1bits.U2TXIE = 0; //Disable interrupt for UART when done.
     }
     /****************************************/
     /* End the IRQ. */

@@ -111,10 +111,10 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x100               0x45a           0x687  (1671)
 .const                       0x55a               0x212           0x31b  (795)
-.text                        0x76c              0x28e6          0x3d59  (15705)
-.dinit                      0x3052                0x32            0x4b  (75)
+.text                        0x76c              0x2900          0x3d80  (15744)
+.dinit                      0x306c                0x32            0x4b  (75)
 
-                 Total program memory used (bytes):         0x4746  (18246) 75%
+                 Total program memory used (bytes):         0x476d  (18285) 75%
 
 
 Ivt Memory  [Origin = 0x4, Length = 0x7c]
@@ -558,82 +558,82 @@ External Symbols in Program Memory (by address):
                   0x00076c                  _portBusyIdle
                   0x00078a                  _fault_read
                   0x00097a                  _cGetData
-                  0x000aba                  _Command_Interp
-                  0x000d2c                  __INT0Interrupt
-                  0x000e36                  __INT1Interrupt
-                  0x000e7e                  __T3Interrupt
-                  0x000e94                  __ADCInterrupt
-                  0x0010ea                  __U1RXInterrupt
-                  0x00110c                  __U2RXInterrupt
-                  0x00112e                  __U1TXInterrupt
-                  0x001172                  __U2TXInterrupt
-                  0x0011ba                  __T1Interrupt
-                  0x001608                  __T2Interrupt
-                  0x00186a                  __FLTAInterrupt
-                  0x001892                  __OscillatorFail
-                  0x0018d8                  __AddressError
-                  0x001900                  __StackError
-                  0x001928                  __MathError
-                  0x001950                  __ReservedTrap7
-                  0x001976                  _set_save
-                  0x0019c4                  _read_save
-                  0x0019f4                  _var_save
-                  0x001a52                  _read_romvars
-                  0x001a82                  _cfig_space
-                  0x001a9c                  _var_space
-                  0x001ab6                  _power_off
-                  0x001ad4                  _first_check
-                  0x001af6                  _main_power_check
-                  0x001b86                  _analog_sanity
-                  0x001c00                  _reset_check
-                  0x001c66                  _volt_percent
-                  0x001d00                  _current_cal
-                  0x001d4c                  _regulate
-                  0x002394                  _heat_control
-                  0x002420                  _fault_log
-                  0x002444                  _heater_calibration
-                  0x002550                  _explody_preventy_check
-                  0x0025f6                  _currentCheck
-                  0x002674                  _general_shutdown
-                  0x00268a                  _io_off
-                  0x0026c2                  _eeprom_erase
-                  0x002704                  _eeprom_write
-                  0x002750                  _eeprom_read
-                  0x002786                  _four_bit_hex_cnvt
-                  0x0027b6                  _dispatch_Serial
-                  0x0027e6                  _load_string
-                  0x0028ec                  _load_float
-                  0x002c74                  _BaudCalc
-                  0x002cb0                  _default_sets
-                  0x002db4                  _Init
-                  0x002f80                  _low_power_mode
-                  0x002fa2                  _low_battery_shutdown
-                  0x002fc6                  _main
+                  0x000ace                  _Command_Interp
+                  0x000d40                  __INT0Interrupt
+                  0x000e4a                  __INT1Interrupt
+                  0x000e92                  __T3Interrupt
+                  0x000ea8                  __ADCInterrupt
+                  0x0010fe                  __U1RXInterrupt
+                  0x001120                  __U2RXInterrupt
+                  0x001142                  __U1TXInterrupt
+                  0x001184                  __U2TXInterrupt
+                  0x0011ca                  __T1Interrupt
+                  0x001618                  __T2Interrupt
+                  0x00187a                  __FLTAInterrupt
+                  0x0018a2                  __OscillatorFail
+                  0x0018e8                  __AddressError
+                  0x001910                  __StackError
+                  0x001938                  __MathError
+                  0x001960                  __ReservedTrap7
+                  0x001986                  _set_save
+                  0x0019d4                  _read_save
+                  0x001a04                  _var_save
+                  0x001a62                  _read_romvars
+                  0x001a92                  _cfig_space
+                  0x001aac                  _var_space
+                  0x001ac6                  _power_off
+                  0x001ae4                  _first_check
+                  0x001b06                  _main_power_check
+                  0x001b96                  _analog_sanity
+                  0x001c10                  _reset_check
+                  0x001c76                  _volt_percent
+                  0x001d10                  _current_cal
+                  0x001d5c                  _regulate
+                  0x0023a4                  _heat_control
+                  0x002430                  _fault_log
+                  0x002454                  _heater_calibration
+                  0x002560                  _explody_preventy_check
+                  0x002614                  _currentCheck
+                  0x002692                  _general_shutdown
+                  0x0026a8                  _io_off
+                  0x0026e0                  _eeprom_erase
+                  0x002722                  _eeprom_write
+                  0x00276e                  _eeprom_read
+                  0x0027a4                  _four_bit_hex_cnvt
+                  0x0027d4                  _dispatch_Serial
+                  0x002804                  _load_string
+                  0x002908                  _load_float
+                  0x002c8e                  _BaudCalc
+                  0x002cca                  _default_sets
+                  0x002dce                  _Init
+                  0x002f9a                  _low_power_mode
+                  0x002fbc                  _low_battery_shutdown
+                  0x002fe0                  _main
                   0xf8000a                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x002c74                  _BaudCalc
-                  0x000aba                  _Command_Interp
-                  0x002db4                  _Init
-                  0x000e94                  __ADCInterrupt
-                  0x0018d8                  __AddressError
+                  0x002c8e                  _BaudCalc
+                  0x000ace                  _Command_Interp
+                  0x002dce                  _Init
+                  0x000ea8                  __ADCInterrupt
+                  0x0018e8                  __AddressError
                   0x0001c8                  __DefaultInterrupt
                   0xf8000a                  __FGS.sec
-                  0x00186a                  __FLTAInterrupt
-                  0x000d2c                  __INT0Interrupt
-                  0x000e36                  __INT1Interrupt
-                  0x001928                  __MathError
-                  0x001892                  __OscillatorFail
-                  0x001950                  __ReservedTrap7
-                  0x001900                  __StackError
-                  0x0011ba                  __T1Interrupt
-                  0x001608                  __T2Interrupt
-                  0x000e7e                  __T3Interrupt
-                  0x0010ea                  __U1RXInterrupt
-                  0x00112e                  __U1TXInterrupt
-                  0x00110c                  __U2RXInterrupt
-                  0x001172                  __U2TXInterrupt
+                  0x00187a                  __FLTAInterrupt
+                  0x000d40                  __INT0Interrupt
+                  0x000e4a                  __INT1Interrupt
+                  0x001938                  __MathError
+                  0x0018a2                  __OscillatorFail
+                  0x001960                  __ReservedTrap7
+                  0x001910                  __StackError
+                  0x0011ca                  __T1Interrupt
+                  0x001618                  __T2Interrupt
+                  0x000e92                  __T3Interrupt
+                  0x0010fe                  __U1RXInterrupt
+                  0x001142                  __U1TXInterrupt
+                  0x001120                  __U2RXInterrupt
+                  0x001184                  __U2TXInterrupt
                   0x0001d0                  ___addsf3
                   0x00028a                  ___divsf3
                   0x00030e                  ___eqsf2
@@ -660,9 +660,9 @@ External Symbols in Program Memory (by name):
                   0x00040e                  __funpack2
                   0x00013c                  __psv_init
                   0x000100                  __resetPRI
-                  0x001b86                  _analog_sanity
+                  0x001b96                  _analog_sanity
                   0x00097a                  _cGetData
-                  0x001a82                  _cfig_space
+                  0x001a92                  _cfig_space
                   0x00055a                  _code01
                   0x000569                  _code02
                   0x00057c                  _code03
@@ -704,38 +704,38 @@ External Symbols in Program Memory (by name):
                   0x0006ba                  _code27
                   0x0006c8                  _code28
                   0x0006d6                  _codeDefault
-                  0x0025f6                  _currentCheck
-                  0x001d00                  _current_cal
-                  0x002cb0                  _default_sets
-                  0x0027b6                  _dispatch_Serial
-                  0x0026c2                  _eeprom_erase
-                  0x002750                  _eeprom_read
-                  0x002704                  _eeprom_write
-                  0x002550                  _explody_preventy_check
-                  0x002420                  _fault_log
+                  0x002614                  _currentCheck
+                  0x001d10                  _current_cal
+                  0x002cca                  _default_sets
+                  0x0027d4                  _dispatch_Serial
+                  0x0026e0                  _eeprom_erase
+                  0x00276e                  _eeprom_read
+                  0x002722                  _eeprom_write
+                  0x002560                  _explody_preventy_check
+                  0x002430                  _fault_log
                   0x00078a                  _fault_read
-                  0x001ad4                  _first_check
-                  0x002786                  _four_bit_hex_cnvt
-                  0x002674                  _general_shutdown
-                  0x002394                  _heat_control
-                  0x002444                  _heater_calibration
-                  0x00268a                  _io_off
-                  0x0028ec                  _load_float
-                  0x0027e6                  _load_string
-                  0x002fa2                  _low_battery_shutdown
-                  0x002f80                  _low_power_mode
-                  0x002fc6                  _main
-                  0x001af6                  _main_power_check
+                  0x001ae4                  _first_check
+                  0x0027a4                  _four_bit_hex_cnvt
+                  0x002692                  _general_shutdown
+                  0x0023a4                  _heat_control
+                  0x002454                  _heater_calibration
+                  0x0026a8                  _io_off
+                  0x002908                  _load_float
+                  0x002804                  _load_string
+                  0x002fbc                  _low_battery_shutdown
+                  0x002f9a                  _low_power_mode
+                  0x002fe0                  _main
+                  0x001b06                  _main_power_check
                   0x00076c                  _portBusyIdle
-                  0x001ab6                  _power_off
-                  0x001a52                  _read_romvars
-                  0x0019c4                  _read_save
-                  0x001d4c                  _regulate
-                  0x001c00                  _reset_check
-                  0x001976                  _set_save
-                  0x0019f4                  _var_save
-                  0x001a9c                  _var_space
-                  0x001c66                  _volt_percent
+                  0x001ac6                  _power_off
+                  0x001a62                  _read_romvars
+                  0x0019d4                  _read_save
+                  0x001d5c                  _regulate
+                  0x001c10                  _reset_check
+                  0x001986                  _set_save
+                  0x001a04                  _var_save
+                  0x001aac                  _var_space
+                  0x001c76                  _volt_percent
 
 Memory Configuration
 
@@ -921,9 +921,9 @@ userdata
  *(.debug_abbrev)
  .debug_abbrev    0x000000        0x214 build/default/production/main.o
 
-.debug_line       0x000000        0x70c
+.debug_line       0x000000        0x70f
  *(.debug_line)
- .debug_line      0x000000        0x70c build/default/production/main.o
+ .debug_line      0x000000        0x70f build/default/production/main.o
 
 .debug_frame      0x000000        0x836
  *(.debug_frame)
@@ -1807,62 +1807,62 @@ __c30_signature
                     0x86c8                  _code28
                     0x86d6                  _codeDefault
 
-.text             0x00076c       0x28e6
- .text            0x00076c       0x28e6 build/default/production/main.o
+.text             0x00076c       0x2900
+ .text            0x00076c       0x2900 build/default/production/main.o
                   0x00076c                  _portBusyIdle
                   0x00078a                  _fault_read
                   0x00097a                  _cGetData
-                  0x000aba                  _Command_Interp
-                  0x000d2c                  __INT0Interrupt
-                  0x000e36                  __INT1Interrupt
-                  0x000e7e                  __T3Interrupt
-                  0x000e94                  __ADCInterrupt
-                  0x0010ea                  __U1RXInterrupt
-                  0x00110c                  __U2RXInterrupt
-                  0x00112e                  __U1TXInterrupt
-                  0x001172                  __U2TXInterrupt
-                  0x0011ba                  __T1Interrupt
-                  0x001608                  __T2Interrupt
-                  0x00186a                  __FLTAInterrupt
-                  0x001892                  __OscillatorFail
-                  0x0018d8                  __AddressError
-                  0x001900                  __StackError
-                  0x001928                  __MathError
-                  0x001950                  __ReservedTrap7
-                  0x001976                  _set_save
-                  0x0019c4                  _read_save
-                  0x0019f4                  _var_save
-                  0x001a52                  _read_romvars
-                  0x001a82                  _cfig_space
-                  0x001a9c                  _var_space
-                  0x001ab6                  _power_off
-                  0x001ad4                  _first_check
-                  0x001af6                  _main_power_check
-                  0x001b86                  _analog_sanity
-                  0x001c00                  _reset_check
-                  0x001c66                  _volt_percent
-                  0x001d00                  _current_cal
-                  0x001d4c                  _regulate
-                  0x002394                  _heat_control
-                  0x002420                  _fault_log
-                  0x002444                  _heater_calibration
-                  0x002550                  _explody_preventy_check
-                  0x0025f6                  _currentCheck
-                  0x002674                  _general_shutdown
-                  0x00268a                  _io_off
-                  0x0026c2                  _eeprom_erase
-                  0x002704                  _eeprom_write
-                  0x002750                  _eeprom_read
-                  0x002786                  _four_bit_hex_cnvt
-                  0x0027b6                  _dispatch_Serial
-                  0x0027e6                  _load_string
-                  0x0028ec                  _load_float
-                  0x002c74                  _BaudCalc
-                  0x002cb0                  _default_sets
-                  0x002db4                  _Init
-                  0x002f80                  _low_power_mode
-                  0x002fa2                  _low_battery_shutdown
-                  0x002fc6                  _main
+                  0x000ace                  _Command_Interp
+                  0x000d40                  __INT0Interrupt
+                  0x000e4a                  __INT1Interrupt
+                  0x000e92                  __T3Interrupt
+                  0x000ea8                  __ADCInterrupt
+                  0x0010fe                  __U1RXInterrupt
+                  0x001120                  __U2RXInterrupt
+                  0x001142                  __U1TXInterrupt
+                  0x001184                  __U2TXInterrupt
+                  0x0011ca                  __T1Interrupt
+                  0x001618                  __T2Interrupt
+                  0x00187a                  __FLTAInterrupt
+                  0x0018a2                  __OscillatorFail
+                  0x0018e8                  __AddressError
+                  0x001910                  __StackError
+                  0x001938                  __MathError
+                  0x001960                  __ReservedTrap7
+                  0x001986                  _set_save
+                  0x0019d4                  _read_save
+                  0x001a04                  _var_save
+                  0x001a62                  _read_romvars
+                  0x001a92                  _cfig_space
+                  0x001aac                  _var_space
+                  0x001ac6                  _power_off
+                  0x001ae4                  _first_check
+                  0x001b06                  _main_power_check
+                  0x001b96                  _analog_sanity
+                  0x001c10                  _reset_check
+                  0x001c76                  _volt_percent
+                  0x001d10                  _current_cal
+                  0x001d5c                  _regulate
+                  0x0023a4                  _heat_control
+                  0x002430                  _fault_log
+                  0x002454                  _heater_calibration
+                  0x002560                  _explody_preventy_check
+                  0x002614                  _currentCheck
+                  0x002692                  _general_shutdown
+                  0x0026a8                  _io_off
+                  0x0026e0                  _eeprom_erase
+                  0x002722                  _eeprom_write
+                  0x00276e                  _eeprom_read
+                  0x0027a4                  _four_bit_hex_cnvt
+                  0x0027d4                  _dispatch_Serial
+                  0x002804                  _load_string
+                  0x002908                  _load_float
+                  0x002c8e                  _BaudCalc
+                  0x002cca                  _default_sets
+                  0x002dce                  _Init
+                  0x002f9a                  _low_power_mode
+                  0x002fbc                  _low_battery_shutdown
+                  0x002fe0                  _main
 
-.dinit            0x003052         0x32
- .dinit           0x003052         0x32 data_init
+.dinit            0x00306c         0x32
+ .dinit           0x00306c         0x32 data_init

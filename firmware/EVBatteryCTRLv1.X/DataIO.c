@@ -135,14 +135,14 @@ void load_string(const char *string_point, int serial_port){
         return;
     }
     writingbuff[serial_port] = 1;
+    StempIndex[serial_port] = 0;
     while (string_point[StempIndex[serial_port]] != 0){
         Buffer[serial_port][Buff_index[serial_port]] = string_point[StempIndex[serial_port]];
         if (Buff_index[serial_port] < 49)
             Buff_index[serial_port]++;
         StempIndex[serial_port]++;
     }
-    StempIndex[serial_port] = 0;
-    Buff_count[serial_port] = Buff_index[serial_port] - 1;
+    Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
 }
 
@@ -211,7 +211,7 @@ void load_float(float f_data, int serial_port){
     }
     FtempIndex[serial_port] = 0;
     config_space[serial_port] = 0;
-    Buff_count[serial_port] = Buff_index[serial_port] - 1;
+    Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
 }
 

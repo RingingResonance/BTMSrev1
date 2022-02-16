@@ -605,8 +605,8 @@ void explody_preventy_check(void){
     }
     //Battery under voltage check.
     if(battery_voltage < low_voltage_shutdown && PORTEbits.RE8 == 0){
-        //fault_log(0x04);    //Log a low battery shutdown event.
-        //low_battery_shutdown();
+        fault_log(0x04);    //Log a low battery shutdown event.
+        low_battery_shutdown();
     }
     //Battery temp shutdown check
     if(battery_temp > battery_shutdown_temp){

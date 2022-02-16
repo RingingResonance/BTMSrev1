@@ -117,7 +117,7 @@ void Init(void){
 /*****************************/
     //PORT 1 setup
     U1STA = 0;
-    U1STAbits.UTXISEL = 1;
+    U1STAbits.UTXISEL = 0;
     U1MODE = 0;
     U1MODEbits.ALTIO = 1;           //Use alternate IO for UART1.
     U1BRG = BaudCalc(BAUD1, IPS);     //calculate the baud rate.
@@ -125,7 +125,7 @@ void Init(void){
 
     //PORT 2 setup
     U2STA = 0;
-    U2STAbits.UTXISEL = 1;
+    U2STAbits.UTXISEL = 0;
     U2MODE = 0;
     U2BRG = BaudCalc(BAUD2, IPS);     //calculate the baud rate.
     //Default power up of UART should be 8n1

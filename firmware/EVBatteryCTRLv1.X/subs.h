@@ -24,7 +24,6 @@ extern void heater_calibration(void);
 extern void fault_log(int);
 extern void general_shutdown(void);
 extern void io_off(void);
-extern void fault_read(int,int);
 extern void regulate(void);
 extern void config_save(void);
 extern void config_load(void);
@@ -142,7 +141,6 @@ float   chrg_percent;           //Percentage of battery charge
 int     heat_set;               //Calculated heater output for wattage chosen by user.
 float   current_compensate;     //Current compensation.
 int     heat_cal_stage = 0;     //0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 5 is disable heater.
-int     use_POS_display = 1;
 int     zero_current = 0;
 float   peak_power = 0;
 float   peak_pwr_vlts = 0;

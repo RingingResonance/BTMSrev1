@@ -84,8 +84,6 @@ int eeprom_read(int addrs){
     }
 }
 //*************************************************************************************************
-
-
 //Converts four bit hex numbers to ASCII
 char four_bit_hex_cnvt(int numb){
     char asci_hex = 0;
@@ -101,87 +99,120 @@ char four_bit_hex_cnvt(int numb){
     return asci_hex;
 }
 
-//Send a string of text to a buffer that can then be dispatched to a serial port.
-void send_string(const char *string_point, int serial_port){
-    int x = 0;
-    while (string_point[x] != 0){
-        if (Buff_index[serial_port] < 45){
-            Buff_index[serial_port]++;
-        }
-        Buffer[serial_port][Buff_index[serial_port]] = string_point[x];
-        x++;
-
-        if (serial_port == 0x00){
-            fault_log(0x1A);        //Log invalid port error.
-            x = 0;
-            break;
-        }
+//Start the data transfer from one of the buffers to the selected serial port
+//Dispatch the data in the buffers to the display by creating a TX IRQ
+void dispatch_Serial(int serial_port){
+    portBSY[serial_port] = 1;
+    Buff_index[serial_port] = 0;  //Start Index at 0.
+    if(serial_port){
+        IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
+        IFS1bits.U2TXIF = 1;        //Start transmitting by manually send an IRQ.
+    }
+    else{
+        IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
+        IFS0bits.U1TXIF = 1;        //Start transmitting by manually send an IRQ.
     }
 }
 
-/* Sends a float through to buffer. */
-void float_send(float f_data, int serial_port){
+//Send a string of text to a buffer that can then be dispatched to a serial port.
+void load_string(const char *string_point, int serial_port){
+    //Check if valid port has been selected.
+    if (serial_port > 0x01){
+        fault_log(0x1A);        //Log invalid port error.
+        FtempIndex[serial_port] = 0;
+        return;
+    }
+    //check if port is busy sending data.
+    if(portBSY[serial_port]){
+        if(serial_port)
+            fault_log(0x28);       //Log Port2 Busy Error.
+        else
+            fault_log(0x27);       //Log Port1 Busy Error.
+        return;
+    }
+    //check if another process is currently writing to buffer.
+    if(writingbuff[serial_port]){
+        return;
+    }
+    writingbuff[serial_port] = 1;
+    while (string_point[StempIndex[serial_port]] != 0){
+        Buffer[serial_port][Buff_index[serial_port]] = string_point[StempIndex[serial_port]];
+        if (Buff_index[serial_port] < 49)
+            Buff_index[serial_port]++;
+        StempIndex[serial_port]++;
+    }
+    StempIndex[serial_port] = 0;
+    Buff_count[serial_port] = Buff_index[serial_port] - 1;
+    writingbuff[serial_port] = 0;
+}
 
-    int x = 0;
-    float tx_float = 0;
-    int tx_temp = 0;
-    //f_data = 0.0010;
+/* Sends a float to buffer. */
+void load_float(float f_data, int serial_port){
+    if (serial_port > 0x01){
+        fault_log(0x1A);        //Log invalid port error.
+        FtempIndex[serial_port] = 0;
+        return;
+    }
+    FtempIndex[serial_port] = 0;
+    tx_float[serial_port] = 0;
+    tx_temp[serial_port] = 0;
 
-    float_out[serial_port][0] = ' ';        //Put a SPACE in "0"
+    float_out[serial_port][0] = ' ';        //Put a SPACE in first char
     if (f_data < 0){
-        f_data *= -1;
-        float_out[serial_port][0] = '-';    //Put a - in "0"
+        f_data *= -1;                       //Convert to absolute value.
+        float_out[serial_port][0] = '-';    //Put a - in first char
     }
     if (f_data > 9999.999){
-        f_data = 9999.999;
-        float_out[serial_port][0] = '?';    //Put a ? in "0"
+        f_data = 9999.999;      //truncate it
+        float_out[serial_port][0] = '?';    //Put a ? in first char if truncated
     }
-    tx_float = f_data / 1000;
-    x++;
-    while (x <= 8){
-        if (x == 5){
+    tx_float[serial_port] = f_data / 1000;
+    FtempIndex[serial_port]++;
+    while (FtempIndex[serial_port] <= 8){
+        if (FtempIndex[serial_port] == 5){
             float_out[serial_port][5] = '.';
-            x++;
+            FtempIndex[serial_port]++;
         }
-        tx_temp = tx_float;
-        float_out[serial_port][x] = tx_temp + 48;
-        x++;
-        tx_float = (tx_float - tx_temp) * 10;
+        tx_temp[serial_port] = tx_float[serial_port];
+        float_out[serial_port][FtempIndex[serial_port]] = tx_temp[serial_port] + 48;
+        FtempIndex[serial_port]++;
+        tx_float[serial_port] = (tx_float[serial_port] - tx_temp[serial_port]) * 10;
     }
 
 /* Write to buffer */
-    x = 0;
-    int ifzero = 1;
-    while (x <= 8){
-        if(float_out[serial_port][x] == 0x30 && ifzero){
-            if(config_space){
-                if (Buff_index[serial_port] < 45){
-                    Buff_index[serial_port]++;
-                }
+    if(writingbuff[serial_port]){
+        return;
+    }
+    writingbuff[serial_port] = 1;
+    ifzero[serial_port] = 1;
+    while (FtempIndex[serial_port] <= 8){
+        //If config_space == 1, then load buffer with only spaces.
+        if(float_out[serial_port][FtempIndex[serial_port]] == 0x30 && ifzero[serial_port]){
+            if(config_space[serial_port]){
                 Buffer[serial_port][Buff_index[serial_port]] = 0x20;
-                x++;
+                if (Buff_index[serial_port] < 49)
+                    Buff_index[serial_port]++;
+                FtempIndex[serial_port]++;
             }
             else{
-                x++;
+                FtempIndex[serial_port]++;
             }
         }
         else{
-            if (Buff_index[serial_port] < 45){
+            Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][FtempIndex[serial_port]];
+            //Do not overrun the buffer.
+            if (Buff_index[serial_port] < 49)
                 Buff_index[serial_port]++;
-            }
-            Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][x];
-            x++;
-            if (serial_port != 0x00 || serial_port != 0x01){
-                fault_log(0x1A);        //Log invalid port error.
-                x = 0;
-                break;
-            }
+            FtempIndex[serial_port]++;
         }
-        if(float_out[serial_port][x] != 0x30 && float_out[serial_port][x] != 0x2D && float_out[serial_port][x] != 0x20){
-            ifzero = 0;
+        if(float_out[serial_port][FtempIndex[serial_port]] != 0x30 && float_out[serial_port][FtempIndex[serial_port]] != 0x2D && float_out[serial_port][FtempIndex[serial_port]] != 0x20){
+            ifzero[serial_port] = 0;
         }
     }
-    config_space = 0;
+    FtempIndex[serial_port] = 0;
+    config_space[serial_port] = 0;
+    Buff_count[serial_port] = Buff_index[serial_port] - 1;
+    writingbuff[serial_port] = 0;
 }
 
 unsigned int BaudCalc(double BD, double mlt){

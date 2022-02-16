@@ -19,25 +19,40 @@
 
 #include <p30f3011.h>
 
+#include "display.h"
 #include "DataIO.h"
 #include "errorCodes.h"
+
+//Check if serial port is busy.
+//If used, ensure that it is used by the lowest priority IRQ possible.
+void portBusyIdle(int serial_port){
+    while(portBSY[serial_port]){
+        PORTBbits.RB6 = 0;      //Turn CPU ACT light off.
+        Idle();                 //Idle Loop, saves power.
+    }
+    PORTBbits.RB6 = 1;      //Turn CPU ACT light on.
+}
 
 /* Read fault codes to serial port.
  * This takes up over 5% of program space.
  */
-void fault_read(int smpl, int serial_port){
-    send_string("Reading Codes...", serial_port);
-    int x = 0;
+void fault_read(int serial_port){
+    load_string("Reading Faults.\r\n", serial_port);
+    dispatch_Serial(serial_port);
+    flt_index[serial_port] = 0;
     const char *textpointer;
+    portBusyIdle(serial_port);  //Check to see if port is ready.
     if(fault_count > 10){
-        send_string("Fault Log Is Full. Please clear faults.", serial_port);
+        load_string("Fault Log Full.\r\n", serial_port);
+        dispatch_Serial(serial_port);
     }
     if(fault_count == 0){
-        send_string("No fault codes to report.", serial_port);
+        load_string("No fault codes.\r\n", serial_port);
+        dispatch_Serial(serial_port);
     }
     else{
-        while(x < fault_count){
-                switch(fault_codes[x]){
+        while(flt_index[serial_port] < fault_count){
+                switch(fault_codes[flt_index[serial_port]]){
                     case 0x01:
                         textpointer = code01;
                     break;
@@ -152,15 +167,150 @@ void fault_read(int smpl, int serial_port){
                     case 0x26:
                         textpointer = code26;
                     break;
+                    case 0x27:
+                        textpointer = code27;
+                    break;
+                    case 0x28:
+                        textpointer = code28;
+                    break;
                     default:
                         textpointer = codeDefault;
                     break;
                 }
-            send_string(textpointer, serial_port);
-            x++;
+            portBusyIdle(serial_port);  //Check to see if port is ready.
+            load_string(textpointer, serial_port);
+            load_string("\r\n", serial_port);
+            dispatch_Serial(serial_port);
+            flt_index[serial_port]++;
         }
     }
 }
 
+void cGetData(int serial_port){
+    if(serial_port)
+        CMD_buff[serial_port][CMD_Point[serial_port]] = U2RXREG;
+    else
+        CMD_buff[serial_port][CMD_Point[serial_port]] = U1RXREG;
+
+    if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) || (CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0A))){
+        if(serial_port)
+            U2TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
+        else
+            U1TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
+    }
+    if (CMD_buff[serial_port][CMD_Point[serial_port]] == 0x0D){     //Check for a RETURN
+        if (Lecho[serial_port]){
+            load_string("\r\n", serial_port);
+        }
+        bufsize[serial_port] = CMD_Point[serial_port];
+        CMD_Point[serial_port] = 0;
+        cmdRDY[serial_port] = 1;                 //Tell our command handler to process.
+    }
+    else if(CMD_Point[serial_port] < Clength) {
+        CMD_Point[serial_port]++;
+    }
+}
+
+void Command_Interp(int serial_port){
+    if(serial_port){
+        while (U2STAbits.URXDA && cmdRDY[serial_port] == 0){
+            cGetData(serial_port);
+        }
+    }
+    else{
+        while (U1STAbits.URXDA && cmdRDY[serial_port] == 0){
+            cGetData(serial_port);
+        }
+    }
+    //Command Handler.
+    if (cmdRDY[serial_port] == 1){
+        //Send command receive "@"
+        load_string("@", serial_port);
+        //Check for faults.
+        if(fault_count > 0){
+            //Send fault alert "!"
+            load_string("!", serial_port);
+        }
+        switch(CMD_buff[serial_port][tempPoint[serial_port]]){
+            case 0x0D:
+            break;
+            case '#':
+                CMD_Point[serial_port] = 0;
+                cmdRDY[serial_port] = 0;
+                asm("reset");
+            break;
+            case 'H':
+                heat_cal_stage = 1;
+            break;
+            case 'h':
+                heat_cal_stage = 5;
+            break;
+            case 'E':
+                Lecho[serial_port] = 1;
+            break;
+            case 'e':
+                Lecho[serial_port] = 0;
+            break;
+            case 'S':
+                deep_sleep = 1;
+            break;
+            case 'F':
+                fault_read(serial_port);          //Read all fault codes.
+            break;
+            case 'P':
+                load_string("P On \r\n", serial_port);
+                cmd_power = 1;
+            break;
+            case 'p':
+                load_string("P Off\r\n", serial_port);
+                v_test = 0;
+                cmd_power = 0;
+            break;
+            case 'M':
+                b_safe = 0;
+                v_test = 0;
+                load_string("BMon On :D\r\n", serial_port);
+            break;
+            case 'm':
+                b_safe = 0x55FF;
+                load_string("!!BMon Off!!\r\n", serial_port);
+            break;
+            case 'C':
+                fault_count = 0;
+                fault_shutdown = 0;
+                heat_cal_stage = 0;
+                osc_fail_event = 0;
+                load_string("Faults Cleared.\r\n", serial_port);
+            break;
+            case 'Z':
+                p_charge = 0;
+                chrg_voltage = battery_rated_voltage;
+                if(PORTEbits.RE8 == 1){
+                    partial_chrg_cnt = 0;
+                }
+                else{
+                    partial_chrg_cnt = 10;
+                }
+            break;
+            case 'U':
+                if(v_test < 99){
+                    v_test++;
+                }
+            break;
+            case 'u':
+                if(v_test > 0){
+                    v_test--;
+                }
+            break;
+            default:
+                load_string("Unknown Command.\r\n", serial_port);
+            break;
+        }
+        CMD_Point[serial_port] = 0;
+        cmdRDY[serial_port] = 0;
+        tempPoint[serial_port] = 0;
+    }
+    dispatch_Serial(serial_port);
+}
 
 #endif

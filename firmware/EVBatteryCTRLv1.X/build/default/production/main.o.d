@@ -6,8 +6,9 @@ IRQs.c  \
 subs.h  \
  DataIO.h  \
 Init.h  \
+display.c  \
+display.h  \
+errorCodes.h  \
 subs.c  \
 DataIO.c  \
-Init.c  \
-display.c  \
-errorCodes.h 
+Init.c 

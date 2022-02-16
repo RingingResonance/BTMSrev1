@@ -23,9 +23,9 @@
 #define full 0
 
 extern unsigned int BaudCalc(double, double);
-extern void float_send(float, int);
-extern void send_string(const char*, int);
-extern void data_send(char, int);
+extern void load_float(float, int);
+extern void load_string(const char*, int);
+extern void dispatch_Serial(int);
 extern char four_bit_hex_cnvt(int);
 extern int eeprom_erase(int);   //address. 0x00 through 0x1FF.      Returns 0 on success.
 extern int eeprom_write(int, int);  //address, data.    Returns 0 on success.
@@ -39,7 +39,6 @@ float IPS = 14.74;   //million instructions per second.
 float BAUD1 = 9600;     //BAUD rate for PORT 1
 float BAUD2 = 9600;     //BAUD rate for PORT 2
 
-int config_space = 0;
 
 //Serial port stuff
 static int Clength = 10;   //Command Buff Length
@@ -47,7 +46,7 @@ char CMD_buff[2][10];              //Command Buffer
 unsigned int CMD_Point[2] = {0,0};  //Command Pointer
 int cmdRDY[2] = {0,0};
 int cmdOVFL[2] = {0,0};
-int Lecho[2] = {1,1};              //Local echo is on by default on PORT 1
+int Lecho[2] = {1,1};              //Local echo is on by default
 int Terr[2] = {0,0};
 int bufsize[2]= {0,0};
 
@@ -55,7 +54,14 @@ char float_out[2][7];
 int  Buff_count[2] = {0,0};
 int  Buff_index[2] = {0,0};
 char Buffer[2][50];
-
+int  StempIndex[2] = {0,0};
+int  FtempIndex[2] = {0,0};
+int config_space[2] = {0,0};
+int ifzero[2] = {1,1};
+float tx_float[2] = {0,0};
+int tx_temp[2] = {0,0};
+int portBSY[2] = {0,0};
+int writingbuff[2] = {0,0};
 
 #endif	/* DATAIO_H */
 

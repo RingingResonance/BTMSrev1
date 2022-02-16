@@ -117,9 +117,10 @@ void Init(void){
 /*****************************/
     //PORT 1 setup
     U1STA = 0;
+    U1STAbits.UTXISEL = 1;
     U1MODE = 0;
-    U1BRG = BaudCalc(BAUD1, IPS);     //calculate the baud rate.
     U1MODEbits.ALTIO = 1;           //Use alternate IO for UART1.
+    U1BRG = BaudCalc(BAUD1, IPS);     //calculate the baud rate.
     //Default power up of UART should be 8n1
 
     //PORT 2 setup
@@ -180,11 +181,11 @@ void Init(void){
     IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is important.
     IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh...
     IPC0bits.INT0IP = 3;    //Charger detect IRQ, need to know basis
-    IPC1bits.T3IP = 2;      //Timer 3 IRQ. Not critical.
-    IPC2bits.U1RXIP = 1;    //RX 1 IRQ, Text can wait
-    IPC2bits.U1TXIP = 1;    //TX 1 IRQ, Text can wait
-    IPC6bits.U2RXIP = 1;    //RX 2 IRQ, Text can wait
-    IPC6bits.U2TXIP = 1;    //TX 2 IRQ, Text can wait
+    IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
+    IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
+    IPC2bits.U1TXIP = 3;    //TX 1 IRQ, Text can wait
+    IPC6bits.U2TXIP = 3;    //TX 2 IRQ, Text can wait
+    IPC1bits.T3IP = 1;      //Timer 3 IRQ. Not critical.
     IPC5bits.INT2IP = 1;    //Not yet used.
     
     //Ensure interrupt nesting is enabled.
@@ -201,6 +202,7 @@ void Init(void){
     IEC2 = 0;
 	IEC0bits.T1IE = 1;	// Enable interrupts for timer 1
     IEC0bits.U1RXIE = 1; //Enable interrupts for UART1 Rx.
+    IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
     IEC1bits.U2RXIE = 1; //Enable interrupts for UART2 Rx.
     IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
     if(EnableChIRQ == 1){
@@ -271,7 +273,7 @@ void low_power_mode(void){
 void low_battery_shutdown(void){
     cmd_power = 0;
     soft_power = 0;
-    PTCONbits.PTEN = 0;     // off PWM
+    PTCONbits.PTEN = 0;     // Turn off PWM
     T1CONbits.TON = 0;      // Stop Timer 1
     // Clear all interrupts flags
     IFS0 = 0;

@@ -46,6 +46,8 @@ const char code23[] = "VH MCT";
 const char code24[] = "VL MCT";
 const char code25[] = "VH SM";
 const char code26[] = "VL SM";
+const char code27[] = "PORT1 BSY err";
+const char code28[] = "PORT2 BSY err";
 const char codeDefault[] = "Unknown";
 
 

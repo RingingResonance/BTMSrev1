@@ -544,7 +544,6 @@ void heater_calibration(void){
                     if (heat_set > 95){
                         fault_log(0x0001);      //Log fault, heater is too small for the watts you want.
                         heat_cal_stage = 4;
-                        float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
                         heat_set = 0;
@@ -552,7 +551,6 @@ void heater_calibration(void){
                     if (heat_set > 50 && watts < 2){
                         fault_log(0x0002);      //Log fault, no heater detected.
                         heat_cal_stage = 4;
-                        float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
                         heat_set = 0;
@@ -560,7 +558,6 @@ void heater_calibration(void){
                     if (heat_set < 5 && watts > 10){
                         fault_log(0x0003);      //Log fault, short circuit on heater.
                         heat_cal_stage = 4;
-                        float_send(watts, PORT1);
                         PORTCbits.RC15 = 0;     //Heat Relay Off
                         heat_rly_timer = 3;     //Reset heat relay timer
                         heat_set = 0;
@@ -608,8 +605,8 @@ void explody_preventy_check(void){
     }
     //Battery under voltage check.
     if(battery_voltage < low_voltage_shutdown && PORTEbits.RE8 == 0){
-        fault_log(0x04);    //Log a low battery shutdown event.
-        low_battery_shutdown();
+        //fault_log(0x04);    //Log a low battery shutdown event.
+        //low_battery_shutdown();
     }
     //Battery temp shutdown check
     if(battery_temp > battery_shutdown_temp){

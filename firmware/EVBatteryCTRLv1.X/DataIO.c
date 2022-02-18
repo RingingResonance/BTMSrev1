@@ -27,62 +27,130 @@ int eeprom_erase(int addrs){
         return 1;       //error clearing, address out of range.
     }
     else{
+        __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
+        IPC2bits.ADIP = 0;  //Disable analog IRQs.
         adrfinal = addrs * 2;
         adrfinal += 0xFC00;
         //Erase location.
         NVMADRU = 0x7F;
         NVMADR = adrfinal;
-        NVMCON = 0x4044;
-        NVMKEY = 0x55;
-        NVMKEY = 0xAA;
+        __asm__ ("MOV #0x4044,w1");
+        __asm__ ("MOV w1,NVMCON");
+        __asm__ ("MOV #0x55,w1");
+        __asm__ ("MOV w1,NVMKEY");
+        __asm__ ("MOV #0xAA,w1");
+        __asm__ ("MOV w1,NVMKEY");
+        __asm__ ("BSET NVMCON,#0x0F");
         __asm__ ("NOP");
         __asm__ ("NOP");
-        NVMCONbits.WR = 1;
+        while(NVMCONbits.WR) //Wait here until write is finished.
+        DISICNT = 0;    //ReEnable all non-critical IRQs.
+        IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
         return 0;
     }
 }
 /** Write a Byte to EEPROM **/
 int eeprom_write(int addrs, int data){
-    int adrfinal = 0;
+    eeprom_erase(addrs);
     if (addrs > 0x1FF){
         return 1;       //error writing, address out of range.
     }
     else{
-        adrfinal = addrs * 2;
-        adrfinal += 0xFC00;
+        __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
+        IPC2bits.ADIP = 0;  //Disable analog IRQs.
+        addrs *=  2;
+        addrs += 0xFC00;
         //Write to location.
         //DO NOT TOUCH THIS, EVERYTHING MUST BE DONE IN THIS EXACT ORDER OR IT WILL NOT WORK!!!
-        WREG1 = 0x7F;     //ADDRESS UPPER
-        __asm__ ("MOV W1,TBLPAG");
-        WREG2 = data; //data pattern.
-        WREG0 = adrfinal;   //ADDRESS LOWER
+        TBLPAG = 0x7F;     //ADDRESS UPPER
+        //__asm__ ("MOV W1,TBLPAG");
+        WREG2 = data; //DATA
+        WREG0 = addrs;   //ADDRESS LOWER
         //ESPECIALLY DON'T TOUCH THE ORDER THAT THE WREGs GET WRITTEN TO.
         __asm__ ("TBLWTL w2,[w0]");
-        NVMCON = 0x4004;
-        NVMKEY = 0x55;
-        NVMKEY = 0xAA;
+        __asm__ ("MOV #0x4004,w1");
+        __asm__ ("MOV w1,NVMCON");
+        __asm__ ("MOV #0x55,w1");
+        __asm__ ("MOV w1,NVMKEY");
+        __asm__ ("MOV #0xAA,w1");
+        __asm__ ("MOV w1,NVMKEY");
+        __asm__ ("BSET NVMCON,#0x0F");
         __asm__ ("NOP");
         __asm__ ("NOP");
-        NVMCONbits.WR = 1;
+        while(NVMCONbits.WR) //Wait here until write is finished.
+        DISICNT = 0;        //ReEnable all non-critical IRQs.
+        IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
         return 0;
     }
 }
+
+int memread(int offset, int address){
+    __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
+    IPC2bits.ADIP = 0;  //Disable analog IRQs.
+    TBLPAG = offset;    //Offset in memory
+    WREG0 = address;    //Address to read from
+    __asm__ ("TBLRDH [w0],w4");
+    __asm__ ("NOP");
+    __asm__ ("NOP");
+    upperMem = WREG4;
+    TBLPAG = offset;    //Offset in memory
+    WREG0 = address;    //Address to read from
+    __asm__ ("TBLRDL [w0],w4");
+    __asm__ ("NOP");
+    __asm__ ("NOP");
+    int x = WREG4;
+    DISICNT = 0;        //ReEnable all non-critical IRQs.
+    IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
+    return x; //WREG4 will contain data read from NVmem
+}
+
 int eeprom_read(int addrs){
-    int adrfinal = 0;
     if (addrs > 0x1FF){
         return 0;       //error reading, address out of range. Return what we hope to be a safe value.
     }
     else{
-        adrfinal = addrs * 2;
-        adrfinal += 0xFC00;
-        TBLPAG = 0x7F;
-        WREG0 = adrfinal; //address to read from
-        __asm__ ("TBLRDL [w0],w4");
-        __asm__ ("NOP");
-        __asm__ ("NOP");
-        return WREG4; //WREG4 will contain data read from eeprom
+        return memread(0x7F, (0xFC00 + (addrs * 2)));
     }
 }
+
+//Generates checksum of flash and chip config memory.
+void flash_checksum(void){
+    flash_chksum = 0;
+    int xaddr = 0;
+    int yaddr = 0;
+    //Read program memory space.
+    for(xaddr=0;xaddr<0x1FFF;xaddr++){
+        flash_chksum += ((0x00FF & memread(0x00,xaddr*2)) + ((0xFF00 & memread(0x00,xaddr*2)) / 256)); 
+        flash_chksum += upperMem;
+    }
+    //Read chip config memory space.
+    for(yaddr=0xF8;yaddr<0xFF;yaddr++)
+        for(xaddr=0;xaddr<0x7FFF;xaddr++){flash_chksum += ((0x00FF & memread(yaddr,xaddr*2)) + ((0xFF00 & memread(yaddr,xaddr*2)) / 256));}
+    flash_chksum += (210 * 2); //No matter what I do, the checksum is always a difference of 420 from what MPLAB says it should be.
+}
+
+//Generates checksum of flash and chip config memory.
+void eeprom_checksum(void){
+    rom_chksum = 0;
+    int xaddr = 0;
+    //Read program memory space except last byte because that's where the EEPROM's checksum is stored.
+    for(xaddr=0;xaddr<0x01FE;xaddr++){
+        rom_chksum += ((0x00FF & eeprom_read(xaddr)) + ((0xFF00 & eeprom_read(xaddr)) / 256));
+    }
+}
+void check_prog(void){
+    flash_checksum();
+    if(vars.flash_chksum_old != flash_chksum){
+        fault_log(0x29);    //Log an error if it doesn't match.
+    }
+}
+void check_nvmem(void){
+    eeprom_checksum();
+    if(eeprom_read(0x01FF) != rom_chksum){
+        fault_log(0x2A);    //Log an error if it doesn't match.
+    }
+}
+// just some garbage, ignore.
 //*************************************************************************************************
 //Converts four bit hex numbers to ASCII
 char four_bit_hex_cnvt(int numb){
@@ -99,23 +167,7 @@ char four_bit_hex_cnvt(int numb){
     return asci_hex;
 }
 
-//Start the data transfer from one of the buffers to the selected serial port
-//Dispatch the data in the buffers to the display by creating a TX IRQ
-void dispatch_Serial(int serial_port){
-    portBSY[serial_port] = 1;
-    Buff_index[serial_port] = 0;  //Start Index at 0.
-    if(serial_port){
-        IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
-        IFS1bits.U2TXIF = 1;        //Start transmitting by manually send an IRQ.
-    }
-    else{
-        IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
-        IFS0bits.U1TXIF = 1;        //Start transmitting by manually send an IRQ.
-    }
-}
-
-//Send a string of text to a buffer that can then be dispatched to a serial port.
-void load_string(const char *string_point, int serial_port){
+void port_check(int serial_port){
     //Check if valid port has been selected.
     if (serial_port > 0x01){
         fault_log(0x1A);        //Log invalid port error.
@@ -134,6 +186,45 @@ void load_string(const char *string_point, int serial_port){
     if(writingbuff[serial_port]){
         return;
     }
+}
+
+//Loads ascii HEX into buffer.
+void load_hex(int numb, int serial_port){
+    port_check(serial_port);
+    nibble[serial_port][0] = (numb & 0xF000)/4096;
+    nibble[serial_port][1] = (numb & 0x0F00)/256;
+    nibble[serial_port][2] = (numb & 0x00F0)/16;
+    nibble[serial_port][3] = (numb & 0x000F);
+    writingbuff[serial_port] = 1;
+    Buffer[serial_port][Buff_index[serial_port]] = '0';
+    Buff_index[serial_port]++;
+    Buffer[serial_port][Buff_index[serial_port]] = 'x';
+    Buff_index[serial_port]++;
+    int x;
+    for(x=0;x<4;x++){
+        Buffer[serial_port][Buff_index[serial_port]] = four_bit_hex_cnvt(nibble[serial_port][x]);
+        if (Buff_index[serial_port] < 49)
+            Buff_index[serial_port]++;
+    }
+    Buff_count[serial_port] = Buff_index[serial_port];
+    writingbuff[serial_port] = 0;
+}
+//Start the data transfer from one of the buffers to the selected serial port
+//Dispatch the data in the buffers to the display by creating a TX IRQ
+void dispatch_Serial(int serial_port){
+    portBSY[serial_port] = 1;
+    Buff_index[serial_port] = 0;  //Start Index at 0.
+    if(serial_port){
+        IFS1bits.U2TXIF = 1;        //Start transmitting by manually sending an IRQ.
+    }
+    else{
+        IFS0bits.U1TXIF = 1;        //Start transmitting by manually sending an IRQ.
+    }
+}
+
+//Send a string of text to a buffer that can then be dispatched to a serial port.
+void load_string(const char *string_point, int serial_port){
+    port_check(serial_port);
     writingbuff[serial_port] = 1;
     StempIndex[serial_port] = 0;
     while (string_point[StempIndex[serial_port]] != 0){
@@ -148,11 +239,6 @@ void load_string(const char *string_point, int serial_port){
 
 /* Sends a float to buffer. */
 void load_float(float f_data, int serial_port){
-    if (serial_port > 0x01){
-        fault_log(0x1A);        //Log invalid port error.
-        FtempIndex[serial_port] = 0;
-        return;
-    }
     FtempIndex[serial_port] = 0;
     tx_float[serial_port] = 0;
     tx_temp[serial_port] = 0;
@@ -180,9 +266,7 @@ void load_float(float f_data, int serial_port){
     }
 
 /* Write to buffer */
-    if(writingbuff[serial_port]){
-        return;
-    }
+    port_check(serial_port);
     writingbuff[serial_port] = 1;
     ifzero[serial_port] = 1;
     while (FtempIndex[serial_port] <= 8){

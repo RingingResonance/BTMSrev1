@@ -27,71 +27,52 @@
  */
 
 //Save settings to EEPROM
-int set_save(int offset){
-    int x = 0;
-    while (x <= (cfg_space / 2)){
-        eeprom_erase(x + offset);
-        while (NVMCONbits.WR){}
-        eeprom_write(x + offset, config_start[x]);
-        while (NVMCONbits.WR){}
-        x++;
+int save_sets(int offset){
+    check_nvmem();
+    int x;
+    for(x=0;x<(cfg_space / 2);x++){
+        eeprom_write(x + offset, sets.settingsArray[x]);
     }
+    eeprom_checksum();  //Generate new EEPROM checksum.
+    eeprom_write(0x01FF, rom_chksum); //Save EEPROM checksum in last byte of EEPROM.
     return x;
 }
 //Read settings from EEPROM
-void read_save(int offset){
-    int x = 0;
-    while (x <= (cfg_space / 2)){
-        config_start[x] = eeprom_read(x + offset);
-        x++;
+void read_sets(int offset){
+    check_nvmem();
+    int x;
+    for(x=0;x<(cfg_space / 2);x++){
+        sets.settingsArray[x] = eeprom_read(x + offset);
     }
 }
 //Save vars to EEPROM
 int var_save(int offset){
-    int x = 0;
-    while (x <= (vr_space / 2)){
-        eeprom_erase(x + offset);
-        while (NVMCONbits.WR){}
+    check_nvmem();
+    int x;
+    for(x=0;x<(vr_space / 2);x++){
         if (x == 0){
             eeprom_write(x + offset,0x7654);
         }
         else{
-            eeprom_write(x + offset,var_start[x]);
+            eeprom_write(x + offset,vars.variablesArray[x]);
         }
-        while (NVMCONbits.WR){}
-        x++;
     }
+    eeprom_checksum();  //Generate new EEPROM checksum.
+    eeprom_write(0x01FF, rom_chksum);           //Save EEPROM checksum in last byte of EEPROM.
     return x;
 }
 //Read vars from EEPROM
 void read_romvars(int offset){
-    int x = 0;
-    while (x <= (vr_space / 2)){
-        var_start[x] = eeprom_read(x + offset);
-        x++;
+    check_nvmem();
+    int x;
+    for(x=0;x<(vr_space / 2);x++){
+        vars.variablesArray[x] = eeprom_read(x + offset);
     }
-}
-
-//Calculate Space required for saving to eeprom.
-//warning: assignment makes integer from pointer without a cast ya ya I know, but it works like this so don't touch it.
-int cfig_space(void){
-    int data_space1 = 0;
-    int data_space2 = 0;
-    data_space1 = &config_start[0];
-    data_space2 = &config_end;
-    return data_space2 - data_space1;
-}
-int var_space(void){
-    int data_space1 = 0;
-    int data_space2 = 0;
-    data_space1 = &var_start[0];
-    data_space2 = &var_end;
-    return data_space2 - data_space1;
 }
 
 //System power off for power saving.
 void power_off(void){
-    voltage_percentage_old = voltage_percentage;    //Save a copy of voltage percentage before we shut down.
+    vars.voltage_percentage_old = voltage_percentage;    //Save a copy of voltage percentage before we shut down.
     // Enough time should have passed by now that the open circuit voltage should be stabilized enough to get an accurate reading.
     var_save((cfg_space / 2) + 1);      //Save variables before power off.
     PORTDbits.RD2 = 0; //Disable Keep Alive signal.
@@ -240,12 +221,12 @@ void reset_check(void){
 
 //Battery Percentage Calculation. This does NOT calculate the % total charge of battery, only the total voltage percentage.
 void volt_percent(void){
-    if (battery_voltage <= (dischrg_voltage - 2)){
+    if (battery_voltage <= (sets.dischrg_voltage - 2)){
         voltage_percentage = 0;
     }
     else if (battery_current < 0.05 && battery_current > -0.05){
         open_voltage = battery_voltage;
-        voltage_percentage = 100 * ((open_voltage - dischrg_voltage) / (battery_rated_voltage - dischrg_voltage));
+        voltage_percentage = 100 * ((open_voltage - sets.dischrg_voltage) / (sets.battery_rated_voltage - sets.dischrg_voltage));
         got_open_voltage = 1;
     }
 }
@@ -257,7 +238,7 @@ void current_cal(void){
     signswpd_avg_cnt = battery_crnt_average * -1;
     //do the current cal.
     if(curnt_cal_stage == 4){
-        current_compensate = (signswpd_avg_cnt - circuit_draw);
+        current_compensate = (signswpd_avg_cnt - sets.circuit_draw);
         curnt_cal_stage = 5;        //Current Cal Complete
         //send_string(NLtxtNL, "Current Cal.", PORT1);
         if(heat_cal_stage != 5){
@@ -288,17 +269,17 @@ void regulate(void){
     
     //Calculate max discharge current based off battery remaining and battery temp.
     temp_dischrg_rate = 1;
-    if (battery_temp > dischrg_reduce_high_temp || battery_temp < dischrg_reduce_low_temp){
+    if (battery_temp > sets.dischrg_reduce_high_temp || battery_temp < sets.dischrg_reduce_low_temp){
         temp_dischrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
     }
-    if (battery_temp < dischrg_min_temp){
+    if (battery_temp < sets.dischrg_min_temp){
         temp_dischrg_rate = 0.5;     //Decrease the current by 50% if we are too cold.
     }
-    dischrg_current = (dischrg_C_rating * battery_remaining) * temp_dischrg_rate;
+    dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining) * temp_dischrg_rate;
     
     //Don't set our max discharge current below the limp current setpoint.
-    if(dischrg_current < limp_current || battery_temp < dischrg_min_temp){
-        dischrg_current = limp_current;
+    if(dischrg_current < sets.limp_current || battery_temp < sets.dischrg_min_temp){
+        dischrg_current = sets.limp_current;
     }
     
     //Get absolute value for battery current.
@@ -310,13 +291,13 @@ void regulate(void){
     }
     //Calculate max charge current based off battery temp.
     temp_dischrg_rate = 1;
-    if (battery_temp > chrg_reduce_high_temp || battery_temp < chrg_reduce_low_temp){
+    if (battery_temp > sets.chrg_reduce_high_temp || battery_temp < sets.chrg_reduce_low_temp){
         temp_dischrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
     }
     
     //Charge current read and target calculation.
-    chrg_current = (chrg_C_rating * amp_hour_rating) * temp_dischrg_rate;
-    if(battery_temp > chrg_max_temp || battery_temp < chrg_min_temp){
+    chrg_current = (sets.chrg_C_rating * sets.amp_hour_rating) * temp_dischrg_rate;
+    if(battery_temp > sets.chrg_max_temp || battery_temp < sets.chrg_min_temp){
         chrg_current = 0;   //Inhibit charging battery if temperature is out of range.
     }
     
@@ -357,7 +338,7 @@ void regulate(void){
         
         //Run heater if needed, but don't turn it up more than what the charger can handle.
         if(chrg_current_read > 0.01 || (battery_voltage >= chrg_voltage - 0.15)){
-            heat_control(chrg_target_temp);
+            heat_control(sets.chrg_target_temp);
         }
         else if(chrg_current_read == 0 && heat_power > 0){
             heat_power--;
@@ -381,9 +362,9 @@ void regulate(void){
         }
         if(heat_cal_stage != 2 && chrg_rly_timer == 0){
             // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
-            if(((charge_power > 0) && (battery_voltage >= (battery_rated_voltage - 0.01))) || (chrg_current_read > (input_current + 0.01)))
+            if(((charge_power > 0) && (battery_voltage >= (sets.battery_rated_voltage - 0.01))) || (chrg_current_read > (input_current + 0.01)))
                 charge_power--;
-            else if(((charge_power < 101) && (battery_voltage < battery_rated_voltage - 0.07)) || (chrg_current_read < input_current))
+            else if(((charge_power < 101) && (battery_voltage < sets.battery_rated_voltage - 0.07)) || (chrg_current_read < input_current))
                 charge_power++;
         }
         else
@@ -410,7 +391,7 @@ void regulate(void){
         //If we are getting charge power then we need to use it to warm the battery to a higher temp if needed.
         //So check charge input first.
         if(PORTEbits.RE8 == 0){
-            heat_control(dischrg_target_temp);
+            heat_control(sets.dischrg_target_temp);
         }
         //Discharge regulation.
         if(b_safe == 0x55FF){
@@ -423,13 +404,13 @@ void regulate(void){
             //Integral Mode
             //High temp limiting.
             float temp_error = 0;
-            temp_error = battery_temp - dischrg_max_temp;
+            temp_error = battery_temp - sets.dischrg_max_temp;
             voltage_output += analog_smpl_time * (temp_error * temp_proportion);
-            if(voltage_output > battery_rated_voltage){
-                voltage_output = battery_rated_voltage;
+            if(voltage_output > sets.battery_rated_voltage){
+                voltage_output = sets.battery_rated_voltage;
             }
-            else if(voltage_output < dischrg_voltage){
-                voltage_output = dischrg_voltage;
+            else if(voltage_output < sets.dischrg_voltage){
+                voltage_output = sets.dischrg_voltage;
             }
             
             //Low voltage limiting.
@@ -444,8 +425,8 @@ void regulate(void){
             }
             
             //Current regulation.
-            if(current_output > absolute_max_current){
-                current_output = absolute_max_current;
+            if(current_output > sets.absolute_max_current){
+                current_output = sets.absolute_max_current;
             }
             crnt_error = (current_output - dischrg_read) * crnt_proportion;
             if(crnt_error > 10000){
@@ -522,12 +503,12 @@ void heat_control(float target_temp){
 
 //Used to log fault codes. Simple eh? Just call it with the code you want to log.
 void fault_log(int f_code){
-    if (fault_count < 10){
-        fault_codes[fault_count] = f_code;
-        fault_count++;
+    if (vars.fault_count < 10){
+        vars.fault_codes[vars.fault_count] = f_code;
+        vars.fault_count++;
     }
     else{
-        fault_count = 11;       //Fault log full.
+        vars.fault_count = 11;       //Fault log full.
     }
 }
 
@@ -536,7 +517,7 @@ void heater_calibration(void){
         if (heat_cal_stage == 2 && main_power == 1){
             float watts = 0;
             watts = (battery_voltage * battery_current) * -1;
-            if (watts < max_heat){
+            if (watts < sets.max_heat){
             PORTCbits.RC15 = 1;     //Heat Relay On
                 if(heat_rly_timer == 0){
                     heat_set++;
@@ -599,27 +580,27 @@ void heater_calibration(void){
 //Check battery status for faults and dangerous conditions.
 void explody_preventy_check(void){
     //Battery over voltage check
-    if(battery_voltage >= max_battery_voltage){
+    if(battery_voltage >= sets.max_battery_voltage){
         fault_log(0x07);    //Log a high battery voltage shutdown event.
         general_shutdown();
     }
     //Battery under voltage check.
-    if(battery_voltage < low_voltage_shutdown && PORTEbits.RE8 == 0){
+    if(battery_voltage < sets.low_voltage_shutdown && PORTEbits.RE8 == 0){
         fault_log(0x04);    //Log a low battery shutdown event.
         low_battery_shutdown();
     }
     //Battery temp shutdown check
-    if(battery_temp > battery_shutdown_temp){
+    if(battery_temp > sets.battery_shutdown_temp){
         fault_log(0x08);    //Log a battery over temp shutdown event.
         general_shutdown();
     }
     //Controller temp shutdown check
-    if(motor_ctrl_temp > ctrlr_shutdown_temp){
+    if(motor_ctrl_temp > sets.ctrlr_shutdown_temp){
         fault_log(0x09);    //Log a motor controller over temp shutdown event.
         general_shutdown();
     }
     //My temp shutdown check
-    if(my_temp > ctrlr_shutdown_temp){
+    if(my_temp > sets.ctrlr_shutdown_temp){
         fault_log(0x0A);    //Log a My Temp over temp shutdown event.
         general_shutdown();
     }
@@ -633,7 +614,7 @@ void currentCheck(void){
     else {
         dischr_current = 0;
     }
-    if(dischr_current > over_current_shutdown){
+    if(dischr_current > sets.over_current_shutdown){
         if(oc_shutdown_timer > 5){
             general_shutdown();
             oc_shutdown_timer = 0;

@@ -42,86 +42,79 @@ extern void main_power_check(void);
 extern void first_check(void);
 extern void power_off(void);
 extern void analog_sanity(void);
-extern int save_sets(int);
-extern void read_sets(int);
-extern int var_save(int);
-extern void read_romvars(int);
+extern int cfig_space(void);
+extern int var_space(void);
+int set_save(int);
+void read_sets(int);
+int var_save(int);
+void read_romvars(int);
 
 /*****************************/
 /* Init vars and stuff. */
 /* Temperatures are in C */
-/*********;********************/
-//#pragma pack(1)
-struct Settings{
-    //Analog input constants
-    int     settingsArray[1];
-    float   R1_resistance;            //R1 resistance in Kohms
-    float   R2_resistance;             //R2 resistance in Kohms
-    float   bt_vlt_adjst;               //battery voltage input compensation in volts.
-    /*****************************/
-    //Battery Ratings and setpoints
-    float   partial_charge;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
-    float   max_battery_voltage;    //Max battery voltage before shutdown.     
-    float   battery_rated_voltage;           //Target max charge voltage
-    float   dischrg_voltage;        //Minimum battery voltage
-    float   low_voltage_shutdown;    //Battery Low Total Shutdown Voltage
-    float   dischrg_C_rating;           //Discharge C rating
-    float   limp_current;              //Limp mode current in amps
-    float   chrg_C_rating;          //Charge C rating.
-    float   amp_hour_rating;         //Battery amp hour rating.
-    float   over_current_shutdown;        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
-    float   absolute_max_current;      //Max regulating current.
-    //Charge temps.
-    float   chrg_min_temp;          //Battery minimum charge temperature. Stop Charging at this temp.
-    float   chrg_reduce_low_temp;      //Reduce charge current when lower than this temp.
-    float   chrg_max_temp;          //Battery max charge temp. Stop charging at this temp.
-    float   chrg_reduce_high_temp; //Reduce charge current when higher than this temp.
-    float   chrg_target_temp;      //Battery heater charge target temp. Keeps us nice and warm in the winter time.
-    //Discharge temps.
-    float   dischrg_min_temp;       //Battery minimum discharge temperature.
-    float   dischrg_reduce_low_temp;    //Reduced current discharge low temperature.
-    float   dischrg_max_temp;       //Battery max discharge temperature.
-    float   dischrg_reduce_high_temp;       //Battery reduced discharge high temperature.
-    float   dischrg_target_temp;      //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
-    //Shutdown temps.
-    float   battery_shutdown_temp;      //Max battery temp before shutting down everything.
-    float   ctrlr_shutdown_temp;        //Max motor or motor controller temp shutdown.
-    //Fan ctrl temps.
-    float   ctrlr_fan_start;               //Turns on cooling fan.
-    float   batt_fan_start;
-    //Some other stuff.
-    float   max_heat;              //Heater watts that you want to use.
-    float   travel_dist;         //Travel Distance in CM per tire rotation.
-    float   circuit_draw;        //Amount of current that Yeti himself draws. Used for current calibration.
-    int     PowerOffAfter;      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
-}sets;
+/*****************************/
+//Analog input constants
+#define   R1_resistance (*((volatile float *) 0x0800))            //R1 resistance in Kohms
+#define   R2_resistance (*((volatile float *) 0x0804))             //R2 resistance in Kohms
+#define   bt_vlt_adjst (*((volatile float *) 0x0808))               //battery voltage input compensation in volts.
+/*****************************/
+//Battery Ratings and setpoints
+#define   partial_charge (*((volatile float *) 0x080C))            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
+#define   max_battery_voltage (*((volatile float *) 0x0810))    //Max battery voltage before shutdown.     
+#define   battery_rated_voltage (*((volatile float *) 0x0814))           //Target max charge voltage
+#define   dischrg_voltage (*((volatile float *) 0x0818))        //Minimum battery voltage
+#define   low_voltage_shutdown (*((volatile float *) 0x081C))    //Battery Low Total Shutdown Voltage
+#define   dischrg_C_rating (*((volatile float *) 0x0820))           //Discharge C rating
+#define   limp_current (*((volatile float *) 0x0824))              //Limp mode current in amps
+#define   chrg_C_rating (*((volatile float *) 0x0828))          //Charge C rating.
+#define   amp_hour_rating (*((volatile float *) 0x082C))         //Battery amp hour rating.
+#define   over_current_shutdown (*((volatile float *) 0x0830))        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
+#define   absolute_max_current (*((volatile float *) 0x0834))      //Max regulating current.
+//Charge temps.
+#define   chrg_min_temp (*((volatile float *) 0x0838))          //Battery minimum charge temperature. Stop Charging at this temp.
+#define   chrg_reduce_low_temp (*((volatile float *) 0x083C))      //Reduce charge current when lower than this temp.
+#define   chrg_max_temp (*((volatile float *) 0x0840))          //Battery max charge temp. Stop charging at this temp.
+#define   chrg_reduce_high_temp (*((volatile float *) 0x0844)) //Reduce charge current when higher than this temp.
+#define   chrg_target_temp (*((volatile float *) 0x0848))      //Battery heater charge target temp. Keeps us nice and warm in the winter time.
+//Discharge temps.
+#define   dischrg_min_temp (*((volatile float *) 0x084C))       //Battery minimum discharge temperature.
+#define   dischrg_reduce_low_temp (*((volatile float *) 0x0850))    //Reduced current discharge low temperature.
+#define   dischrg_max_temp (*((volatile float *) 0x0854))       //Battery max discharge temperature.
+#define   dischrg_reduce_high_temp (*((volatile float *) 0x0858))       //Battery reduced discharge high temperature.
+#define   dischrg_target_temp (*((volatile float *) 0x085C))      //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
+//Shutdown temps.
+#define   battery_shutdown_temp (*((volatile float *) 0x0860))      //Max battery temp before shutting down everything.
+#define   ctrlr_shutdown_temp (*((volatile float *) 0x0864))        //Max motor or motor controller temp shutdown.
+//Fan ctrl temps.
+#define   ctrlr_fan_start (*((volatile float *) 0x0868))               //Turns on cooling fan.
+#define   batt_fan_start (*((volatile float *) 0x086C))
+//Some other stuff.
+#define   max_heat (*((volatile float *) 0x0870))              //Heater watts that you want to use.
+#define   travel_dist (*((volatile float *) 0x0874))         //Travel Distance in CM per tire rotation.
+#define   circuit_draw (*((volatile float *) 0x0878))        //Amount of current that Yeti himself draws. Used for current calibration.
+#define   PowerOffAfter (*((volatile int *) 0x087C))      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
 //***************************************************************************************
 /*****************************/
 /*****************************/
 /*****************************/
 /*****************************/
-//#pragma pack(1)
-struct Variables{
-    int     variablesArray[1];
-    // Fault Codes.
-    int     fault_codes[10];
-    int     fault_count;
-    int     flash_chksum_old;           //System Flash Checksum as stored in NV-mem
+#define  flash_chksum_old  (*((volatile int *) 0x087E))           //System Flash Checksum as stored in NV-mem
 // Calculated Battery Ratings
-    double  battery_capacity;           //Calculated total battery capacity in ah
-    float   absolute_battery_usage;     //Max total power used from battery.
-    int     partial_chrg_cnt;           //How many times have we plugged in the charger since the last full charge?
-    float   voltage_percentage_old;     //Voltage percentage from the last time we where on.
-    double  battery_usage;              //Calculated Ah usage in/out of battery
-    double  battery_usage_smll;
-    double  battery_remaining;          //Calculated remaining capacity in battery.
-    double  battery_remaining_smll;
-}vars; 
-/*****************************/
+#define  battery_capacity (*((volatile double *) 0x0880))           //Calculated total battery capacity in ah
+#define  absolute_battery_usage (*((volatile float *) 0x0888))     //Max total power used from battery.
+#define  partial_chrg_cnt (*((volatile int *) 0x088C))           //How many times have we plugged in the charger since the last full charge?
+#define  voltage_percentage_old (*((volatile float *) 0x088E))     //Voltage percentage from the last time we where on.
+#define  battery_usage (*((volatile double *) 0x0892))              //Calculated Ah usage in/out of battery
+#define  battery_usage_smll (*((volatile double *) 0x089A))
+#define  battery_remaining (*((volatile double *) 0x08A2))          //Calculated remaining capacity in battery.
+#define  battery_remaining_smll (*((volatile double *) 0x08AA))
 /*****************************/
 /* End of SAVE vars. */
 /*****************************/
 /*****************************/
+// Fault Codes.
+int fault_codes[10];
+int fault_count = 0;
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
 float   vltg_dvid = 0;              //Value for calculating the ratio of the input voltage divider.

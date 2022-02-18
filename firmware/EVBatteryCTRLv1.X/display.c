@@ -24,7 +24,7 @@
 #include "errorCodes.h"
 
 //Check if serial port is busy.
-//If used, ensure that it is used by the lowest priority IRQ possible.
+//If used, ensure that it is used by an IRQ priority that is lower than TX IRQs.
 void portBusyIdle(int serial_port){
     while(portBSY[serial_port]){
         PORTBbits.RB6 = 0;      //Turn CPU ACT light off.
@@ -34,25 +34,24 @@ void portBusyIdle(int serial_port){
 }
 
 /* Read fault codes to serial port.
- * This takes up over 5% of program space.
- */
+ * This takes up over 5% of program space.*/
 void fault_read(int serial_port){
     load_string("Reading Faults.\r\n", serial_port);
     dispatch_Serial(serial_port);
     flt_index[serial_port] = 0;
     const char *textpointer;
     portBusyIdle(serial_port);  //Check to see if port is ready.
-    if(fault_count > 10){
+    if(vars.fault_count > 10){
         load_string("Fault Log Full.\r\n", serial_port);
         dispatch_Serial(serial_port);
     }
-    if(fault_count == 0){
+    if(vars.fault_count == 0){
         load_string("No fault codes.\r\n", serial_port);
         dispatch_Serial(serial_port);
     }
     else{
-        while(flt_index[serial_port] < fault_count){
-                switch(fault_codes[flt_index[serial_port]]){
+        while(flt_index[serial_port] < vars.fault_count){
+                switch(vars.fault_codes[flt_index[serial_port]]){
                     case 0x01:
                         textpointer = code01;
                     break;
@@ -173,11 +172,20 @@ void fault_read(int serial_port){
                     case 0x28:
                         textpointer = code28;
                     break;
+                    case 0x29:
+                        textpointer = code29;
+                    break;
+                    case 0x2A:
+                        textpointer = code2A;
+                    break;
                     default:
                         textpointer = codeDefault;
                     break;
                 }
             portBusyIdle(serial_port);  //Check to see if port is ready.
+            load_string("Code: ", serial_port);
+            load_hex(vars.fault_codes[flt_index[serial_port]],serial_port);
+            load_string(" -> ", serial_port);
             load_string(textpointer, serial_port);
             load_string("\r\n", serial_port);
             dispatch_Serial(serial_port);
@@ -187,25 +195,28 @@ void fault_read(int serial_port){
 }
 
 void cGetData(int serial_port){
+    //Data input
     if(serial_port)
         CMD_buff[serial_port][CMD_Point[serial_port]] = U2RXREG;
     else
         CMD_buff[serial_port][CMD_Point[serial_port]] = U1RXREG;
-
+    //Data echo
     if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) || (CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0A))){
         if(serial_port)
             U2TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
         else
             U1TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
     }
-    if (CMD_buff[serial_port][CMD_Point[serial_port]] == 0x0D){     //Check for a RETURN
+    //Check for a RETURN
+    if (CMD_buff[serial_port][CMD_Point[serial_port]] == 0x0D){
         if (Lecho[serial_port]){
             load_string("\r\n", serial_port);
         }
         bufsize[serial_port] = CMD_Point[serial_port];
         CMD_Point[serial_port] = 0;
-        cmdRDY[serial_port] = 1;                 //Tell our command handler to process.
+        cmdRDY[serial_port] = 1; //Tell our command handler to process.
     }
+    //No RETURN detected? Store the data.
     else if(CMD_Point[serial_port] < Clength) {
         CMD_Point[serial_port]++;
     }
@@ -227,7 +238,7 @@ void Command_Interp(int serial_port){
         //Send command receive "@"
         load_string("@", serial_port);
         //Check for faults.
-        if(fault_count > 0){
+        if(vars.fault_count > 0){
             //Send fault alert "!"
             load_string("!", serial_port);
         }
@@ -238,6 +249,32 @@ void Command_Interp(int serial_port){
                 CMD_Point[serial_port] = 0;
                 cmdRDY[serial_port] = 0;
                 asm("reset");
+            break;
+            case '$':       
+                //Generate flash and chip config checksum and compare it to the old one.
+                load_string("\r\nPRG:\r\nStored:", serial_port);
+                load_hex(vars.flash_chksum_old, serial_port);
+                load_string("\r\nCalc:  ", serial_port);
+                check_prog();
+                load_hex(flash_chksum, serial_port);
+                load_string("\r\n", serial_port);
+            break;
+            case '&':
+                //Generate EEPROM checksum and compare it to the old one.
+                load_string("\r\nNVM:\r\nStored:", serial_port);
+                load_hex(eeprom_read(0x01FF), serial_port);
+                load_string("\r\nCalc:  ", serial_port);
+                check_nvmem();
+                load_hex(rom_chksum, serial_port);
+                load_string("\r\n", serial_port);
+            break;
+            case '%':
+                load_string("\r\nSettings and Vars Saved.\r\n", serial_port);
+                save_sets(0x00);
+                var_save((cfg_space / 2) + 1);  //Save settings to NV-memory
+            break;
+            case '1':
+                load_hex(eeprom_read(0x00),serial_port);
             break;
             case 'H':
                 heat_cal_stage = 1;
@@ -276,20 +313,21 @@ void Command_Interp(int serial_port){
                 load_string("!!BMon Off!!\r\n", serial_port);
             break;
             case 'C':
-                fault_count = 0;
+                vars.fault_count = 0;
                 fault_shutdown = 0;
-                heat_cal_stage = 0;
+                if(heat_cal_stage != 5)
+                    heat_cal_stage = 0;
                 osc_fail_event = 0;
                 load_string("Faults Cleared.\r\n", serial_port);
             break;
             case 'Z':
                 p_charge = 0;
-                chrg_voltage = battery_rated_voltage;
+                chrg_voltage = sets.battery_rated_voltage;
                 if(PORTEbits.RE8 == 1){
-                    partial_chrg_cnt = 0;
+                    vars.partial_chrg_cnt = 0;
                 }
                 else{
-                    partial_chrg_cnt = 10;
+                    vars.partial_chrg_cnt = 10;
                 }
             break;
             case 'U':

@@ -22,46 +22,45 @@
 #include "Init.h"
 
 void default_sets(void){
-    config_start[0] = 0x4567;
-    R1_resistance = 200;            //R1 resistance in Kohms
-    R2_resistance = 16;             //R2 resistance in Kohms
-    bt_vlt_adjst = -0.231;               //battery voltage input compensation in volts.
+    sets.R1_resistance = 200;            //R1 resistance in Kohms
+    sets.R2_resistance = 16;             //R2 resistance in Kohms
+    sets.bt_vlt_adjst = -0.231;               //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
-    partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
-    max_battery_voltage = 59.08;    //Max battery voltage before shutdown.
-    battery_rated_voltage = 58.8;           //Target max charge voltage
-    dischrg_voltage = 39.2;        //Minimum battery voltage
-    low_voltage_shutdown = 35;    //Battery Low Total Shutdown Voltage
-    dischrg_C_rating = 2;           //Discharge C rating
-    limp_current = 5;              //Limp mode current in amps
-    chrg_C_rating = 0.5;          //Charge C rating.
-    amp_hour_rating = 22;         //Battery amp hour rating.
-    over_current_shutdown = 30;        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
-    absolute_max_current = 25;      //Max regulating current.
+    sets.partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
+    sets.max_battery_voltage = 59.08;    //Max battery voltage before shutdown.
+    sets.battery_rated_voltage = 58.8;           //Target max charge voltage
+    sets.dischrg_voltage = 39.2;        //Minimum battery voltage
+    sets.low_voltage_shutdown = 35;    //Battery Low Total Shutdown Voltage
+    sets.dischrg_C_rating = 2;           //Discharge C rating
+    sets.limp_current = 5;              //Limp mode current in amps
+    sets.chrg_C_rating = 0.5;          //Charge C rating.
+    sets.amp_hour_rating = 22;         //Battery amp hour rating.
+    sets.over_current_shutdown = 30;        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
+    sets.absolute_max_current = 25;      //Max regulating current.
     //Charge temps.
-    chrg_min_temp = 10;          //Battery minimum charge temperature. Stop Charging at this temp.
-    chrg_reduce_low_temp = 15;      //Reduce charge current when lower than this temp.
-    chrg_max_temp = 40;          //Battery max charge temp. Stop charging at this temp.
-    chrg_reduce_high_temp = 35; //Reduce charge current when higher than this temp.
-    chrg_target_temp = 25;      //Battery heater charge target temp. Keeps us nice and warm in the winter time.
+    sets.chrg_min_temp = 10;          //Battery minimum charge temperature. Stop Charging at this temp.
+    sets.chrg_reduce_low_temp = 15;      //Reduce charge current when lower than this temp.
+    sets.chrg_max_temp = 40;          //Battery max charge temp. Stop charging at this temp.
+    sets.chrg_reduce_high_temp = 35; //Reduce charge current when higher than this temp.
+    sets.chrg_target_temp = 25;      //Battery heater charge target temp. Keeps us nice and warm in the winter time.
     //Discharge temps.
-    dischrg_min_temp = 0;       //Battery minimum discharge temperature.
-    dischrg_reduce_low_temp = 10;    //Reduced current discharge low temperature.
-    dischrg_max_temp = 55;       //Battery max discharge temperature.
-    dischrg_reduce_high_temp = 50;       //Battery reduced discharge high temperature.
-    dischrg_target_temp = 15;      //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
+    sets.dischrg_min_temp = 0;       //Battery minimum discharge temperature.
+    sets.dischrg_reduce_low_temp = 10;    //Reduced current discharge low temperature.
+    sets.dischrg_max_temp = 55;       //Battery max discharge temperature.
+    sets.dischrg_reduce_high_temp = 50;       //Battery reduced discharge high temperature.
+    sets.dischrg_target_temp = 15;      //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
     //Shutdown temps.
-    battery_shutdown_temp = 60;      //Max battery temp before shutting down everything.
-    ctrlr_shutdown_temp = 80;        //Max motor or motor controller temp shutdown.
+    sets.battery_shutdown_temp = 60;      //Max battery temp before shutting down everything.
+    sets.ctrlr_shutdown_temp = 80;        //Max motor or motor controller temp shutdown.
     //Fan ctrl temps.
-    ctrlr_fan_start = 50;               //Turns on cooling fan.
-    batt_fan_start = 30;
+    sets.ctrlr_fan_start = 50;               //Turns on cooling fan.
+    sets.batt_fan_start = 30;
     //Some other stuff.
-    max_heat = 50;              //Heater watts that you want to use.
-    travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
-    circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
-    PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
+    sets.max_heat = 50;              //Heater watts that you want to use.
+    sets.travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
+    sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
+    sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
 }
 
 void Init(void){
@@ -77,10 +76,6 @@ void Init(void){
     TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
     LATD = 0;
     PORTDbits.RD2 = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
-    /**************************/
-    /* Analog inputs and general IO */
-    TRISB = 0x008F;              //set portb to mix analog inputs and digital outputs.
-    LATB = 0;               //clear portb
     /**************************/
     /* General IO */
     TRISC = 0x0000;
@@ -196,7 +191,7 @@ void Init(void){
     IFS2 = 0;
 
 	// enable interrupts
-	__asm__ volatile ("DISI #0x3FFF");
+	__asm__ volatile ("DISI #0x3FFF");  //First disable IRQs via instruction.
     IEC0 = 0;
     IEC1 = 0;
     IEC2 = 0;
@@ -216,7 +211,7 @@ void Init(void){
     IEC0bits.ADIE = 1;  // Enable ADC IRQs.
     INTCON2bits.INT0EP = 0;
     INTCON2bits.INT2EP = 0;
-DISICNT = 0;
+    DISICNT = 0;
 /*****************************/
 /* Enable our devices. */
 /*****************************/
@@ -233,7 +228,7 @@ DISICNT = 0;
 /* Now do some pre-calculations. */
 
     //Calculate our voltage divider values.
-    vltg_dvid = R2_resistance / (R1_resistance + R2_resistance);
+    vltg_dvid = sets.R2_resistance / (sets.R1_resistance + sets.R2_resistance);
     //Calculate our charge/discharge rate.
     calc_125 = 0.125 / 3600;
     //We've done Init.
@@ -241,10 +236,9 @@ DISICNT = 0;
     //We aren't in low power mode
     lw_pwr = 0;
     //Calculate max charge current.
-    max_chrg_current = chrg_C_rating * amp_hour_rating;
+    max_chrg_current = sets.chrg_C_rating * sets.amp_hour_rating;
     //Send Init message.
     //send_string(NLtxtNL, "Initialized.", PORT1);
-
 }
 
 //Go in to low power mode when not in use.
@@ -253,13 +247,11 @@ void low_power_mode(void){
     ADCON1bits.ADON = 0;    // turn ADC off
     T2CONbits.TON = 0;      // Stop Timer 2
     T3CONbits.TON = 0;      // Stop Timer 3
-    	// disable interrupts
-	__asm__ volatile ("DISI #0x3FFF");
+    // disable interrupts
     IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
-    IEC0bits.T2IE = 0;	// disable interrupts for timer 2
+    IEC0bits.T2IE = 0;      //disable interrupts for timer 2
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
-    DISICNT = 0;
     //Need to reinit on restart
     init_done = 0;
     //Tell everyone we are in low power mode.

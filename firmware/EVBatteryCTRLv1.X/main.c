@@ -33,33 +33,41 @@
 #include "Init.h"
 #include "Init.c"
 #include "display.c"
+#include "display.h"
 
 /* Program Start */
 /***********************************************************
 ***********************************************************/
 int main(void){
+    /* Analog inputs and general IO */
+    TRISB = 0x008F;          //set portb to mix analog inputs and digital outputs.
+    LATB = 0;               //clear portb
+    PORTBbits.RB6 = 1;
     //Calculate space required for eeprom storage.
-    cfg_space = cfig_space();
-    vr_space = var_space();
+    cfg_space = sizeof(sets);
+    vr_space = sizeof(vars);
+    writingbuff[PORT1] = 0;
     //Set Initial Defaults if EEPROM is blank. Otherwise load Settings from EEPROM
     if (eeprom_read(0x00) != 0x4567){
         default_sets();
     }
     else{
-        read_save(0x00);
-    }
-    //Check to see if we have saved vars once before. Load them if we have.
-    if (eeprom_read((cfg_space / 2) + 1) == 0x7654){
-        read_romvars((cfg_space / 2) + 1);
+        read_sets(0x00);
     }
     first_check();              //Do an initial reset and warm start check.
     EnableChIRQ = 0;            //Disable Charge Detect IRQ on power up.
-    Init();                     //First initialize.
+    Init();                     //Initialize.
+    //Check to see if we have saved vars once before. Load them if we have.
+    if (eeprom_read((cfg_space / 2) + 1) == 0x7654){
+        read_romvars((cfg_space / 2) + 1);
+        //Compare the generated checksums with the stored ones.
+        check_prog();
+    }
+    else {
+        flash_checksum();
+        vars.flash_chksum_old = flash_chksum;       //Save checksum for the first time.
+    }
     analog_smpl_time = 1 / (((IPS * 1000000) / (ADCON3upper8 + ADCON3lower8)) / 45);        //Calculate analog sample time.
-    //send_string(NLtxtNL, "System Start.", PORT1);
-    /*config_save();
-    config_load();
-    float_send(testguy2);*/
 
 /*****************************/
     // Main Loop.
@@ -82,7 +90,8 @@ int main(void){
              * It's what I had on hand when I first started developing this.
              * Oh well, we have ways of getting around it so it works for now.
              */
-            Idle();
+            Idle(); 
+            //Sleep();
             deep_sleep = 0;
         }
         else{

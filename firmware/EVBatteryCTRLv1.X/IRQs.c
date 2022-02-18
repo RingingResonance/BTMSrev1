@@ -35,25 +35,25 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     //reset peak power when we plug in a charger.
     peak_power = 0;
     //Check for partial charge status to see if we need to do a full charge to ballance the cells.
-    if(partial_charge > 1){
-        partial_charge = 1;
+    if(sets.partial_charge > 1){
+        sets.partial_charge = 1;
         fault_log(0x1C);            // Log Partial charge was set higher than 100% event.
     }
     //If parial_charge is set to 0% then we disable and charge the battery up to full every time.
-    if(partial_charge == 0){
-        chrg_voltage = battery_rated_voltage;
+    if(sets.partial_charge == 0){
+        chrg_voltage = sets.battery_rated_voltage;
         p_charge = 0;
     }
     //Do a full charge every 10 cycles so that we can ballance the cells.
-    if(power_plugged != 1 && partial_chrg_cnt < 10){
-        partial_chrg_cnt++;
+    if(power_plugged != 1 && vars.partial_chrg_cnt < 10){
+        vars.partial_chrg_cnt++;
         p_charge = 1;
-        chrg_voltage = ((battery_rated_voltage - dischrg_voltage) * partial_charge) + dischrg_voltage;
+        chrg_voltage = ((sets.battery_rated_voltage - sets.dischrg_voltage) * sets.partial_charge) + sets.dischrg_voltage;
     }
-    else if(power_plugged != 1 && partial_chrg_cnt >= 10){
-        partial_chrg_cnt = 0;
+    else if(power_plugged != 1 && vars.partial_chrg_cnt >= 10){
+        vars.partial_chrg_cnt = 0;
         p_charge = 0;
-        chrg_voltage = battery_rated_voltage;
+        chrg_voltage = sets.battery_rated_voltage;
     }
     /* If heat_cal is not running, is not disabled, and key switch/cmd_power is off
      * run heater calibration check when charger is plugged in.
@@ -61,17 +61,16 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     if(heat_cal_stage != 2 && PORTFbits.RF1 == 1 && cmd_power == 0 && power_plugged == 0 && fault_shutdown == 0){
         curnt_cal_stage = 1;
         //Check for disabled heater setting.
-        if(heat_cal_stage != 5){
+        if(heat_cal_stage != 5)
             heat_cal_stage = 1;
-        }
         //soft_power = 1;
         power_plugged = 1;
     }
     
     //Reset battery usage session when charger is plugged in and power is turned off.
     if(PORTFbits.RF1 == 1 && cmd_power == 0){
-        battery_usage = 0;      //Reset battery usage session.
-        battery_usage_smll = 0;
+        vars.battery_usage = 0;      //Reset battery usage session.
+        vars.battery_usage_smll = 0;
     }
     charger_detected = 1;
     IFS0bits.INT0IF = 0;
@@ -83,7 +82,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt (void){
     wheelTime = TMR3;
     TMR3 = 0;
     if (wheelSpin)
-        speed = 3600 * (travel_dist / (wheelTime / 65,535)); //This gives us KM per hour.
+        speed = 3600 * (sets.travel_dist / (wheelTime / 65535)); //This gives us KM per hour.
     wheelSpin = 1;
     IFS1bits.INT1IF = 0;
 }
@@ -124,7 +123,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         //adctemp0 *= 5;      //Converted to 0 - 5V voltage.
         //Do it all at once to save time.
         adctemp0 /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
-        battery_voltage = (adctemp0 / vltg_dvid) + bt_vlt_adjst;    //Use resistor divider values to covert to actual voltage.
+        battery_voltage = (adctemp0 / vltg_dvid) + sets.bt_vlt_adjst;    //Use resistor divider values to covert to actual voltage.
         adctemp0 = 0;       //Clear average.
 
         //Battery temperature.
@@ -244,7 +243,7 @@ void __attribute__((interrupt, no_auto_psv)) _U2RXInterrupt (void){
 /* Output IRQ for Port 1 */
 void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
     PORTBbits.RB6 = 1;
-    //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
+    //Dispatch the buffer to the little 4 word Serial Port buffer as it empties.
     while(U1STAbits.UTXBF == 0 && (Buff_index[PORT1] < Buff_count[PORT1])){
         U1TXREG = Buffer[PORT1][Buff_index[PORT1]];
         Buff_index[PORT1]++;
@@ -253,8 +252,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
     if (Buff_index[PORT1] >= Buff_count[PORT1]){
         Buff_index[PORT1] = 0;
         Buff_count[PORT1] = 0;
-        portBSY[PORT1] = 0;
-        //IEC0bits.U1TXIE = 0; //Disable interrupt for UART when done.
+        portBSY[PORT1] = 0;//Inhibits writing to buffer while the serial port is transmitting buffer.
     }
     /****************************************/
     /* End the IRQ. */
@@ -264,7 +262,7 @@ void __attribute__((interrupt, no_auto_psv)) _U1TXInterrupt (void){
 /* Output IRQ for Port 2 */
 void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt (void){
     PORTBbits.RB6 = 1;
-    //Dispatch the big buffer to the little 4 word Serial Port buffer as it empties.
+    //Dispatch the buffer to the little 4 word Serial Port buffer as it empties.
     while(U2STAbits.UTXBF == 0 && (Buff_index[PORT2] < Buff_count[PORT2])){
         U2TXREG = Buffer[PORT2][Buff_index[PORT2]];
         Buff_index[PORT2]++;
@@ -273,8 +271,7 @@ void __attribute__((interrupt, no_auto_psv)) _U2TXInterrupt (void){
     if (Buff_index[PORT2] >= Buff_count[PORT2]){
         Buff_index[PORT2] = 0;
         Buff_count[PORT2] = 0;
-        portBSY[PORT2] = 0;
-        //IEC1bits.U2TXIE = 0; //Disable interrupt for UART when done.
+        portBSY[PORT2] = 0;//Inhibits writing to buffer while the serial port is transmitting buffer.
     }
     /****************************************/
     /* End the IRQ. */
@@ -296,7 +293,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
      */
 
     if(main_power){
-        PowerOffTimer = PowerOffAfter;      //reset the timer when main_power is on.
+        PowerOffTimer = sets.PowerOffAfter;      //reset the timer when main_power is on.
         PowerOffTimerSec = 59;              //60 seconds.
         PORTDbits.RD2 = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
     }
@@ -317,7 +314,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     }
     /***************************************************************************/
     //Over current shutdown timer stuff.
-    if(oc_shutdown_timer > 0 && dischr_current < over_current_shutdown){
+    if(oc_shutdown_timer > 0 && dischr_current < sets.over_current_shutdown){
         oc_shutdown_timer--;
     }
     // Check for charger disconnect.
@@ -328,10 +325,10 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     }
 
     //Fan control
-    if(main_power && (battery_temp > batt_fan_start || my_temp > ctrlr_fan_start || motor_ctrl_temp > ctrlr_fan_start)){
+    if(main_power && (battery_temp > sets.batt_fan_start || my_temp > sets.ctrlr_fan_start || motor_ctrl_temp > sets.ctrlr_fan_start)){
         PORTFbits.RF0 = 1;
     }
-    else if(main_power == 0 || (battery_temp < (batt_fan_start - 5) && my_temp < (ctrlr_fan_start - 5) && motor_ctrl_temp < (ctrlr_fan_start - 5))){
+    else if(main_power == 0 || (battery_temp < (sets.batt_fan_start - 5) && my_temp < (sets.ctrlr_fan_start - 5) && motor_ctrl_temp < (sets.ctrlr_fan_start - 5))){
         PORTFbits.RF0 = 0;
     }
     
@@ -351,7 +348,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         }
         else{
             error_blink = 1;
-            if(fault_count != 0){
+            if(vars.fault_count != 0){
                 PORTBbits.RB5 = 1;
             }
         }
@@ -375,14 +372,14 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         //Check to see if we have valid data in EEPROM that we can start with.
         if (eeprom_read((cfg_space / 2) + 1) == 0x7654){
             //Calculate how much power was used while the power was off. This is not exact, but should be close enough.
-            int power_diff = (battery_capacity * ((voltage_percentage_old - voltage_percentage) / 100));
-            battery_remaining -= power_diff;        //Subtract the power difference
-            absolute_battery_usage -= power_diff;
-            battery_usage -= power_diff;
+            int power_diff = (vars.battery_capacity * ((vars.voltage_percentage_old - voltage_percentage) / 100));
+            vars.battery_remaining -= power_diff;        //Subtract the power difference
+            vars.absolute_battery_usage -= power_diff;
+            vars.battery_usage -= power_diff;
         }
         else{
-            battery_capacity = amp_hour_rating; //Just use the amp hour rating on first start.
-            battery_remaining = amp_hour_rating * (voltage_percentage / 100);   //Rough estimation of how much power is left.
+            vars.battery_capacity = sets.amp_hour_rating; //Just use the amp hour rating on first start.
+            vars.battery_remaining = sets.amp_hour_rating * (voltage_percentage / 100);   //Rough estimation of how much power is left.
         }
         first_cal = 9;      //Signal that we are done with power up.
         soft_power = 0;
@@ -406,61 +403,61 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     volt_percent();
     
     //Get the absolute value of battery_usage and store it in absolute_battery_usage.
-    if(battery_usage < 0){
-        absolute_battery_usage = battery_usage * -1;
+    if(vars.battery_usage < 0){
+        vars.absolute_battery_usage = vars.battery_usage * -1;
     }
     else{
-        absolute_battery_usage = battery_usage;
+        vars.absolute_battery_usage = vars.battery_usage;
     }
     
     //Calculate the max capacity of the battery once the battery has been fully charged and fully discharged.
     if(voltage_percentage > 99 && power_session != 4){
         //battery_capacity = absolute_battery_usage;
-        battery_remaining = battery_capacity;
+        vars.battery_remaining = vars.battery_capacity;
         //if(power_session != 4){
             power_session = 4;
-            battery_usage = 0;  //reset battery usage session.
-            battery_usage_smll = 0;
+            vars.battery_usage = 0;  //reset battery usage session.
+            vars.battery_usage_smll = 0;
         //}
     }
     //At about 82% voltage the battery is at about 50% actual capacity for lithium ion.
     else if(voltage_percentage < 83 && voltage_percentage > 81 && (power_session == 4 || power_session == 0)){
-        battery_capacity = absolute_battery_usage;  //Calculate the max capacity of the battery after a half discharge.
-        battery_capacity *= 2;
+        vars.battery_capacity = vars.absolute_battery_usage;  //Calculate the max capacity of the battery after a half discharge.
+        vars.battery_capacity *= 2;
         power_session = 2;
     }
     else if(voltage_percentage < 1 && power_session != 0){
-        battery_capacity = absolute_battery_usage;  //Calculate the max capacity of the battery after a full discharge.
-        battery_remaining = 0;  // Set ah remaining to 0 when less than 2% voltage.
-        battery_remaining_smll = 0;
+        vars.battery_capacity = vars.absolute_battery_usage;  //Calculate the max capacity of the battery after a full discharge.
+        vars.battery_remaining = 0;  // Set ah remaining to 0 when less than 2% voltage.
+        vars.battery_remaining_smll = 0;
         power_session = 0;
-        battery_usage = 0;  //reset battery usage session.
-        battery_usage_smll = 0;
+        vars.battery_usage = 0;  //reset battery usage session.
+        vars.battery_usage_smll = 0;
     }
 
     //Don't let battery_remaining go below 0;
     //This should never happen in normal conditions. This is just a catch.
-    if(battery_remaining < 0){
-        battery_remaining = 0;
-        battery_remaining_smll = 0;
+    if(vars.battery_remaining < 0){
+        vars.battery_remaining = 0;
+        vars.battery_remaining_smll = 0;
     }
     //*******************************************
     //Don't let battery_remaining go above battery capacity, ever.
-    if(battery_remaining > battery_capacity + 0.005){
-        battery_remaining = battery_capacity + 0.005;        //Go slightly above. Just slightly.
+    if(vars.battery_remaining > vars.battery_capacity + 0.005){
+        vars.battery_remaining = vars.battery_capacity + 0.005;        //Go slightly above. Just slightly.
     }
     //Don't let battery remaining go above the partial charge percentage when partial charging.
     //To Do: This isn't exactly right because 90% Voltage != 90% total capacity!!! It's only a few % off so for now it's okay.
-    if(battery_voltage < (partial_charge * battery_rated_voltage) && p_charge && battery_remaining > (battery_capacity * partial_charge)){
-        battery_remaining = (battery_capacity * partial_charge);
+    if(battery_voltage < (sets.partial_charge * sets.battery_rated_voltage) && p_charge && vars.battery_remaining > (vars.battery_capacity * sets.partial_charge)){
+        vars.battery_remaining = (vars.battery_capacity * sets.partial_charge);
     }
     //**************************************************
     //Circuit draw compensation.
     //Heart beat draws power even when the system is off. This logs that current draw.
     if(main_power == 0){
-        battery_remaining -= (circuit_draw * 0.0002777);
+        vars.battery_remaining -= (sets.circuit_draw * 0.0002777);
     }
-    //**************************************************
+//**************************************************
 //battery_usage = 0;      //Reset battery usage session.
 /****************************************/
     /* End the IRQ. */
@@ -521,23 +518,23 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     //Do not track current usage if below +-0.002 amps due to error in current sensing. We need a lower pass filter then what we already have.
     if(battery_current > 0.002 || battery_current < -0.002){
         //Calculate how much current has gone in/out of the battery.
-        battery_usage_smll = battery_usage_smll + (calc_125 * battery_current); 
-        battery_remaining_smll = battery_remaining_smll + (calc_125 * battery_current);
-        if(battery_usage_smll > 0.001){
-            battery_usage_smll -= 0.001;
-            battery_usage += 0.001;
+        vars.battery_usage_smll = vars.battery_usage_smll + (calc_125 * battery_current); 
+        vars.battery_remaining_smll = vars.battery_remaining_smll + (calc_125 * battery_current);
+        if(vars.battery_usage_smll > 0.001){
+            vars.battery_usage_smll -= 0.001;
+            vars.battery_usage += 0.001;
         }
-        else if(battery_usage_smll < -0.001){
-            battery_usage_smll += 0.001;
-            battery_usage -= 0.001;
+        else if(vars.battery_usage_smll < -0.001){
+            vars.battery_usage_smll += 0.001;
+            vars.battery_usage -= 0.001;
         }
-        if(battery_remaining_smll > 0.001){
-            battery_remaining_smll -= 0.001;
-            battery_remaining += 0.001;
+        if(vars.battery_remaining_smll > 0.001){
+            vars.battery_remaining_smll -= 0.001;
+            vars.battery_remaining += 0.001;
         }
-        else if(battery_remaining_smll < -0.001){
-            battery_remaining_smll += 0.001;
-            battery_remaining -= 0.001;
+        else if(vars.battery_remaining_smll < -0.001){
+            vars.battery_remaining_smll += 0.001;
+            vars.battery_remaining -= 0.001;
         }
     }
     //*************************************************************

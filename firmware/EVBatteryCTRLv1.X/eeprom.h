@@ -14,14 +14,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>*/
 
-#ifndef INIT_H
-#define	INIT_H
+#ifndef eeprom_H
+#define	eeprom_H
 
-extern void Init(void);
-extern void low_battery_shutdown(void);
-extern void low_power_mode(void);
-extern void default_sets(void);
-extern void sys_debug(void);
+extern int eeprom_erase(int);   //address. 0x00 through 0x1FF.      Returns 0 on success.
+extern int eeprom_write(int, int);  //address, data.    Returns 0 on success.
+extern int eeprom_read(int);    //address. Returns data or 0 on failure.
+extern void save_sets(void);
+extern int read_sets(void);
+extern void save_vars(void);
+extern int read_vars(void);
+extern void get_variables(void);
+void get_settings(void);
 
-#endif	/* INIT_H */
+int upperMem = 0;
+int printSets = 0;
+
+#endif	/* DATAIO_H */
 

@@ -14,14 +14,28 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>*/
 
-#ifndef INIT_H
-#define	INIT_H
+#ifndef chksum_H
+#define	chksum_H
 
-extern void Init(void);
-extern void low_battery_shutdown(void);
-extern void low_power_mode(void);
-extern void default_sets(void);
-extern void sys_debug(void);
+void flash_checksum(void);
+void eeprom_checksum(void);
+int check_prog(void);
+int check_nvmem(void);
+void nvmSets_checksum(void);
+void ramSets_checksum(void);
+int check_ramSets(void);
+int check_nvmSets(void);
+void ram_chksum_update(void);
+void prgm_chksum_update(void);
+void nvm_chksum_update(void);
 
-#endif	/* INIT_H */
+int flash_chksum = 0;
+int rom_chksum = 0;
+int nvSets_chksum = 0;
+int ramSets_chksum = 0;
+int ramSets_chksum_old = 0;
+int check_timer = 0;
+int ram_err_count = 0;
+
+#endif	/* DATAIO_H */
 

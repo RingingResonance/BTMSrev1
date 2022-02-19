@@ -61,12 +61,11 @@ void default_sets(void){
     sets.travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
     sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
+    ram_chksum_update();         //Generate new checksum.
 }
-
-void Init(void){
-/*******************************
- * initialization values setup.
-*******************************/
+//Configure IO
+void configure_IO(void){
+        /**************************/
     /* Osc Config*/
     OSCCONbits.NOSC = 1;
     OSCCONbits.OSWEN = 1;
@@ -89,8 +88,7 @@ void Init(void){
     TRISF = 0xFFBE; //set portf to all inputs and two output.
     LATF = 0;
 
-/***************
-**************/
+/*****************************/
 /* Configure PWM */
 /*****************************/
     //FBORPOR = 0x82B2;
@@ -154,6 +152,17 @@ void Init(void){
     TMR3 = 0x0000;
     T3CON = 0x0000;
     T3CONbits.TCKPS = 3;        //1:256 prescale
+    
+/*****************************/
+/* Configure Timer 4 */
+/* Non-Critical Timing. */
+/*****************************/
+/* For exactly 1 second timing operations. */
+    PR4 = 0xE0EA;   //57,578
+    //PR3 = 0x7271;     //29,297
+    TMR4 = 0x0000;
+    T4CON = 0x0000;
+    T4CONbits.TCKPS = 3;        //1:256 prescale
 
 /*****************************/
 /* Configure and Enable analog inputs */
@@ -162,15 +171,12 @@ void Init(void){
     ADCON3lower8 = 0x0F;
     ADCON1 = 0x02E4;
     ADCON2 = 0x0410;
-    ADCON3 = 0x0F0F;    //0x0F0F;
+    ADCON3 = 0x0F0F;
     ADCHS = 0x0000;
     ADPCFG = 0xFF70;
     ADCSSL = 0x008F;
-
-/*****************************/
-/* Configure IRQs. */
-/*****************************/
-    //Configure Priorities
+    
+    //Configure IRQ Priorities
     IPC2bits.ADIP = 7;      //Analog inputs and regulation routines, Important
     IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing
     IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is important.
@@ -180,8 +186,32 @@ void Init(void){
     IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC2bits.U1TXIP = 3;    //TX 1 IRQ, Text can wait
     IPC6bits.U2TXIP = 3;    //TX 2 IRQ, Text can wait
-    IPC1bits.T3IP = 1;      //Timer 3 IRQ. Not critical.
+    IPC1bits.T3IP = 2;      //Timer 3 IRQ. Not critical.
+    IPC5bits.T4IP = 1;      //Non-critical operations.
     IPC5bits.INT2IP = 1;    //Not yet used.
+}
+void Init(void){
+/*******************************
+ * initialization values setup.
+*******************************/
+    //Calculate our voltage divider values.
+    vltg_dvid = sets.R2_resistance / (sets.R1_resistance + sets.R2_resistance);
+    //Calculate our charge/discharge rate.
+    calc_125 = 0.125 / 3600;
+    //We've done Init.
+    init_done = 1;
+    //We aren't in low power mode
+    lw_pwr = 0;
+    //Calculate max charge current.
+    max_chrg_current = sets.chrg_C_rating * sets.amp_hour_rating;
+    //Calculate analog sample time.
+    analog_smpl_time = 1 / (((IPS * 1000000) / (ADCON3upper8 + ADCON3lower8)) / 45);
+
+    configure_IO();
+
+/*****************************/
+/* Configure IRQs. */
+/*****************************/
     
     //Ensure interrupt nesting is enabled.
     INTCON1bits.NSTDIS = 0; //This should be the default state on chip reset.
@@ -208,6 +238,7 @@ void Init(void){
     IEC1bits.INT2IE = 0;  //Disable irq for INT2, not used.
     IEC0bits.T2IE = 1;	// Enable interrupts for timer 2
     IEC0bits.T3IE = 1;	// Enable interrupts for timer 3
+    IEC1bits.T4IE = 1;	// Enable interrupts for timer 4
     IEC0bits.ADIE = 1;  // Enable ADC IRQs.
     INTCON2bits.INT0EP = 0;
     INTCON2bits.INT2EP = 0;
@@ -220,25 +251,43 @@ void Init(void){
     T2CONbits.TON = 1;      // Start Timer 2
     T1CONbits.TON = 1;      // Start Timer 1
     T3CONbits.TON = 1;      // Start Timer 3
+    T4CONbits.TON = 1;      // Start Timer 4
     U1MODEbits.UARTEN = 1;  //enable UART1
     U1STAbits.UTXEN = 1;    //enable UART1 TX
     U2MODEbits.UARTEN = 1;  //enable UART2
     U2STAbits.UTXEN = 1;    //enable UART2 TX
 /* End Of Initial Config stuff. */
-/* Now do some pre-calculations. */
-
-    //Calculate our voltage divider values.
-    vltg_dvid = sets.R2_resistance / (sets.R1_resistance + sets.R2_resistance);
-    //Calculate our charge/discharge rate.
-    calc_125 = 0.125 / 3600;
-    //We've done Init.
-    init_done = 1;
-    //We aren't in low power mode
-    lw_pwr = 0;
-    //Calculate max charge current.
-    max_chrg_current = sets.chrg_C_rating * sets.amp_hour_rating;
-    //Send Init message.
-    //send_string(NLtxtNL, "Initialized.", PORT1);
+}
+void sys_debug(void){
+    configure_IO();
+    __asm__ volatile ("DISI #0x3FFF");  //First disable IRQs via instruction.
+    // Clear all interrupts flags
+    IFS0 = 0;
+    IFS1 = 0;
+    IFS2 = 0;
+	// enable or Disable select interrupts
+    IEC0 = 0;
+    IEC1 = 0;
+    IEC2 = 0;
+    IEC0bits.U1RXIE = 1; //Enable interrupts for UART1 Rx.
+    IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
+    IEC1bits.U2RXIE = 1; //Enable interrupts for UART2 Rx.
+    IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
+    DISICNT = 0;
+/*****************************/
+/* Enable our devices. */
+/*****************************/
+    ADCON1bits.ADON = 0;    // Disable ADC
+    PTCONbits.PTEN = 0;     // Disable PWM
+    T2CONbits.TON = 0;      // Disable Timer 2
+    T1CONbits.TON = 0;      // Disable Timer 1
+    T3CONbits.TON = 0;      // Disable Timer 3
+    T4CONbits.TON = 0;      // Disable Timer 4
+    U1MODEbits.UARTEN = 1;  //enable UART1
+    U1STAbits.UTXEN = 1;    //enable UART1 TX
+    U2MODEbits.UARTEN = 1;  //enable UART2
+    U2STAbits.UTXEN = 1;    //enable UART2 TX
+/* End Of Initial Config stuff. */
 }
 
 //Go in to low power mode when not in use.
@@ -247,11 +296,16 @@ void low_power_mode(void){
     ADCON1bits.ADON = 0;    // turn ADC off
     T2CONbits.TON = 0;      // Stop Timer 2
     T3CONbits.TON = 0;      // Stop Timer 3
+    T4CONbits.TON = 0;      // Stop Timer 3
     // disable interrupts
     IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
     IEC0bits.T2IE = 0;      //disable interrupts for timer 2
+    IEC0bits.T3IE = 0;	// Disable interrupts for timer 3
+    IEC1bits.T4IE = 0;	// Disable interrupts for timer 4
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
+    //Set check_timer to just a few seconds before check.
+    check_timer = 0x0700;
     //Need to reinit on restart
     init_done = 0;
     //Tell everyone we are in low power mode.

@@ -25,48 +25,15 @@
  * Probably because they are included in main.c IDK mplab is weird.
  * TODO: This file needs to be split up into it's seperate systems.
  */
-
-//Save settings to EEPROM
-int save_sets(int offset){
-    check_nvmem();
-    int x;
-    for(x=0;x<(cfg_space / 2);x++){
-        eeprom_write(x + offset, sets.settingsArray[x]);
-    }
-    eeprom_checksum();  //Generate new EEPROM checksum.
-    eeprom_write(0x01FF, rom_chksum); //Save EEPROM checksum in last byte of EEPROM.
-    return x;
-}
-//Read settings from EEPROM
-void read_sets(int offset){
-    check_nvmem();
-    int x;
-    for(x=0;x<(cfg_space / 2);x++){
-        sets.settingsArray[x] = eeprom_read(x + offset);
-    }
-}
-//Save vars to EEPROM
-int var_save(int offset){
-    check_nvmem();
-    int x;
-    for(x=0;x<(vr_space / 2);x++){
-        if (x == 0){
-            eeprom_write(x + offset,0x7654);
-        }
-        else{
-            eeprom_write(x + offset,vars.variablesArray[x]);
-        }
-    }
-    eeprom_checksum();  //Generate new EEPROM checksum.
-    eeprom_write(0x01FF, rom_chksum);           //Save EEPROM checksum in last byte of EEPROM.
-    return x;
-}
-//Read vars from EEPROM
-void read_romvars(int offset){
-    check_nvmem();
-    int x;
-    for(x=0;x<(vr_space / 2);x++){
-        vars.variablesArray[x] = eeprom_read(x + offset);
+//System debug mode
+void death_loop(void){
+    general_shutdown();     //Turn everything off.
+    sys_debug();    //Disable everything that is not needed. Only Serial Ports and Timer 1 Active. 
+    PORTBbits.RB5 = 1;  //Turn Error light solid on to show fatal error.
+    PORTBbits.RB5 = 1;  //WTF??? This will only turn the LED on solid if I have two of these one right after the other. Otherwise it doesn't turn on at all???
+    for(;;){
+        PORTBbits.RB6 = 0;      //Turn CPU ACT light off.
+        Idle();
     }
 }
 
@@ -74,7 +41,7 @@ void read_romvars(int offset){
 void power_off(void){
     vars.voltage_percentage_old = voltage_percentage;    //Save a copy of voltage percentage before we shut down.
     // Enough time should have passed by now that the open circuit voltage should be stabilized enough to get an accurate reading.
-    var_save((cfg_space / 2) + 1);      //Save variables before power off.
+    save_vars();      //Save variables before power off.
     PORTDbits.RD2 = 0; //Disable Keep Alive signal.
 }
 

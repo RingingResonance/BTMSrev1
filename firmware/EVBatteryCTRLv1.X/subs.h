@@ -42,16 +42,13 @@ extern void main_power_check(void);
 extern void first_check(void);
 extern void power_off(void);
 extern void analog_sanity(void);
-extern int save_sets(int);
-extern void read_sets(int);
-extern int var_save(int);
-extern void read_romvars(int);
+extern void death_loop(void);
 
 /*****************************/
 /* Init vars and stuff. */
 /* Temperatures are in C */
 /*********;********************/
-//#pragma pack(1)
+#pragma pack(1)
 struct Settings{
     //Analog input constants
     int     settingsArray[1];
@@ -94,13 +91,13 @@ struct Settings{
     float   travel_dist;         //Travel Distance in CM per tire rotation.
     float   circuit_draw;        //Amount of current that Yeti himself draws. Used for current calibration.
     int     PowerOffAfter;      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
-}sets;
+}sets; //32
 //***************************************************************************************
 /*****************************/
 /*****************************/
 /*****************************/
 /*****************************/
-//#pragma pack(1)
+#pragma pack(1)
 struct Variables{
     int     variablesArray[1];
     // Fault Codes.
@@ -185,7 +182,6 @@ float battery_vltg_average = 0;
 double bt_crnt_avg_temp = 0;
 double bt_vltg_avg_temp = 0;
 int adc_sample_burn = 0;            //Burn it. Don't touch this var it will burn you if you do.
-int read_vars = 0;
 int heat_rly_timer = 3;     //3 is resting, setting to 2 starts the countdown, 0 = relay is ready
 int contact_rly_timer = 3;
 int chrg_rly_timer = 3;

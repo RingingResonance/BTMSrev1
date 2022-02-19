@@ -6,9 +6,13 @@ IRQs.c  \
 subs.h  \
  DataIO.h  \
 Init.h  \
-display.c  \
 display.h  \
-errorCodes.h  \
+eeprom.h  \
+checksum.h  \
 subs.c  \
 DataIO.c  \
-Init.c 
+Init.c  \
+ display.c  \
+errorCodes.h  \
+eeprom.c  \
+checksum.c 

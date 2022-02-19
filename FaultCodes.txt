@@ -76,7 +76,15 @@ Fault Codes for battery controller. When SD proceeds error code, the system has 
 
 0x26	Voltage Low on snowman's temp input pin of dsPIC. SD.
 
-0x27	Spare error code.
+0x27	PORT1 Busy Error.
 
-0x28	Spare error code.
+0x28	PORT2 Busy Error.
+
+0x29	Program Memory Checksum Error.
+
+0x2A	EEPROM (NVmem) Checksum Error.
+
+0x2B	Settings (Sets) Ram Checksum Error.
+
+0x2C	EEPROM and Settings Checksum Missmatch After Copy.
 

@@ -22,8 +22,9 @@
 #include "subs.h"
 #include "DataIO.h"
 #include "Init.h"
-#include "display.c"
 #include "display.h"
+#include "eeprom.h"
+#include "checksum.h"
 
 /*****************/
 /* IRQs go here. */
@@ -36,7 +37,9 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     peak_power = 0;
     //Check for partial charge status to see if we need to do a full charge to ballance the cells.
     if(sets.partial_charge > 1){
+        TMR4 = 0;   //Reset timer 4 to prevent a check between writes.
         sets.partial_charge = 1;
+        ram_chksum_update();     //Update the checksum after a write.
         fault_log(0x1C);            // Log Partial charge was set higher than 100% event.
     }
     //If parial_charge is set to 0% then we disable and charge the battery up to full every time.
@@ -76,7 +79,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     IFS0bits.INT0IF = 0;
 }
 
-/* Wheel Rotate IRQ. */
+/* Wheel Rotate and low priority IRQ. */
 void __attribute__((interrupt, no_auto_psv)) _INT1Interrupt (void){
     PORTBbits.RB6 = 1;
     wheelTime = TMR3;
@@ -94,6 +97,28 @@ void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void){
     //End IRQ
     IFS0bits.T3IF = 0;
 }
+
+/* Non-critical systems. Timer 4 IRQ */
+void __attribute__((interrupt, no_auto_psv)) _T4Interrupt (void){
+    PORTBbits.RB6 = 1;
+    //Check settings ram in background. (lowest priority IRQ))
+    if(check_ramSets()){
+        //If failed, shutdown and attempt to recover.
+        get_settings();
+        //Make no more than 5 attempts to recover before going into debug mode.
+        if(ram_err_count >= 5) death_loop();
+        else ram_err_count++;
+    }
+    //Runtime program memory check. Checks every half hour.
+    if(check_timer == 0x0708){
+        check_prog();
+        check_timer = 0;
+    }
+    else check_timer++;
+    //End IRQ
+    IFS1bits.T4IF = 0;
+}
+
 /* Analog Input IRQ */
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     PORTBbits.RB6 = 1;
@@ -347,7 +372,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
             PORTBbits.RB5 = 0;
         }
         else{
-            error_blink = 1;
+            error_blink = 1;    //Used for blinking stuff on displays.
             if(vars.fault_count != 0){
                 PORTBbits.RB5 = 1;
             }
@@ -370,7 +395,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     }
     else if (first_cal == 8 && got_open_voltage == 1){
         //Check to see if we have valid data in EEPROM that we can start with.
-        if (eeprom_read((cfg_space / 2) + 1) == 0x7654){
+        if (eeprom_read((cfg_space) + 1) == 0x7654){
             //Calculate how much power was used while the power was off. This is not exact, but should be close enough.
             int power_diff = (vars.battery_capacity * ((vars.voltage_percentage_old - voltage_percentage) / 100));
             vars.battery_remaining -= power_diff;        //Subtract the power difference

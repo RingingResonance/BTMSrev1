@@ -22,6 +22,8 @@
 #include "display.h"
 #include "DataIO.h"
 #include "errorCodes.h"
+#include "eeprom.h"
+#include "checksum.h"
 
 //Check if serial port is busy.
 //If used, ensure that it is used by an IRQ priority that is lower than TX IRQs.
@@ -178,6 +180,12 @@ void fault_read(int serial_port){
                     case 0x2A:
                         textpointer = code2A;
                     break;
+                    case 0x2B:
+                        textpointer = code2B;
+                    break;
+                    case 0x2C:
+                        textpointer = code2C;
+                    break;
                     default:
                         textpointer = codeDefault;
                     break;
@@ -270,11 +278,13 @@ void Command_Interp(int serial_port){
             break;
             case '%':
                 load_string("\r\nSettings and Vars Saved.\r\n", serial_port);
-                save_sets(0x00);
-                var_save((cfg_space / 2) + 1);  //Save settings to NV-memory
+                save_sets();
+                save_vars();  //Save settings to NV-memory
             break;
-            case '1':
-                load_hex(eeprom_read(0x00),serial_port);
+            case '~':
+                default_sets(); //Load defaults.
+                eeprom_erase(0x0000);   //Erase address 0x0000 to 0xFFFF
+                nvm_chksum_update();    //Update EEPROM checksum.
             break;
             case 'H':
                 heat_cal_stage = 1;

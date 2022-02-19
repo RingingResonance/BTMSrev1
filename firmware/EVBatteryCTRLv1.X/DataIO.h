@@ -27,15 +27,7 @@ extern void load_float(float, int);
 extern void load_string(const char*, int);
 extern void dispatch_Serial(int);
 extern char four_bit_hex_cnvt(int);
-extern int eeprom_erase(int);   //address. 0x00 through 0x1FF.      Returns 0 on success.
-extern int eeprom_write(int, int);  //address, data.    Returns 0 on success.
-extern int eeprom_read(int);    //address. Returns data or 0 on failure.
 void load_hex(int, int);
-void flash_checksum(void);
-void eeprom_checksum(void);
-void check_prog(void);
-void check_nvmem(void);
-
 
 // Tm = 32767 * (1 / (((clkSpeedmhz * PLL) / 4) / tiksPerIRQ))
 //#define IPS 29.48;   //million instructions per second.
@@ -43,11 +35,6 @@ float IPS = 14.74;   //million instructions per second.
 //Don't define baud rate as static because we might want to add the option of changing it later during runtime.
 float BAUD1 = 9600;     //BAUD rate for PORT 1
 float BAUD2 = 9600;     //BAUD rate for PORT 2
-
-//Memory stuff
-int upperMem = 0;
-int flash_chksum = 0;
-int rom_chksum = 0;
 
 //Serial port stuff
 static int Clength = 10;   //Command Buff Length

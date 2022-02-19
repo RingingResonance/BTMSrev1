@@ -12,8 +12,6 @@ h - Disable heater calibration and check.
 
 E - Local echo on or off using "y" or "n" as args with no space in between. (default 'y') Examples: 'Ey' or 'En'
 
-r - Reads analog inputs only one time. (warning, this currently causes charge/discharge regulator services to hang for a moment)
-
 S - Low power shutdown test. Can only be waken back up through pluggin in the charger, turning the key, or resetting through the command set if not using the power managment circuit.
 
 F - Read fault codes.
@@ -30,14 +28,12 @@ p - Turns off main power output. Software power switch.
 
 Z - Overide partial charge and set to fully charge battery one time.
 
-V - Shows Voltage Percentage
-
-B - Read battery's calculated current capacity.
-
-O - Use POS display for HUD (default)
-
-o - Disable POS display for HUD
-
 U - increase v_test -- this is a debug command. It increases the PWM duty cycle for the main output by one tick.
 
 u - decrease v_test -- this is a debug command. It decreases the PWM duty cycle for the main output by one tick.
+
+~ - Reset Settings to default values stored in program memory.
+
+$ - Generate and Check Program Memory Checksum.
+
+& - Generate and Check EEPROM Checksum.

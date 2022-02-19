@@ -34,40 +34,33 @@
 #include "Init.c"
 #include "display.c"
 #include "display.h"
+#include "eeprom.c"
+#include "eeprom.h"
+#include "checksum.c"
+#include "checksum.h"
 
 /* Program Start */
 /***********************************************************
 ***********************************************************/
 int main(void){
     /* Analog inputs and general IO */
+    //Initialize PORTB first.
     TRISB = 0x008F;          //set portb to mix analog inputs and digital outputs.
     LATB = 0;               //clear portb
-    PORTBbits.RB6 = 1;
+    PORTBbits.RB6 = 1;      //Turn on CPU ACT light.
     //Calculate space required for eeprom storage.
-    cfg_space = sizeof(sets);
-    vr_space = sizeof(vars);
-    writingbuff[PORT1] = 0;
-    //Set Initial Defaults if EEPROM is blank. Otherwise load Settings from EEPROM
-    if (eeprom_read(0x00) != 0x4567){
-        default_sets();
-    }
-    else{
-        read_sets(0x00);
-    }
-    first_check();              //Do an initial reset and warm start check.
-    EnableChIRQ = 0;            //Disable Charge Detect IRQ on power up.
-    Init();                     //Initialize.
-    //Check to see if we have saved vars once before. Load them if we have.
-    if (eeprom_read((cfg_space / 2) + 1) == 0x7654){
-        read_romvars((cfg_space / 2) + 1);
-        //Compare the generated checksums with the stored ones.
-        check_prog();
-    }
-    else {
-        flash_checksum();
-        vars.flash_chksum_old = flash_chksum;       //Save checksum for the first time.
-    }
-    analog_smpl_time = 1 / (((IPS * 1000000) / (ADCON3upper8 + ADCON3lower8)) / 45);        //Calculate analog sample time.
+    cfg_space = sizeof(sets) / 2;
+    vr_space = sizeof(vars) / 2;
+    //Get variable data if it exists.
+    get_variables();
+    //Get either default or custom settings.
+    get_settings();
+    //Do an initial reset and warm start check.
+    first_check();
+    //Disable Charge Detect IRQ on power up.
+    EnableChIRQ = 0;
+    //Initialize Systems.
+    Init();
 
 /*****************************/
     // Main Loop.

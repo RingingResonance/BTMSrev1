@@ -50,6 +50,8 @@ const char code27[] = "PORT1 BSY err";
 const char code28[] = "PORT2 BSY err";
 const char code29[] = "Prgm Chksum Err";
 const char code2A[] = "NVmem Chksum Err";
+const char code2B[] = "Sets Chksum Err";
+const char code2C[] = "NVsets Chksum Mismatch";
 const char codeDefault[] = "Unknown";
 
 

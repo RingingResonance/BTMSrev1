@@ -38,9 +38,14 @@ void get_variables(void){
 void get_settings(void){
     int var_exist = eeprom_read(0x0000);
     if(var_exist == 0x4567){
-        if(read_sets() == 0){
-            //If settings are read back but the EEPROM shows corruption, we cannot trust the settings, nor can we trust defaults.
-            death_loop();
+        int x = 0;
+        for(;;){
+            if(!read_sets()){
+                //Attempt to copy data no more than 5 times.
+                if(x >= 5)death_loop();//If settings are read back but the EEPROM shows corruption, we cannot trust the settings, nor can we trust defaults.
+                x++;
+            }
+            else break;
         }
     }
     else if(var_exist == 0xFFFF){
@@ -59,6 +64,7 @@ void save_sets(void){
     nvm_chksum_update();
 }
 //Read settings from EEPROM
+//Returns 1 on success.
 int read_sets(void){
     if(check_nvmem())return 0;          //First check to make sure EEPROM checksum hasn't changed since last write.
     int x;
@@ -66,7 +72,7 @@ int read_sets(void){
         sets.settingsArray[x] = eeprom_read(x);
     }
     //Now generate and compare checksums of settings ram and settings EEPROM to ensure a correct copy of data.
-    check_nvmSets();
+    if(check_nvmSets())return 0;
     //Update the settings ram checksum.
     ram_chksum_update();
     return 1;
@@ -83,6 +89,7 @@ void save_vars(void){
     nvm_chksum_update();
 }
 //Read vars from EEPROM
+//Returns 1 on success
 int read_vars(void){
     if(check_nvmem())return 0;
     int x;

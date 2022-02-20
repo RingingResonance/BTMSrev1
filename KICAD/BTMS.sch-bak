@@ -3634,17 +3634,6 @@ Connection ~ 6200 8900
 Wire Wire Line
 	5350 8400 5700 8400
 $Comp
-L power:+5P #PWR0131
-U 1 1 6047FC08
-P 3950 7000
-F 0 "#PWR0131" H 3950 6850 50  0001 C CNN
-F 1 "+5P" H 3965 7173 50  0000 C CNN
-F 2 "" H 3950 7000 50  0001 C CNN
-F 3 "" H 3950 7000 50  0001 C CNN
-	1    3950 7000
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:R R49
 U 1 1 60481A16
 P 8050 9300
@@ -7039,10 +7028,10 @@ F 5 "CCS15S40L3FCT-ND" H 5900 1450 50  0001 C CNN "Digi-Key_PN"
 	0    1    1    0   
 $EndComp
 $Comp
-L Device:R R?
+L Device:R R27
 U 1 1 62134C51
 P 5650 1300
-F 0 "R?" H 5720 1346 50  0000 L CNN
+F 0 "R27" H 5720 1346 50  0000 L CNN
 F 1 "1K" H 5720 1255 50  0000 L CNN
 F 2 "Resistors_SMD:R_0603" V 5580 1300 50  0001 C CNN
 F 3 "~" H 5650 1300 50  0001 C CNN
@@ -7050,5 +7039,16 @@ F 4 "https://www.digikey.com/en/products/detail/te-connectivity-passive-product/
 F 5 "A130416CT-ND" H 5650 1300 50  0001 C CNN "Digi-Key_PN"
 	1    5650 1300
 	0    -1   -1   0   
+$EndComp
+$Comp
+L power:+5C #PWR?
+U 1 1 6212B3B2
+P 3950 7000
+F 0 "#PWR?" H 3950 6850 50  0001 C CNN
+F 1 "+5C" H 3965 7173 50  0000 C CNN
+F 2 "" H 3950 7000 50  0001 C CNN
+F 3 "" H 3950 7000 50  0001 C CNN
+	1    3950 7000
+	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

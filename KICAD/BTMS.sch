@@ -6326,19 +6326,6 @@ Wire Wire Line
 Connection ~ 3800 5050
 Connection ~ 2350 7400
 $Comp
-L Device:CP C109
-U 1 1 60218595
-P 2050 6750
-F 0 "C109" H 2165 6796 50  0000 L CNN
-F 1 "10uf 100v" H 1950 7050 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210" H 2088 6600 50  0001 C CNN
-F 3 "~" H 2050 6750 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/murata-electronics/GRM32EC72A106KE05L/7319356" H 2050 6750 50  0001 C CNN "DK_Detail_Page"
-F 5 "490-16266-1-ND" H 2050 6750 50  0001 C CNN "Digi-Key_PN"
-	1    2050 6750
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:C C108
 U 1 1 602192A2
 P 1800 6750
@@ -6351,13 +6338,8 @@ F 5 "490-10918-1-ND" H 1800 6750 50  0001 C CNN "Digi-Key_PN"
 	1    1800 6750
 	1    0    0    -1  
 $EndComp
-Connection ~ 1800 6900
 Wire Wire Line
 	1800 6900 1350 6900
-Wire Wire Line
-	1800 6900 2050 6900
-Wire Wire Line
-	2050 6600 1800 6600
 Wire Wire Line
 	1800 6600 1600 6600
 Wire Wire Line

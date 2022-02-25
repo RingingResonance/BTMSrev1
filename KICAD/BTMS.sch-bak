@@ -6326,19 +6326,6 @@ Wire Wire Line
 Connection ~ 3800 5050
 Connection ~ 2350 7400
 $Comp
-L Device:L L5
-U 1 1 602155FB
-P 2200 6900
-F 0 "L5" V 2019 6900 50  0000 C CNN
-F 1 "10uH" V 2110 6900 50  0000 C CNN
-F 2 "Inductors:Inductor_Wurth_HCI-5040" H 2200 6900 50  0001 C CNN
-F 3 "~" H 2200 6900 50  0001 C CNN
-F 4 "https://www.digikey.com/en/products/detail/w%C3%BCrth-elektronik/74404054100/4865412" H 2200 6900 50  0001 C CNN "DK_Detail_Page"
-F 5 "732-5519-1-ND" H 2200 6900 50  0001 C CNN "Digi-Key_PN"
-	1    2200 6900
-	0    1    1    0   
-$EndComp
-$Comp
 L Device:CP C109
 U 1 1 60218595
 P 2050 6750
@@ -6369,7 +6356,6 @@ Wire Wire Line
 	1800 6900 1350 6900
 Wire Wire Line
 	1800 6900 2050 6900
-Connection ~ 2050 6900
 Wire Wire Line
 	2050 6600 1800 6600
 Wire Wire Line

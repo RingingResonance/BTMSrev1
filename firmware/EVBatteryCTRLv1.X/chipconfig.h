@@ -18,7 +18,7 @@ extern "C" {
 // 'C' source line config statements
 
 // FOSC
-#pragma config FOSFPR = FRC_PLL8        // Oscillator (FRC w/PLL 8x)
+#pragma config FOSFPR = FRC_PLL8       // Oscillator (FRC w/PLL 8x)
 #pragma config FCKSMEN = CSW_FSCM_OFF   // Clock Switching and Monitor (Sw Disabled, Mon Disabled)
 
 // FWDT
@@ -33,7 +33,7 @@ extern "C" {
 #pragma config LPOL = PWMxL_ACT_HI      // Low-side PWM Output Polarity (Active Low)
 #pragma config HPOL = PWMxH_ACT_HI      // High-side PWM Output Polarity (Active High)
 #pragma config PWMPIN = RST_IOPIN       // PWM Output Pin Reset (Control with PORT/TRIS regs)
-#pragma config MCLRE = MCLR_EN          // Master Clear Enable (Enabled)
+#pragma config MCLRE = MCLR_EN          // Master Clear Enable
 
 // FGS
 #pragma config GWRP = GWRP_OFF          // General Code Segment Write Protect (Disabled)

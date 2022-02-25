@@ -20,18 +20,12 @@
 #include <p30f3011.h>
 #include "eeprom.h"
 #include "checksum.h"
+#include "common.h"
 
 void get_variables(void){
     int var_exist = eeprom_read(cfg_space + 1);
     if(var_exist == 0x7654) {
-        if(read_vars()){
-            //Check program memory on successful read.
-            if(check_prog())death_loop(); //If program memory checksum doesn't match, don't trust anything!
-        }
-    }
-    else if(var_exist == 0xFFFF){
-        prgm_chksum_update();//If a first read is detected, update the prog_checksum.
-        save_vars();//Save vars including program checksum to eeprom.
+        read_vars();
     }
 }
 
@@ -50,7 +44,9 @@ void get_settings(void){
     }
     else if(var_exist == 0xFFFF){
         //If no settings were previously stored in EEPROM then it should be safe to load defaults.
+        prgm_chksum_update();//If a first read is detected, update the prog_checksum.
         default_sets();
+        save_sets();//Save sets including program memory checksum to eeprom.
     }
 }
 //Save settings to EEPROM
@@ -87,6 +83,7 @@ void save_vars(void){
     //Write this in memory so we know we have written data at least once before.
     eeprom_write(caddr,0x7654);
     nvm_chksum_update();
+    CONDbits.failSave = 0;
 }
 //Read vars from EEPROM
 //Returns 1 on success

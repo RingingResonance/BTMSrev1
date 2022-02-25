@@ -14,15 +14,29 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>*/
 
-#ifndef DSKY_H
-#define	DSKY_H
+#ifndef SYSCHKS_H
+#define	SYSCHKS_H
 
-extern void Command_Interp(int);
-extern void fault_read(int);
-void pageOut(int, int);
+extern void explody_preventy_check(void);
+extern void currentCheck(void);
+extern void heater_calibration(void);
+extern void fault_log(int);
+extern void general_shutdown(void);
+extern void io_off(void);
+extern void reset_check(void);
+extern void hud_vars(int);
+extern void main_power_check(void);
+extern void first_check(void);
+extern void analog_sanity(void);
+extern void death_loop(void);
+extern void initialCal(void);
 
-int tempPoint[2] = {0,0};
-int flt_index[2] = {0,0};
-
-#endif	/* DATAIO_H */
+/*****************************/
+/* Init vars and stuff. */
+/* Temperatures are in C */
+/******************************/
+int heat_set;               //Calculated heater output for wattage chosen by user.
+int oc_shutdown_timer = 0;
+int shutdown_timer = 0;
+#endif	/* SUBS_H */
 

@@ -19,7 +19,7 @@
 
 #include <p30f3011.h>
 #include "checksum.h"
-#include "subs.h"
+#include "common.h"
 
 /********************/
 /* Update checksum. */
@@ -31,7 +31,7 @@ void ram_chksum_update(void){
 //Update the Program Memory checksum.
 void prgm_chksum_update(void){
     flash_checksum();         //Generate New Checksum
-    vars.flash_chksum_old = flash_chksum;    //Copy it.
+    sets.flash_chksum_old = flash_chksum;    //Copy it.
 }
 //Update the EEPROM checksum.
 void nvm_chksum_update(void){
@@ -56,27 +56,32 @@ int check_nvmSets(void){
     nvmSets_checksum();
     if(ramSets_chksum != nvSets_chksum){
         fault_log(0x2C);    //Log an error if it doesn't match.
-        fault_shutdown = 1;
+        STINGbits.fault_shutdown = 1;
         return 1;
     }
     return 0;
 }
 //Checks program memory checksum.
 int check_prog(void){
+    if(CONDbits.chkInProgress) return 0;
+    CONDbits.chkInProgress = 1;
     flash_checksum();
-    if(vars.flash_chksum_old != flash_chksum){
+    if(sets.flash_chksum_old != flash_chksum){
         fault_log(0x29);    //Log an error if it doesn't match.
-        fault_shutdown = 1;
+        STINGbits.fault_shutdown = 1;
+        CONDbits.chkInProgress = 0;
         return 1;
     }
+    CONDbits.chkInProgress = 0;
     return 0;
+    
 }
 //Checks EEPROM memory checksum.
 int check_nvmem(void){
     eeprom_checksum();
     if(eeprom_read(0x01FF) != rom_chksum){
         fault_log(0x2A);    //Log an error if it doesn't match.
-        fault_shutdown = 1;
+        STINGbits.fault_shutdown = 1;
         return 1;
     }
     return 0;

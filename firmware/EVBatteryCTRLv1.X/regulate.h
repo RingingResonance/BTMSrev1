@@ -14,15 +14,25 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>*/
 
-#ifndef DSKY_H
-#define	DSKY_H
+#ifndef REGULATE_H
+#define	REGULATE_H
 
-extern void Command_Interp(int);
-extern void fault_read(int);
-void pageOut(int, int);
+extern void temperatureCalc(void);
+extern void outputReg(void);
+extern void chargeReg(void);
+extern void heat_control(float);
 
-int tempPoint[2] = {0,0};
-int flt_index[2] = {0,0};
+float dischrg_current = 0;
+float chrg_current = 0;
+float dischrg_read = 0;
+float analog_smpl_time = 0;
+float crnt_proportion = 70000;
+float crnt_error = 0;
+float crnt_integral = 0;
+float vltg_proportion = 70000;
+float current_output = 0;
+float temp_proportion = 70000;
+float voltage_output = 0;
 
-#endif	/* DATAIO_H */
+#endif	/* SUBS_H */
 

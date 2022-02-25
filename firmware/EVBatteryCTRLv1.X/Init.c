@@ -24,7 +24,7 @@
 void default_sets(void){
     sets.R1_resistance = 200;            //R1 resistance in Kohms
     sets.R2_resistance = 16;             //R2 resistance in Kohms
-    sets.bt_vlt_adjst = -0.231;               //battery voltage input compensation in volts.
+    sets.bt_vlt_adjst = 0;               //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
     sets.partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
@@ -61,20 +61,38 @@ void default_sets(void){
     sets.travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
     sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
+    //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
+    sets.page[0][0] = 2;  //%
+    sets.page[0][1] = 3;  //V
+    sets.page[0][2] = 8;  //W
+    sets.page[0][3] = 4;  //TV
+    sets.page[0][4] = 10; //BT C
+    sets.page[0][5] = 11; //ST C
     ram_chksum_update();         //Generate new checksum.
 }
 //Configure IO
 void configure_IO(void){
-        /**************************/
+    STINGbits.zero_current = 0;
+    dsky.peak_power = 0;
+    dsky.peak_pwr_vlts = 0;
+    dsky.peak_pwr_crnt = 0;
+    /*****************************/
+    //Battery Sensor Input
+    dsky.battery_temp = 0;           //Battery Temperature
+    dsky.my_temp = 0;                //Controller board Temperature
+    dsky.motor_ctrl_temp = 0;         //Motor or Motor controller Temperature
+    dsky.battery_voltage = 0;        //Battery voltage
+    open_voltage = 0;           //Battery Open Circuit Voltage
+    voltage_percentage = 0;     //Battery Voltage Percentage.
+    CONDbits.got_open_voltage = 0;
+    dsky.battery_current = 0;        //Battery charge/discharge current
+    
+    /**************************/
     /* Osc Config*/
     OSCCONbits.NOSC = 1;
     OSCCONbits.OSWEN = 1;
     OSCCONbits.LPOSCEN = 0;
     /**************************/
-    /* General IO. */
-    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
-    LATD = 0;
-    PORTDbits.RD2 = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
     /**************************/
     /* General IO */
     TRISC = 0x0000;
@@ -124,10 +142,10 @@ void configure_IO(void){
     //Default power up of UART should be 8n1
 /*****************************/
 /* Configure Timer 1 */
-/* Scan IO about every second when KeySwitch is off. */
+/* Scan IO every second when KeySwitch is off. */
 /*****************************/
 /* Timer one CTRL. */
-    PR1 = 0xFFFF;
+    PR1 = 0xE0EA;
     TMR1 = 0x0000;
     T1CON = 0x0000;
     T1CONbits.TCKPS = 3;        //1:256 prescale
@@ -169,6 +187,7 @@ void configure_IO(void){
 /*****************************/
     ADCON3upper8 = 0x0F;
     ADCON3lower8 = 0x0F;
+    analog_smpl_time = 1 / (((IPS * 1000000) / (ADCON3upper8 + ADCON3lower8)) / 45);
     ADCON1 = 0x02E4;
     ADCON2 = 0x0410;
     ADCON3 = 0x0F0F;
@@ -182,31 +201,30 @@ void configure_IO(void){
     IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is important.
     IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh...
     IPC0bits.INT0IP = 3;    //Charger detect IRQ, need to know basis
-    IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
-    IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC2bits.U1TXIP = 3;    //TX 1 IRQ, Text can wait
     IPC6bits.U2TXIP = 3;    //TX 2 IRQ, Text can wait
-    IPC1bits.T3IP = 2;      //Timer 3 IRQ. Not critical.
-    IPC5bits.T4IP = 1;      //Non-critical operations.
+    IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
+    IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
+    IPC1bits.T3IP = 2;      //Timer 3 IRQ for wheel rotate timeout. Not critical.
+    IPC5bits.T4IP = 2;      //Non-critical operations.
+    IPC5bits.T5IP = 1;      //Non-critical processes.
     IPC5bits.INT2IP = 1;    //Not yet used.
 }
 void Init(void){
 /*******************************
  * initialization values setup.
 *******************************/
+    //Configure stack overflow catch address.
+    SPLIM = ramFree; //This should be updated according to how much ram is being used by all variables.
     //Calculate our voltage divider values.
     vltg_dvid = sets.R2_resistance / (sets.R1_resistance + sets.R2_resistance);
-    //Calculate our charge/discharge rate.
-    calc_125 = 0.125 / 3600;
     //We've done Init.
-    init_done = 1;
+    STINGbits.init_done = 1;
     //We aren't in low power mode
-    lw_pwr = 0;
+    STINGbits.lw_pwr = 0;
     //Calculate max charge current.
     max_chrg_current = sets.chrg_C_rating * sets.amp_hour_rating;
-    //Calculate analog sample time.
-    analog_smpl_time = 1 / (((IPS * 1000000) / (ADCON3upper8 + ADCON3lower8)) / 45);
-
+    //Configure the inputs, outputs, and device.
     configure_IO();
 
 /*****************************/
@@ -230,10 +248,10 @@ void Init(void){
     IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
     IEC1bits.U2RXIE = 1; //Enable interrupts for UART2 Rx.
     IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
-    if(EnableChIRQ == 1){
+    if(CONDbits.EnableChIRQ){
         IEC0bits.INT0IE = 1;    //Charge Detect IRQ
     }
-    EnableChIRQ = 1;    //By default, enable charge detect IRQ on init.
+    CONDbits.EnableChIRQ = 1;    //By default, enable charge detect IRQ on init.
     IEC1bits.INT1IE = 1;    //Wheel rotate IRQ
     IEC1bits.INT2IE = 0;  //Disable irq for INT2, not used.
     IEC0bits.T2IE = 1;	// Enable interrupts for timer 2
@@ -296,7 +314,7 @@ void low_power_mode(void){
     ADCON1bits.ADON = 0;    // turn ADC off
     T2CONbits.TON = 0;      // Stop Timer 2
     T3CONbits.TON = 0;      // Stop Timer 3
-    T4CONbits.TON = 0;      // Stop Timer 3
+    T4CONbits.TON = 0;      // Stop Timer 4
     // disable interrupts
     IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
     IEC0bits.T2IE = 0;      //disable interrupts for timer 2
@@ -307,18 +325,16 @@ void low_power_mode(void){
     //Set check_timer to just a few seconds before check.
     check_timer = 0x0700;
     //Need to reinit on restart
-    init_done = 0;
+    STINGbits.init_done = 0;
     //Tell everyone we are in low power mode.
-    lw_pwr = 1;
-    //Turn off Outputs, etc
-    PORTBbits.RB6 = 0;
+    STINGbits.lw_pwr = 1;
 }
 
 /* Turn everything off so we don't waste any more power.
  * Only plugging in the charge will restart the CPU, or yaknow, just restart the CPU... */
 void low_battery_shutdown(void){
-    cmd_power = 0;
-    soft_power = 0;
+    CONDbits.cmd_power = 0;
+    CONDbits.soft_power = 0;
     PTCONbits.PTEN = 0;     // Turn off PWM
     T1CONbits.TON = 0;      // Stop Timer 1
     // Clear all interrupts flags
@@ -332,7 +348,7 @@ void low_battery_shutdown(void){
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
     low_power_mode();
-    deep_sleep = 1;     //Tell the system to enter a deep sleep after we have completed all tasks one last time.
+    STINGbits.deep_sleep = 1;     //Tell the system to enter a deep sleep after we have completed all tasks one last time.
 }
 
 #endif

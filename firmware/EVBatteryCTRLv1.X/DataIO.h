@@ -21,44 +21,47 @@
 #define PORT2 1
 #define simple 1
 #define full 0
+#define bffize 60
 
 extern unsigned int BaudCalc(double, double);
 extern void load_float(float, int);
 extern void load_string(const char*, int);
 extern void dispatch_Serial(int);
 extern char four_bit_hex_cnvt(int);
+extern void Buffrst(int);
 void load_hex(int, int);
 
 // Tm = 32767 * (1 / (((clkSpeedmhz * PLL) / 4) / tiksPerIRQ))
 //#define IPS 29.48;   //million instructions per second.
-float IPS = 14.74;   //million instructions per second.
+const float IPS = 14.74;   //million instructions per second.
+//float IPS = 29.48;
 //Don't define baud rate as static because we might want to add the option of changing it later during runtime.
 float BAUD1 = 9600;     //BAUD rate for PORT 1
 float BAUD2 = 9600;     //BAUD rate for PORT 2
 
 //Serial port stuff
-static int Clength = 10;   //Command Buff Length
-char CMD_buff[2][10];              //Command Buffer
+#define Clength 4   //Command Buff Length - 1
+char CMD_buff[2][5];              //Command Buffer
 unsigned int CMD_Point[2] = {0,0};  //Command Pointer
-int cmdRDY[2] = {0,0};
-int cmdOVFL[2] = {0,0};
-int Lecho[2] = {1,1};              //Local echo is on by default
-int Terr[2] = {0,0};
-int bufsize[2]= {0,0};
+char cmdRDY[2] = {0,0};
+char cmdOVFL[2] = {0,0};
+char Lecho[2] = {1,1};              //Local echo is on by default
+char Terr[2] = {0,0};
+char bufsize[2]= {0,0};
 
-int nibble[2][4];
+char nibble[2][4];
 char float_out[2][7];
-int  Buff_count[2] = {0,0};
+char  Buff_count[2] = {0,0};
 int  Buff_index[2] = {0,0};
-char Buffer[2][50];
+char Buffer[2][bffize];
 int  StempIndex[2] = {0,0};
 int  FtempIndex[2] = {0,0};
-int config_space[2] = {0,0};
-int ifzero[2] = {1,1};
+char config_space[2] = {0,0};
 float tx_float[2] = {0,0};
-int tx_temp[2] = {0,0};
-int portBSY[2] = {0,0};
-int writingbuff[2] = {0,0};
+char tx_temp[2] = {0,0};
+char portBSY[2] = {0,0};
+char writingbuff[2] = {0,0};
+char dynaSpace[2] = {0,0};
 
 #endif	/* DATAIO_H */
 

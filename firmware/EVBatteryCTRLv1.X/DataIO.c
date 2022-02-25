@@ -20,6 +20,13 @@
 #include <p30f3011.h>
 #include "DataIO.h"
 
+void Buffrst(int serial_port){
+    if (Buff_index[serial_port] >= Buff_count[serial_port]){
+            Buff_index[serial_port] = 0;
+            Buff_count[serial_port] = 0;
+            portBSY[serial_port] = 0;//Inhibits writing to buffer while the serial port is transmitting buffer.
+        }
+}
 //*************************************************************************************************
 //Converts four bit hex numbers to ASCII
 char four_bit_hex_cnvt(int numb){
@@ -72,7 +79,7 @@ void load_hex(int numb, int serial_port){
     int x;
     for(x=0;x<4;x++){
         Buffer[serial_port][Buff_index[serial_port]] = four_bit_hex_cnvt(nibble[serial_port][x]);
-        if (Buff_index[serial_port] < 49)
+        if (Buff_index[serial_port] < bffize-1)
             Buff_index[serial_port]++;
     }
     Buff_count[serial_port] = Buff_index[serial_port];
@@ -98,12 +105,17 @@ void load_string(const char *string_point, int serial_port){
     StempIndex[serial_port] = 0;
     while (string_point[StempIndex[serial_port]] != 0){
         Buffer[serial_port][Buff_index[serial_port]] = string_point[StempIndex[serial_port]];
-        if (Buff_index[serial_port] < 49)
+        if (Buff_index[serial_port] < bffize-1)
             Buff_index[serial_port]++;
         StempIndex[serial_port]++;
     }
     Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
+}
+void cpyFLT(int serial_port){
+    Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][FtempIndex[serial_port]];
+    //Do not overrun the buffer.
+    if (Buff_index[serial_port] < bffize-1)Buff_index[serial_port]++;
 }
 
 /* Sends a float to buffer. */
@@ -111,58 +123,65 @@ void load_float(float f_data, int serial_port){
     FtempIndex[serial_port] = 0;
     tx_float[serial_port] = 0;
     tx_temp[serial_port] = 0;
-
-    float_out[serial_port][0] = ' ';        //Put a SPACE in first char
+    int extSpc = 0;
+    
+    float_out[serial_port][0] = ' ';
     if (f_data < 0){
         f_data *= -1;                       //Convert to absolute value.
         float_out[serial_port][0] = '-';    //Put a - in first char
+        extSpc = 1;
     }
     if (f_data > 9999.999){
-        f_data = 9999.999;      //truncate it
-        float_out[serial_port][0] = '?';    //Put a ? in first char if truncated
+        f_data = 9999.999;      //truncate it if it's too big of a number.
+        float_out[serial_port][0] = '?';    //Put a ? in first char if truncated.
+        extSpc = 1;
     }
+
     tx_float[serial_port] = f_data / 1000;
     FtempIndex[serial_port]++;
     while (FtempIndex[serial_port] <= 8){
         if (FtempIndex[serial_port] == 5){
-            float_out[serial_port][5] = '.';
-            FtempIndex[serial_port]++;
+            float_out[serial_port][5] = '.';    //Put a decimal at the 5th spot.
+            FtempIndex[serial_port]++;          //Got to 6th spot after.
         }
-        tx_temp[serial_port] = tx_float[serial_port];
-        float_out[serial_port][FtempIndex[serial_port]] = tx_temp[serial_port] + 48;
-        FtempIndex[serial_port]++;
-        tx_float[serial_port] = (tx_float[serial_port] - tx_temp[serial_port]) * 10;
+        tx_temp[serial_port] = tx_float[serial_port];   //Truncate anything on the right side of the decimal.
+        float_out[serial_port][FtempIndex[serial_port]] = tx_temp[serial_port] + 48; //Convert it to ASCII.
+        FtempIndex[serial_port]++;                                                   //Go to next ASCII spot.
+        tx_float[serial_port] = (tx_float[serial_port] - tx_temp[serial_port]) * 10; //Shift the float left by 1
     }
 
 /* Write to buffer */
-    port_check(serial_port);
-    writingbuff[serial_port] = 1;
-    ifzero[serial_port] = 1;
-    while (FtempIndex[serial_port] <= 8){
-        //If config_space == 1, then load buffer with only spaces.
-        if(float_out[serial_port][FtempIndex[serial_port]] == 0x30 && ifzero[serial_port]){
-            if(config_space[serial_port]){
-                Buffer[serial_port][Buff_index[serial_port]] = 0x20;
-                if (Buff_index[serial_port] < 49)
-                    Buff_index[serial_port]++;
-                FtempIndex[serial_port]++;
-            }
-            else{
-                FtempIndex[serial_port]++;
-            }
-        }
-        else{
-            Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][FtempIndex[serial_port]];
-            //Do not overrun the buffer.
-            if (Buff_index[serial_port] < 49)
-                Buff_index[serial_port]++;
+    FtempIndex[serial_port] = 0;
+    port_check(serial_port);        //Check serial port to see if it's busy before writing to buffer.
+    writingbuff[serial_port] = 1;   //Tell other processes we are busy with the buffer.
+    while (FtempIndex[serial_port] < 9){
+        //If 0, do not copy unless it's 00.000 or a '-' && config_space is 1
+        while(float_out[serial_port][FtempIndex[serial_port]] == '0' && 
+        !config_space[serial_port] && FtempIndex[serial_port] < 3){
             FtempIndex[serial_port]++;
         }
-        if(float_out[serial_port][FtempIndex[serial_port]] != 0x30 && float_out[serial_port][FtempIndex[serial_port]] != 0x2D && float_out[serial_port][FtempIndex[serial_port]] != 0x20){
-            ifzero[serial_port] = 0;
+        //Copy data. Check for dynamic spacing for sign char.
+        if(dynaSpace[serial_port]){ 
+            switch(float_out[serial_port][FtempIndex[serial_port]]){
+                case '-':
+                    cpyFLT(serial_port);
+                case ' ':
+                    FtempIndex[serial_port]++;
+                break;
+            }
+            dynaSpace[serial_port] = 0;
+        }
+        else{
+            cpyFLT(serial_port);
+            FtempIndex[serial_port]++;
+        }
+        //Clear 'ifzero' if anything but '0', '-', or ' ' found.
+        if(float_out[serial_port][FtempIndex[serial_port]] != '0' && 
+        float_out[serial_port][FtempIndex[serial_port]] != '-' && 
+        float_out[serial_port][FtempIndex[serial_port]] != ' '){
+            config_space[serial_port] = 0;
         }
     }
-    FtempIndex[serial_port] = 0;
     config_space[serial_port] = 0;
     Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;

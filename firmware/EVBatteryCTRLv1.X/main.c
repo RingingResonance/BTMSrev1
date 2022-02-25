@@ -25,8 +25,10 @@
 
 #include "chipconfig.h"
 #include "IRQs.h"
-#include "IRQs.c"
-#include "subs.h"
+#include "sysIRQs.c"
+#include "dataIRQs.c"
+#include "trapIRQs.c"
+#include "common.h"
 #include "subs.c"
 #include "DataIO.h"
 #include "DataIO.c"
@@ -38,19 +40,29 @@
 #include "eeprom.h"
 #include "checksum.c"
 #include "checksum.h"
+#include "sysChecks.c"
+#include "sysChecks.h"
+#include "regulate.c"
+#include "regulate.h"
 
 /* Program Start */
 /***********************************************************
 ***********************************************************/
 int main(void){
+    CONDbits.EnableChIRQ = 1;
+    /* General IO. */
+    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
+    LATD = 0;
+    keepAlive = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
     /* Analog inputs and general IO */
     //Initialize PORTB first.
     TRISB = 0x008F;          //set portb to mix analog inputs and digital outputs.
     LATB = 0;               //clear portb
-    PORTBbits.RB6 = 1;      //Turn on CPU ACT light.
+    CPUact = 1;             //Turn on CPU ACT light.
     //Calculate space required for eeprom storage.
     cfg_space = sizeof(sets) / 2;
     vr_space = sizeof(vars) / 2;
+    dsky_space = sizeof(dsky) / 2;
     //Get variable data if it exists.
     get_variables();
     //Get either default or custom settings.
@@ -58,7 +70,7 @@ int main(void){
     //Do an initial reset and warm start check.
     first_check();
     //Disable Charge Detect IRQ on power up.
-    EnableChIRQ = 0;
+    CONDbits.EnableChIRQ = 0;
     //Initialize Systems.
     Init();
 
@@ -71,9 +83,9 @@ int main(void){
     for (;;)        //loop forever. or not, idc, we have IRQs for stuff.
     {
         //Deep sleep check.
-        if(deep_sleep == 1){
+        if(STINGbits.deep_sleep){
             io_off();               //Turn off all IO before sleeping.
-            PORTBbits.RB6 = 0;      //Turn CPU ACT light off.
+            CPUact = 0;      //Turn CPU ACT light off.
             power_off();        //Cuts main power to self.
             /* If the keep alive pin isn't used or if the power control hardware
              * is faulty then this does nothing and the micro will 
@@ -85,10 +97,10 @@ int main(void){
              */
             Idle(); 
             //Sleep();
-            deep_sleep = 0;
+            STINGbits.deep_sleep = 0;
         }
         else{
-            PORTBbits.RB6 = 0;      //Turn CPU ACT light off.
+            CPUact = 0;      //Turn CPU ACT light off.
             Idle();                 //Idle Loop, saves power.
         }
     }

@@ -2,17 +2,23 @@ build/default/production/main.o:  \
 main.c  \
 chipconfig.h  \
 IRQs.h  \
-IRQs.c  \
-subs.h  \
- DataIO.h  \
+sysIRQs.c  \
+ common.h  \
+DataIO.h  \
 Init.h  \
 display.h  \
 eeprom.h  \
 checksum.h  \
+sysChecks.h  \
+ regulate.h  \
+dataIRQs.c  \
+trapIRQs.c  \
 subs.c  \
 DataIO.c  \
 Init.c  \
- display.c  \
-errorCodes.h  \
+display.c  \
+ errorCodes.h  \
 eeprom.c  \
-checksum.c 
+checksum.c  \
+sysChecks.c  \
+regulate.c 

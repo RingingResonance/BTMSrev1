@@ -248,9 +248,7 @@ void Init(void){
     IEC0bits.U1TXIE = 1; //Enable interrupts for UART1 Tx.
     IEC1bits.U2RXIE = 1; //Enable interrupts for UART2 Rx.
     IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
-    if(CONDbits.EnableChIRQ){
-        IEC0bits.INT0IE = 1;    //Charge Detect IRQ
-    }
+    IEC0bits.INT0IE = 1;    //Charge Detect IRQ
     CONDbits.EnableChIRQ = 1;    //By default, enable charge detect IRQ on init.
     IEC1bits.INT1IE = 1;    //Wheel rotate IRQ
     IEC1bits.INT2IE = 0;  //Disable irq for INT2, not used.

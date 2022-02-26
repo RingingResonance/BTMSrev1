@@ -29,50 +29,10 @@
 #include "regulate.h"
 
 
-//You left off here. Plugging in the charger causes heatcal to run twice when it only needs to run once.
-//Serial terminal still hangs for an unknown reason.
 /* Charge Detect IRQ. */
 void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
     CPUact = 1;
-    //reset peak power when we plug in a charger.
-    dsky.peak_power = 0;
-    //Check for partial charge status to see if we need to do a full charge to ballance the cells.
-    //If partial_charge is greater than 100%, set to 100% and write the new value.
-    if(sets.partial_charge > 1){
-        TMR4 = 0;   //Reset timer 4 to prevent a check between writes.
-        sets.partial_charge = 1;
-        ram_chksum_update();     //Update the checksum after a write.
-        fault_log(0x1C);            // Log Partial charge was set higher than 100% event.
-    }
-    //If parial_charge is set to 0% then we disable and charge the battery up to full every time.
-    if(sets.partial_charge == 0){
-        dsky.chrg_voltage = sets.battery_rated_voltage;
-        p_charge = 0;
-    }
-    //Do a full charge every 10 cycles so that we can ballance the cells.
-    //Need to make this configure-able by the user at runtime.
-    if(!CONDbits.power_plugged && vars.partial_chrg_cnt < 10){
-        vars.partial_chrg_cnt++;
-        p_charge = 1;
-        dsky.chrg_voltage = ((sets.battery_rated_voltage - sets.dischrg_voltage) * sets.partial_charge) + sets.dischrg_voltage;
-    }
-    else if(!CONDbits.power_plugged && vars.partial_chrg_cnt >= 10){
-        vars.partial_chrg_cnt = 0;
-        p_charge = 0;
-        dsky.chrg_voltage = sets.battery_rated_voltage;
-    }
-    /* If heat_cal is not running, is not disabled, and key switch/cmd_power is off
-     * run heater calibration check when charger is plugged in.
-     */
-    if(vars.heat_cal_stage != 2 && !keySwitch && !CONDbits.cmd_power && !CONDbits.power_plugged && !STINGbits.fault_shutdown){
-        CONDbits.power_plugged = 1;
-    }
-    
-    //Reset battery usage session when charger is plugged in and power is turned off.
-    if(!keySwitch && !CONDbits.cmd_power){
-        vars.battery_usage = 0;      //Reset battery usage session.
-    }
-    CONDbits.charger_detected = 1;
+    //Don't do anything here. Charger plug IRQ is only to wake the micro from deep sleep if needed.
     IFS0bits.INT0IF = 0;
 }
 
@@ -147,17 +107,19 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         }
         
         //Check to see if the system is ready to run.
+        //If there is a fault, keep it from running.
         if(!STINGbits.deep_sleep && !STINGbits.fault_shutdown){
             //Check for heater calibration event.
             heater_calibration();
             //Do power regulation and heater control.
-            if((vars.heat_cal_stage >= 3 || vars.heat_cal_stage == 0) && CONDbits.main_power && first_cal == 5){
-                outputReg();
-                chargeReg();
+            if((vars.heat_cal_stage >= 3 || !vars.heat_cal_stage) && CONDbits.main_power && first_cal == fCalReady){
+                outputReg();    //Output regulation routine
+                chargeReg();    //Charge input regulation routine
                 //Check for fault shutdown.
-                if(STINGbits.fault_shutdown){
-                    io_off();               //There was a fault, shut everything down as fast as possible.
-                }
+                //If there was a fault, shut everything down as fast as possible.
+                //This seems redundant, but it isn't. 
+                //Shuts down a detected fault just after the regulation routine.
+                if(STINGbits.fault_shutdown)io_off();
                 else {
                     //Set the PWM output to what the variables are during normal operation.
                     PWMCON1bits.PEN3L = 1;  //Set PWM3 Low side to PWM output.
@@ -166,13 +128,9 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
                     outPWM = output_power;             //set output control
                 }
             }
-            else if (!CONDbits.main_power){
-                io_off();
-            }
+            else if (!CONDbits.main_power)io_off();
         }
-        else{
-            io_off();
-        }
+        else io_off();
         
         //ADC sample burn check. Only burn once when main power is on.
         if (!CONDbits.main_power && STINGbits.adc_sample_burn){
@@ -213,7 +171,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     CPUact = 1;
     ADCON1bits.ADON = 1;    // turn ADC on to get a sample.
-    //Get open circuit voltage percentage if current is less than 0.1
+    //Get open circuit voltage percentage if current is less than 0.1 amps
     volt_percent();
     //Calculate limit currents based on temperature.
     temperatureCalc();
@@ -221,6 +179,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     initialCal();
     //Main power check
     main_power_check();
+    //Charger plug-in check.
+    chargeDetect();
     /* Power off TIMER stuff. Do this to save power.
      * This is so that this system doesn't drain your 1000wh battery over the 
      * course of a couple weeks while being unplugged from a charger. 
@@ -254,7 +214,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     }
     // Check for charger disconnect.
     if(!chrgSwitch){
-        chrgLight = 0;          //charger light off.
+        chrgLight = 0;  //charger light off.
         charge_power = 0;
         chrg_check = 0;
     }
@@ -346,7 +306,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
 //Used for some critical math timing operations. Cycles through every 1/8 sec.
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     CPUact = 1;
-    dsky.watts = dsky.battery_current * dsky.battery_voltage;
+    dsky.watts = dsky.battery_crnt_average * dsky.battery_vltg_average;
     //Relay On Timers. Wait a little bit after turning on the relays before trying to regulate.
     if(chrg_rly_timer > 0 && chrg_rly_timer != 3)
         chrg_rly_timer--;
@@ -384,7 +344,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     //Do not track current usage if below +-0.002 amps due to error in current sensing. We need a lower pass filter then what we already have.
     if(absFloat(dsky.battery_current) > 0.002){
         //Calculate how much current has gone in/out of the battery.
-        vars.battery_usage += (calc_125 * dsky.battery_current); 
+        vars.battery_usage += (calc_125 * dsky.battery_current);
         vars.battery_remaining += (calc_125 * dsky.battery_current);
     }
     //*************************************************************

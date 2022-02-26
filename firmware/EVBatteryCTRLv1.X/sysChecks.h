@@ -17,6 +17,9 @@
 #ifndef SYSCHKS_H
 #define	SYSCHKS_H
 
+#define fCalReady 3
+#define fCalTimer fCalReady - 1
+
 extern void explody_preventy_check(void);
 extern void currentCheck(void);
 extern void heater_calibration(void);
@@ -30,6 +33,7 @@ extern void first_check(void);
 extern void analog_sanity(void);
 extern void death_loop(void);
 extern void initialCal(void);
+extern void chargeDetect(void);
 
 /*****************************/
 /* Init vars and stuff. */

@@ -170,8 +170,6 @@ int     ADCON3lower8 = 0;
 /* General Vars */
 float   open_voltage;           //Battery Open Circuit Voltage
 float   voltage_percentage;     //Battery Open Circuit Voltage Percentage.
-float   temp_dischrg_rate;      //calculated discharge rate based off temp and capacity remaining. Is in %
-float   max_chrg_current;       //calculated charge rate based off temp and capacity remaining. Is in %
 float   current_compensate;     //Current compensation.
 
 float dischr_current = 0;
@@ -217,7 +215,6 @@ int     heat_power = 0;             //heater power
 volatile unsigned int COND;
 typedef struct tagCONDBITS {
   unsigned error_blink:1;
-  unsigned power_plugged:1;
   unsigned wheelSpin:1; //Is the wheel spinning?
   unsigned soft_power:1;
   unsigned main_power:1;

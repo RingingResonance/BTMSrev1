@@ -22,6 +22,53 @@
 #include "common.h"
 #include "eeprom.h"
 
+void chargeDetect(void){
+    //Check to see if charger has been plugged in, if this routine has been run already, and that initial calibration is done.
+    if(!CONDbits.charger_detected && chrgSwitch && first_cal == fCalReady){
+        //reset peak power when we plug in a charger.
+        dsky.peak_power = 0;
+        //Check for partial charge status to see if we need to do a full charge to ballance the cells.
+        //If partial_charge is greater than 100%, set to 100% and write the new value.
+        if(sets.partial_charge > 1){
+            TMR4 = 0;   //Reset timer 4 to prevent a check between writes.
+            sets.partial_charge = 1;
+            ram_chksum_update();     //Update the checksum after a write.
+            fault_log(0x1C);         // Log Partial charge was set higher than 100% event.
+        }
+        //If parial_charge is set to 0% then we disable and charge the battery up to full every time.
+        if(sets.partial_charge == 0){
+            dsky.chrg_voltage = sets.battery_rated_voltage;
+            p_charge = 0;
+        }
+        //Do a full charge every 10 cycles so that we can ballance the cells.
+        //Need to make this configure-able by the user at runtime.
+        if(vars.partial_chrg_cnt < 10){
+            vars.partial_chrg_cnt++;
+            p_charge = 1;
+            dsky.chrg_voltage = ((sets.battery_rated_voltage - sets.dischrg_voltage) * sets.partial_charge) + sets.dischrg_voltage;
+            //If partial charge is less than the open circuit voltage of the battery
+            //then set partial charge voltage to just above the open circuit voltage
+            //so that we don't discharge the battery any while a charge is plugged in.
+            if(dsky.chrg_voltage < open_voltage && CONDbits.got_open_voltage) dsky.chrg_voltage = open_voltage + 0.05;
+        }
+        else if(vars.partial_chrg_cnt >= 10){
+            vars.partial_chrg_cnt = 0;
+            p_charge = 0;
+            dsky.chrg_voltage = sets.battery_rated_voltage;
+        }
+
+        //Reset battery usage session when charger is plugged in and power is turned off.
+        if(!keySwitch && !CONDbits.cmd_power){
+            vars.battery_usage = 0;
+        }
+        CONDbits.charger_detected = 1;  //Set this variable to 1 so that we only run this routine once per charger plugin.
+    }
+    else {
+        CONDbits.charger_detected = 0;  //If charger has been unplugged, clear this.
+    }
+}
+
+//Initiate current calibration, heater calibration, and try to get battery capacity from NVmem upon cold and dead startup.
 void initialCal(void){
     //Calibrate the current sense and calculate remaining capacity on first power up based on voltage percentage and rated capacity of battery.
     if(first_cal == 0 && curnt_cal_stage == 0){
@@ -29,10 +76,9 @@ void initialCal(void){
         CONDbits.soft_power = 1;
         first_cal = 1;
     }
-    else if(first_cal < 4){
-        first_cal++;            //delay, wait about 3 seconds for other services to complete.
-    }
-    else if (first_cal == 4 && CONDbits.got_open_voltage){
+    else if(curnt_cal_stage == 5 && first_cal < fCalTimer)first_cal++; //delay, wait about 1 second for other services to complete.
+
+    else if (first_cal == 2 && CONDbits.got_open_voltage){
         //Check to see if we have valid data in EEPROM that we can start with.
         if (eeprom_read((cfg_space) + 1) == 0x7654 && vars.battery_capacity > 1){
             //Calculate how much power was used while the power was off. This is not exact, but should be close enough.
@@ -47,21 +93,8 @@ void initialCal(void){
             vars.battery_capacity = sets.amp_hour_rating; //Just use the amp hour rating on first start.
             vars.battery_remaining = sets.amp_hour_rating * (voltage_percentage / 100);   //Rough estimation of how much power is left.
         }
-        first_cal = 5;      //Signal that we are done with power up.
+        first_cal = fCalReady;      //Signal that we are done with power up.
         CONDbits.soft_power = 0;
-        //We have our starting variables, now check for a charger manually this one time. 
-        //Do this here because plugging in a charger on a power off state might cause the charger IRQ to do things
-        //while the rest of the system isn't ready if it even triggers it at all.
-        //Enable Charger IRQ.
-        IFS0bits.INT0IF = 0;    //Make sure we don't trigger an IRQ just yet.
-        IEC0bits.INT0IE = 1;    //Charge Detect IRQ Enabled.
-        //Check for charger input on power up.
-        if(chrgSwitch){
-            //Check to see if we have already ran the IRQ. If we have, no need to manually trigger it again.
-            if (CONDbits.charger_detected == 0){
-                IFS0bits.INT0IF = 1;    //Force a charger plugged IRQ.
-            }
-        }
     }
 }
 
@@ -88,7 +121,7 @@ void first_check(void){
 //Main Power Check.
 void main_power_check(void){
     /* Check for charger, key, or software power up. */
-    if((chrgSwitch || keySwitch || CONDbits.soft_power || CONDbits.cmd_power || CONDbits.power_plugged)){
+    if((chrgSwitch || keySwitch || CONDbits.soft_power || CONDbits.cmd_power)){
         CONDbits.pwr_detect = 1;         //Used for blinking error light when in a fault shutdown.
         //Reset Overcurrent shutdown timer.
         if(shutdown_timer){
@@ -337,7 +370,6 @@ void general_shutdown(void){
     STINGbits.fault_shutdown = 1;       //Tells other stuff that we had a general shutdown.
     CONDbits.cmd_power = 0;
     CONDbits.soft_power = 0;
-    CONDbits.power_plugged = 0;
     fault_log(0x0B);            //Log a general Shutdown Event.
 }
 

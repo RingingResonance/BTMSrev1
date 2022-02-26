@@ -90,39 +90,29 @@ void fault_read(int serial_port){
     }
 }
 
-void cGetData(int serial_port){
-    //Data input
-    if(serial_port)
-        CMD_buff[serial_port][CMD_Point[serial_port]] = U2RXREG;
-    else
-        CMD_buff[serial_port][CMD_Point[serial_port]] = U1RXREG;
-    //Data echo
-    if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) || (CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0A))){
-        if(serial_port)
-            U2TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
-        else
-            U1TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
-    }
-    //Check for a RETURN
-    char cmdinput = CMD_buff[serial_port][CMD_Point[serial_port]];
-    if (cmdinput == 0x0D || cmdinput == 0x0A){
-        if (Lecho[serial_port]){
-            load_string("\r\n", serial_port);
-        }
-        bufsize[serial_port] = CMD_Point[serial_port];
-        CMD_Point[serial_port] = 0;
-        cmdRDY[serial_port] = 1; //Tell our command handler to process.
-    }
-    //No RETURN detected? Store the data.
-    else if(CMD_Point[serial_port] < Clength) {
-        CMD_Point[serial_port]++;
-    }
-}
 
 void Command_Interp(int serial_port){
     //Get data. Get allll the data.
     while (((serial_port == PORT1 && U1STAbits.URXDA) || (serial_port == PORT2 && U2STAbits.URXDA)) && !cmdRDY[serial_port]){
-        cGetData(serial_port);
+        //Data input
+        if(serial_port)CMD_buff[serial_port][CMD_Point[serial_port]] = U2RXREG;
+        else CMD_buff[serial_port][CMD_Point[serial_port]] = U1RXREG;
+        //Data echo
+        if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) || 
+        (CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0A))){
+            if(serial_port)U2TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
+            else U1TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
+        }
+        //Check for a RETURN
+        char cmdinput = CMD_buff[serial_port][CMD_Point[serial_port]];
+        if (cmdinput == 0x0D || cmdinput == 0x0A){
+            if (Lecho[serial_port])load_string("\r\n", serial_port);
+            bufsize[serial_port] = CMD_Point[serial_port];
+            CMD_Point[serial_port] = 0;
+            cmdRDY[serial_port] = 1; //Tell our command handler to process.
+        }
+        //No RETURN detected? Store the data.
+        else if(CMD_Point[serial_port] < Clength)CMD_Point[serial_port]++;
     }
     //Command Handler.
     if (cmdRDY[serial_port]){

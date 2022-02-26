@@ -33,6 +33,9 @@ float vltg_proportion = 70000;
 float current_output = 0;
 float temp_proportion = 70000;
 float voltage_output = 0;
+float   temp_dischrg_rate;      //calculated discharge rate based off temp and capacity remaining. Is in %
+float   temp_chrg_rate;      //calculated discharge rate based off temp and capacity remaining. Is in %
+float   max_chrg_current;       //calculated charge rate based off temp and capacity remaining. Is in %
 
 #endif	/* SUBS_H */
 

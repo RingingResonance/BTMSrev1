@@ -88,14 +88,11 @@ void load_hex(int numb, int serial_port){
 //Start the data transfer from one of the buffers to the selected serial port
 //Dispatch the data in the buffers to the display by creating a TX IRQ
 void dispatch_Serial(int serial_port){
+    if(portBSY[serial_port])return;             //If port it busy, don't dispatch a second time.
     portBSY[serial_port] = 1;
-    Buff_index[serial_port] = 0;  //Start Index at 0.
-    if(serial_port){
-        IFS1bits.U2TXIF = 1;        //Start transmitting by manually sending an IRQ.
-    }
-    else{
-        IFS0bits.U1TXIF = 1;        //Start transmitting by manually sending an IRQ.
-    }
+    Buff_index[serial_port] = 0;                //Start Index at 0.
+    if(serial_port) IFS1bits.U2TXIF = 1;        //Start transmitting by manually sending an IRQ.
+    else IFS0bits.U1TXIF = 1;                   //Start transmitting by manually sending an IRQ.
 }
 
 //Send a string of text to a buffer that can then be dispatched to a serial port.
@@ -112,12 +109,12 @@ void load_string(const char *string_point, int serial_port){
     Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
 }
+//Copy float data to buffer.
 void cpyFLT(int serial_port){
     Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][FtempIndex[serial_port]];
     //Do not overrun the buffer.
     if (Buff_index[serial_port] < bffize-1)Buff_index[serial_port]++;
 }
-
 /* Sends a float to buffer. */
 void load_float(float f_data, int serial_port){
     FtempIndex[serial_port] = 0;

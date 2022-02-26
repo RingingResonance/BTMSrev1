@@ -39,9 +39,9 @@ void temperatureCalc(void){
         dischrg_current = sets.limp_current;
     }
     //Calculate max charge current based off battery temp.
-    temp_dischrg_rate = 1;
+    temp_chrg_rate = 1;
     if (dsky.battery_temp > sets.chrg_reduce_high_temp || dsky.battery_temp < sets.chrg_reduce_low_temp){
-        temp_dischrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
+        temp_chrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
     }
 }
 
@@ -112,32 +112,24 @@ void outputReg(void){
 
 void chargeReg(void){
     //Charge current read and target calculation.
-    chrg_current = (sets.chrg_C_rating * sets.amp_hour_rating) * temp_dischrg_rate;
-    if(dsky.battery_temp > sets.chrg_max_temp || dsky.battery_temp < sets.chrg_min_temp){
-        chrg_current = 0;   //Inhibit charging battery if temperature is out of range.
-    }
-    float chrg_current_read = dsky.battery_current;
-    //Charge current should be positive, if it is negative then set it to 0.
-    if (chrg_current_read < 0){
-        chrg_current_read = 0;
-    }
-    //Delay is over, start checking for charger again.
-    CONDbits.power_plugged = 0;
+    chrg_current = (sets.chrg_C_rating * sets.amp_hour_rating) * temp_chrg_rate;
+    //Inhibit charging battery if temperature or voltage is out of range.
+    if(dsky.battery_temp > sets.chrg_max_temp || dsky.battery_temp < sets.chrg_min_temp || 
+    dsky.battery_voltage > dsky.chrg_voltage + 0.05) chrg_current = 0.01;
+
     //// Check for Charger.
     if(chrgSwitch){
         chrgLight = 1;          //charger light on.
         if(!STINGbits.fault_shutdown){
             chrgRelay = 1;          //charger relay on, but only if fault shutdown is 0
-            if(chrg_rly_timer == 3)
-                chrg_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
+            if(chrg_rly_timer == 3)chrg_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
         }
         //Charger timeout check. If charger is plugged in but we aren't getting current then we 
         //need to shutdown and log an error code so we don't run down the battery.
-        float chk_voltage = 0;
-        chk_voltage = dsky.chrg_voltage - 0.5;       //Half a volt less than charge voltage.
-        if(chrg_check < 20000 && chrg_current_read == 0 && !keySwitch && dsky.battery_voltage < chk_voltage && chrg_rly_timer == 0){
-            chrg_check++;
-        }
+        //Half a volt less than charge voltage.
+        if(chrg_check < 20000 && dsky.battery_current < 0 && !keySwitch && 
+        dsky.battery_voltage < (dsky.chrg_voltage - 0.5) && !chrg_rly_timer && 
+        !heat_power && chrg_current > 0.01) chrg_check++;
         else if(chrg_check >= 20000 && !keySwitch){
             fault_log(0x1B);            //Log insufficient current from charger.
             STINGbits.fault_shutdown = 1;
@@ -145,51 +137,31 @@ void chargeReg(void){
             chrgRelay = 0;          //charger relay off. Don't waste power on a relay that is doing nothing.
             //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current.
         }
-        else if(chrg_check > 0){
-            chrg_check--;
-        }
+        else if(chrg_check > 0) chrg_check--;
         
         //Run heater if needed, but don't turn it up more than what the charger can handle.
-        if(chrg_current_read > 0.01 || (dsky.battery_voltage >= (dsky.chrg_voltage - 0.15))){
-            heat_control(sets.chrg_target_temp);
-        }
-        else if(chrg_current_read == 0 && heat_power > 0){
-            heat_power--;
-        }
-        
-        //Set current to 0 if battery voltage is over the charge set voltage.
-        //Do this so that we can still run the heater without charging or discharging the battery when doing a partial charge.
-        float   input_current = 0;
-        if((dsky.battery_voltage > dsky.chrg_voltage + 0.05)){
-            STINGbits.zero_current = 0;
-        }
-        else if((dsky.battery_voltage < dsky.chrg_voltage - 0.05)){
-            STINGbits.zero_current = 1;
-        }
-        //We do it like this so that float_current can be updated even when neither of the previous if statements are true.
-        if(STINGbits.zero_current){
-            input_current = chrg_current;
-        }
-        else{
-            input_current = 0;
-        }
-        if(vars.heat_cal_stage != 2 && chrg_rly_timer == 0){
+        //This way we don't discharge the battery from trying to run the heater while the charger is plugged in, but
+        //not supplying enough current to do both.
+        if(dsky.battery_current >= 0) heat_control(sets.chrg_target_temp);
+        else if(dsky.battery_current < 0.01 && heat_power > 0) heat_power--;
+
+        //Regulate the charger input.
+        if(vars.heat_cal_stage != 2 && !chrg_rly_timer){
             // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
-            if(((charge_power > 0) && (dsky.battery_voltage >= (sets.battery_rated_voltage - 0.01))) || (chrg_current_read > (input_current + 0.01)))
-                charge_power--;
-            else if(((charge_power < 101) && (dsky.battery_voltage < sets.battery_rated_voltage - 0.07)) || (chrg_current_read < input_current))
-                charge_power++;
+            if(((charge_power > 0) && (dsky.battery_voltage >= (sets.battery_rated_voltage - 0.01))) || 
+            (dsky.battery_current > (chrg_current + 0.02)))charge_power--;
+            else if(((charge_power < 101) && (dsky.battery_voltage < sets.battery_rated_voltage - 0.07)) || 
+            (dsky.battery_current < chrg_current))charge_power++;
         }
-        else
-            charge_power = 0;       //Inhibit charging if we are in the middle of heater calibration.
+        else charge_power = 0;       //Inhibit charging if we are in the middle of heater calibration.
     }
     else{
         chrgLight = 0;          //charger light off.
-        charge_power = 0;
-        chrgPWM = 0;                   //Set charger output to 0 before turning off relay
+        charge_power = 0;       //charger set to 0
+        chrgPWM = 0;            //Set charger output to 0 before turning off relay
         chrgRelay = 0;          //charger relay off.
-        chrg_rly_timer = 3;         //reset charge relay timer.
-        chrg_check = 0;
+        chrg_rly_timer = 3;     //reset charge relay timer.
+        chrg_check = 0;         //Reset charger check timer
     }
 }
 

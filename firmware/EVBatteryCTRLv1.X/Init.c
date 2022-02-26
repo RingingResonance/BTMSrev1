@@ -194,7 +194,7 @@ void configure_IO(void){
     ADCHS = 0x0000;
     ADPCFG = 0xFF70;
     ADCSSL = 0x008F;
-    
+
     //Configure IRQ Priorities
     IPC2bits.ADIP = 7;      //Analog inputs and regulation routines, Important
     IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing
@@ -206,8 +206,8 @@ void configure_IO(void){
     IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
     IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC1bits.T3IP = 2;      //Timer 3 IRQ for wheel rotate timeout. Not critical.
-    IPC5bits.T4IP = 2;      //Non-critical operations.
-    IPC5bits.T5IP = 1;      //Non-critical processes.
+    IPC5bits.T4IP = 1;      //Checksum timer IRQ
+    IPC5bits.T5IP = 1;      //Non-critical processes. Not currently used for anything.
     IPC5bits.INT2IP = 1;    //Not yet used.
 }
 void Init(void){

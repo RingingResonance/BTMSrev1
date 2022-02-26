@@ -90,7 +90,6 @@ void fault_read(int serial_port){
     }
 }
 
-
 void Command_Interp(int serial_port){
     //Get data. Get allll the data.
     while (((serial_port == PORT1 && U1STAbits.URXDA) || (serial_port == PORT2 && U2STAbits.URXDA)) && !cmdRDY[serial_port]){

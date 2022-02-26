@@ -52,13 +52,15 @@ const char code29[] = "Prgm Chksum Err";
 const char code2A[] = "NVmem Chksum Err";
 const char code2B[] = "Sets Chksum Err";
 const char code2C[] = "NVsets Chksum Mismatch";
+const char code2D[] = "PORT1 OERR";
+const char code2E[] = "PORT2 OERR";
 const char codeDefault[] = "Unknown";
 
 const char * const errArray[] = {code01,code02,code03,code04,code05,code06,code07,code08,code09,code0A,code0B,code0C
                          ,code0D,code0E,code0F,code10,code11,code12,code13,code14,code15,code16,code17,code18
                          ,code19,code1A,code1B,code1C,code1D,code1E,code1F,code20,code21,code22,code23,code24
-                         ,code25,code26,code27,code28,code29,code2A,code2B,code2C};
-#define numOfCodes 0x2B
+                         ,code25,code26,code27,code28,code29,code2A,code2B,code2C,code2D,code2E};
+#define numOfCodes 0x2D
 
 #endif	/* ERRORCODES_H */
 

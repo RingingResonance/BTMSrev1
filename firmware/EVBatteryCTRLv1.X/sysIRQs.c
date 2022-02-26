@@ -170,6 +170,21 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
 /* Heartbeat IRQ, Once every Second. Lots of stuff goes on here. */
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     CPUact = 1;
+    //Check for reveive buffer overflow.
+    if(U1STAbits.OERR){
+        fault_log(0x2D);
+        char garbage;
+        //Flush the buffer.
+        while(U1STAbits.URXDA)garbage = U1RXREG;
+        U1STAbits.OERR = 0; //Clear the fault bit so that receiving can continue.
+    }
+    if(U2STAbits.OERR){
+        fault_log(0x2E);
+        char garbage;
+        //Flush the buffer.
+        while(U2STAbits.URXDA)garbage = U2RXREG;
+        U2STAbits.OERR = 0; //Clear the fault bit so that receiving can continue.
+    }
     ADCON1bits.ADON = 1;    // turn ADC on to get a sample.
     //Get open circuit voltage percentage if current is less than 0.1 amps
     volt_percent();

@@ -17,7 +17,6 @@
 #ifndef chksum_C
 #define chksum_C
 
-#include <p30f3011.h>
 #include "checksum.h"
 #include "common.h"
 

@@ -17,8 +17,6 @@
 #ifndef SUBSYS_C
 #define SUBSYS_C
 
-#include <p30f3011.h>
-
 #include "common.h"
 #include "Init.h"
 /* Fun fact, you can comment out these includes and it still compiles even though they are needed!
@@ -41,17 +39,24 @@ float absFloat(float number){
     else return number;
 }
 
+void volt_zero(void){
+    voltage_percentage = 0;
+    open_voltage = 0;
+}
 //Battery Percentage Calculation. This does NOT calculate the % total charge of battery, only the total voltage percentage.
 void volt_percent(void){
-    if (dsky.battery_voltage <= (sets.dischrg_voltage - 2)){
-        voltage_percentage = 0;
-        CONDbits.got_open_voltage = 0;
-        open_voltage = 0;
-    }
-    else if (absFloat(dsky.battery_current) < 0.05){
+    if (absFloat(dsky.battery_current) < 0.05 && !CONDbits.charger_detected){
         open_voltage = dsky.battery_voltage;
         voltage_percentage = 100 * ((open_voltage - sets.dischrg_voltage) / (sets.battery_rated_voltage - sets.dischrg_voltage));
-        CONDbits.got_open_voltage = 1;
+        CONDbits.got_open_voltage = yes;
+    }
+    else if (dsky.battery_voltage <= (sets.dischrg_voltage + 0.05)){
+        volt_zero();
+        CONDbits.got_open_voltage = yes;
+    }
+    else {
+        volt_zero();
+        CONDbits.got_open_voltage = no;
     }
 }
 
@@ -66,7 +71,7 @@ void current_cal(void){
         if(vars.heat_cal_stage != 5){
             vars.heat_cal_stage = 1;     //Do a heater cal after we have done current cal unless it is disabled.
         }
-        CONDbits.soft_power = 0;
+        CONDbits.soft_power = off;
         //Done with current cal.
     }
     //Initialize current cal.
@@ -74,7 +79,7 @@ void current_cal(void){
         current_compensate = 0;
         io_off();    //Turn off all inputs and outputs.
         curnt_cal_stage = 4;
-        CONDbits.soft_power = 1;         //Turn soft power on to run 0.125s IRQ.
+        CONDbits.soft_power = on;         //Turn soft power on to run 0.125s IRQ.
     }
 }
 

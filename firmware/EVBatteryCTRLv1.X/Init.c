@@ -18,24 +18,24 @@
 #define INIT_C
 
 
-#include <p30f3011.h>
+#include "common.h"
 #include "Init.h"
 
 void default_sets(void){
     sets.R1_resistance = 200;            //R1 resistance in Kohms
     sets.R2_resistance = 16;             //R2 resistance in Kohms
-    sets.bt_vlt_adjst = 0;               //battery voltage input compensation in volts.
+    sets.bt_vlt_adjst = -0.1;            //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
     sets.partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
-    sets.max_battery_voltage = 59.08;    //Max battery voltage before shutdown.
+    sets.max_battery_voltage = 59.2;      //Max battery voltage before shutdown.
     sets.battery_rated_voltage = 58.8;           //Target max charge voltage
     sets.dischrg_voltage = 39.2;        //Minimum battery voltage
     sets.low_voltage_shutdown = 35;    //Battery Low Total Shutdown Voltage
     sets.dischrg_C_rating = 2;           //Discharge C rating
-    sets.limp_current = 5;              //Limp mode current in amps
+    sets.limp_current = 5;              //Limp mode current in amps. Minimum current to regulate to.
     sets.chrg_C_rating = 0.5;          //Charge C rating.
-    sets.amp_hour_rating = 22;         //Battery amp hour rating.
+    sets.amp_hour_rating = 23.4;         //Battery amp hour rating.
     sets.over_current_shutdown = 30;        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
     sets.absolute_max_current = 25;      //Max regulating current.
     //Charge temps.
@@ -54,12 +54,12 @@ void default_sets(void){
     sets.battery_shutdown_temp = 60;      //Max battery temp before shutting down everything.
     sets.ctrlr_shutdown_temp = 80;        //Max motor or motor controller temp shutdown.
     //Fan ctrl temps.
-    sets.ctrlr_fan_start = 50;               //Turns on cooling fan.
+    sets.ctrlr_fan_start = 50;          //Turns on cooling fan.
     sets.batt_fan_start = 30;
     //Some other stuff.
     sets.max_heat = 50;              //Heater watts that you want to use.
     sets.travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
-    sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws. Used for current calibration.
+    sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws at idle. Used for current calibration.
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
     //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
     sets.page[0][0] = 2;  //%

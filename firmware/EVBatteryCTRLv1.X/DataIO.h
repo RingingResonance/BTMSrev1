@@ -31,14 +31,6 @@ extern char four_bit_hex_cnvt(int);
 extern void Buffrst(int);
 void load_hex(int, int);
 
-// Tm = 32767 * (1 / (((clkSpeedmhz * PLL) / 4) / tiksPerIRQ))
-//#define IPS 29.48;   //million instructions per second.
-const float IPS = 14.74;   //million instructions per second.
-//float IPS = 29.48;
-//Don't define baud rate as static because we might want to add the option of changing it later during runtime.
-float BAUD1 = 9600;     //BAUD rate for PORT 1
-float BAUD2 = 9600;     //BAUD rate for PORT 2
-
 //Serial port stuff
 #define Clength 4   //Command Buff Length - 1
 char CMD_buff[2][5];              //Command Buffer

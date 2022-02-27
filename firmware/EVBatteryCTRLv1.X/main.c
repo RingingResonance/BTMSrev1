@@ -14,9 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>*/
 
-#include <p30f3011.h>
-#include <libpic30.h>
-#include <xc.h>
+#include "common.h"
 
 /* Include the Source AND Headers HERE or else mplab gets pissy for some reason.
  * Don't bother trying to include the source and header files into the project,

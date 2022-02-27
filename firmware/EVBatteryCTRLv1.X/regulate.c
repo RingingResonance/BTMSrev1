@@ -17,40 +17,41 @@
 #ifndef REGULATE_C
 #define REGULATE_C
 
-#include <p30f3011.h>
-
 #include "regulate.h"
 #include "common.h"
 #include "Init.h"
 
+float Temperature_I_Calc(float lowTCutout, float lowBeginReduce, float highTCutout, float highBeginReduce){
+    float percentOut;
+    if(dsky.battery_temp < lowBeginReduce) percentOut = (dsky.battery_temp - lowTCutout) / (lowBeginReduce - lowTCutout);
+    else if (dsky.battery_temp > highBeginReduce) percentOut = 1 + (-1 * (dsky.battery_temp - highTCutout) / (highBeginReduce - highTCutout));
+    else return 1;
+    //Clamp the result 0 - 1
+    if(percentOut > 1) return 1;
+    else if (percentOut < 0) return 0;
+    else return percentOut;
+}
+
 void temperatureCalc(void){
-    //Calculate max discharge current based off battery remaining and battery temp.
-    temp_dischrg_rate = 1;
-    if (dsky.battery_temp > sets.dischrg_reduce_high_temp || dsky.battery_temp < sets.dischrg_reduce_low_temp){
-        temp_dischrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
-    }
-    if (dsky.battery_temp < sets.dischrg_min_temp){
-        temp_dischrg_rate = 0.5;     //Decrease the current by 50% if we are too cold.
-    }
-    dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining) * temp_dischrg_rate;
-    
-    //Don't set our max discharge current below the limp current setpoint.
-    if(dischrg_current < sets.limp_current || dsky.battery_temp < sets.dischrg_min_temp){
-        dischrg_current = sets.limp_current;
-    }
-    //Calculate max charge current based off battery temp.
-    temp_chrg_rate = 1;
-    if (dsky.battery_temp > sets.chrg_reduce_high_temp || dsky.battery_temp < sets.chrg_reduce_low_temp){
-        temp_chrg_rate = 0.8;     //Decrease the current by 20% if we are too hot or too cold.
-    }
+    //Calculate max discharge current based off battery temp and battery remaining.
+    dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining) 
+    * Temperature_I_Calc(sets.dischrg_min_temp, sets.dischrg_reduce_low_temp, sets.dischrg_max_temp, sets.dischrg_reduce_high_temp);
+    if(dischrg_current < sets.limp_current) dischrg_current = sets.limp_current;
+
+    //Calculate max charge current based off battery temp and battery remaining.
+    float chrg_remaining = (vars.battery_capacity - vars.battery_remaining);
+    if(chrg_remaining < 0.2) chrg_remaining = 0.2;  //Minimum charge current is 0.2 * charge C rating.
+    chrg_current = (sets.chrg_C_rating * chrg_remaining) 
+    * Temperature_I_Calc(sets.chrg_min_temp, sets.chrg_reduce_low_temp, sets.chrg_max_temp, sets.chrg_reduce_high_temp);
+
 }
 
 void outputReg(void){
     ////Check for key power or command power signal, but not soft power signal.
     if((keySwitch || CONDbits.cmd_power)){
         if(!STINGbits.fault_shutdown){
-            ctRelay = 1;          //contactor relay on, but only if fault shutdown is 0
-            AUXrelay = 1;         //Turn on AUX 
+            ctRelay = on;          //contactor relay on, but only if fault shutdown is 0
+            AUXrelay = on;         //Turn on AUX 
             if(contact_rly_timer == 3)
                 contact_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
         }
@@ -99,24 +100,19 @@ void outputReg(void){
         }
     }
     else{
-        output_power = 0;
-        outPWM = 0;             //set output control to 0 before turning off the relay
-        LATE = 0;               //Insure all PORTE outputs are off.
-        PWMCON1bits.PEN3L = 0;  //Set PWM3 Low side to standard output so that it can be set to 0
+        output_power = off;
+        outPWM = off;             //set output control to 0 before turning off the relay
+        LATE = off;               //Insure all PORTE outputs are off.
+        PWMCON1bits.PEN3L = off;  //Set PWM3 Low side to standard output so that it can be set to 0
         crnt_integral = 0;
         contact_rly_timer = 3; //Reset contactor relay timer
-        AUXrelay = 0; //Turn off AUX 
-        ctRelay = 0; //Turn off contactor relay
+        AUXrelay = off; //Turn off AUX 
+        ctRelay = off; //Turn off contactor relay
     }
 }
 
 void chargeReg(void){
-    //Charge current read and target calculation.
-    chrg_current = (sets.chrg_C_rating * sets.amp_hour_rating) * temp_chrg_rate;
-    //Inhibit charging battery if temperature or voltage is out of range.
-    if(dsky.battery_temp > sets.chrg_max_temp || dsky.battery_temp < sets.chrg_min_temp || 
-    dsky.battery_voltage > dsky.chrg_voltage + 0.05) chrg_current = 0.01;
-
+    //Charge current read and target calculation.    
     //// Check for Charger.
     if(chrgSwitch){
         chrgLight = 1;          //charger light on.
@@ -126,15 +122,14 @@ void chargeReg(void){
         }
         //Charger timeout check. If charger is plugged in but we aren't getting current then we 
         //need to shutdown and log an error code so we don't run down the battery.
-        //Half a volt less than charge voltage.
         if(chrg_check < 20000 && dsky.battery_current < 0 && !keySwitch && 
-        dsky.battery_voltage < (dsky.chrg_voltage - 0.5) && !chrg_rly_timer && 
+        dsky.battery_voltage < (dsky.chrg_voltage - 0.1) && !chrg_rly_timer && 
         !heat_power && chrg_current > 0.01) chrg_check++;
-        else if(chrg_check >= 20000 && !keySwitch){
+        else if(chrg_check >= 20000){
             fault_log(0x1B);            //Log insufficient current from charger.
-            STINGbits.fault_shutdown = 1;
+            STINGbits.fault_shutdown = yes;
             chrg_check = 0;
-            chrgRelay = 0;          //charger relay off. Don't waste power on a relay that is doing nothing.
+            chrgRelay = off;          //charger relay off. Don't waste power on a relay that is doing nothing.
             //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current.
         }
         else if(chrg_check > 0) chrg_check--;
@@ -148,18 +143,18 @@ void chargeReg(void){
         //Regulate the charger input.
         if(vars.heat_cal_stage != 2 && !chrg_rly_timer){
             // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
-            if(((charge_power > 0) && (dsky.battery_voltage >= (sets.battery_rated_voltage - 0.01))) || 
+            if(((charge_power > 0) && (dsky.battery_voltage >= (dsky.chrg_voltage))) || 
             (dsky.battery_current > (chrg_current + 0.02)))charge_power--;
-            else if(((charge_power < 101) && (dsky.battery_voltage < sets.battery_rated_voltage - 0.07)) || 
+            else if(((charge_power < 101) && (dsky.battery_voltage < dsky.chrg_voltage - 0.07)) || 
             (dsky.battery_current < chrg_current))charge_power++;
         }
         else charge_power = 0;       //Inhibit charging if we are in the middle of heater calibration.
     }
     else{
-        chrgLight = 0;          //charger light off.
-        charge_power = 0;       //charger set to 0
-        chrgPWM = 0;            //Set charger output to 0 before turning off relay
-        chrgRelay = 0;          //charger relay off.
+        chrgLight = off;          //charger light off.
+        charge_power = off;       //charger set to 0
+        chrgPWM = off;            //Set charger output to 0 before turning off relay
+        chrgRelay = off;          //charger relay off.
         chrg_rly_timer = 3;     //reset charge relay timer.
         chrg_check = 0;         //Reset charger check timer
     }
@@ -174,13 +169,13 @@ void heat_control(float target_temp){
     if(vars.heat_cal_stage == 3){
         if(dsky.battery_temp < (target_temp - 0.5) && heat_power < heat_set){
             if(heat_rly_timer == 0)heat_power++;
-            heatRelay = 1;     //Heat Relay On
+            heatRelay = on;     //Heat Relay On
             if(heat_rly_timer == 3)heat_rly_timer = 2; //wait two 0.125ms cycles before allowing heat regulation to start.
         }
         else if(dsky.battery_temp > (target_temp + 0.5)){
             if(heat_power > 0)heat_power--;
             if(heat_power <= 0){
-                heatRelay = 0;     //Heat Relay Off
+                heatRelay = off;     //Heat Relay Off
                 heat_rly_timer = 3;     //Reset heat relay timer
             }
         }

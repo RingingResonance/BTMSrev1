@@ -17,7 +17,6 @@
 #ifndef eeprom_C
 #define eeprom_C
 
-#include <p30f3011.h>
 #include "eeprom.h"
 #include "checksum.h"
 #include "common.h"

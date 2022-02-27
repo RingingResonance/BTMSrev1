@@ -17,6 +17,10 @@
 #ifndef COMMON_H
 #define	COMMON_H
 
+#include <p30f3011.h>
+//#include <libpic30.h>
+//#include <xc.h>
+
 //IO inputs
 #define keySwitch !PORTFbits.RF1
 #define chrgSwitch PORTEbits.RE8
@@ -47,11 +51,24 @@
 #define stackFaultDefault ramSize + ramAddressStart
 #define ramFree (ramSize + ramAddressStart) - 15
 
+// Tm = 32767 * (1 / (((clkSpeedmhz * PLL) / 4) / tiksPerIRQ))
+//#define IPS 29.48;   //million instructions per second.
+#define IPS 14.74   //million instructions per second.
+//Don't make baud rate as static, const, or define because we might want to add the option of changing it later during runtime.
+float BAUD1 = 9600;     //BAUD rate for PORT 1
+float BAUD2 = 9600;     //BAUD rate for PORT 2
+
+
 extern void current_cal(void);
 extern void volt_percent(void);
 extern void reset_check(void);
 extern void power_off(void);
 extern float absFloat(float);
+
+#define yes 1
+#define no 0
+#define on 1
+#define off 0
 
 /* NOTE: Try to keep memory usage below about 75% for the dsPIC30F3011 as the stack can use as much as 15% */
 /*****************************/
@@ -163,7 +180,7 @@ struct dskyvars{
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
 float   vltg_dvid = 0;              //Value for calculating the ratio of the input voltage divider.
-const float   calc_125 = 0.00003472; //Value for calculating the total current in and out of battery every second.
+#define calc_125 0.00003472 //Value for calculating the total current in and out of battery every second.
 int     ADCON3upper8 = 0;
 int     ADCON3lower8 = 0;
 /*****************************/

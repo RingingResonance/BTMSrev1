@@ -17,7 +17,6 @@
 #ifndef DATAIRQS_C
 #define DATAIRQS_C
 
-#include <p30f3011.h>
 #include "IRQs.h"
 #include "common.h"
 #include "DataIO.h"

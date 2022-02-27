@@ -17,7 +17,7 @@
 #ifndef DATAIO_C
 #define DATAIO_C
 
-#include <p30f3011.h>
+#include "common.h"
 #include "DataIO.h"
 
 void Buffrst(int serial_port){

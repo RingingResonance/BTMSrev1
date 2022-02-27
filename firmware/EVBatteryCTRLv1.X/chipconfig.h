@@ -7,16 +7,8 @@
 
 #ifndef CHIPCONFIG_H
 #define	CHIPCONFIG_H
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-
+#include <xc.h>
 // DSPIC30F3011 Configuration Bit Settings
-
-// 'C' source line config statements
-
 // FOSC
 #pragma config FOSFPR = FRC_PLL8       // Oscillator (FRC w/PLL 8x)
 #pragma config FCKSMEN = CSW_FSCM_OFF   // Clock Switching and Monitor (Sw Disabled, Mon Disabled)
@@ -44,12 +36,6 @@ extern "C" {
 
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
-
-#include <xc.h>
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif	/* CHIPCONFIG_H */
 

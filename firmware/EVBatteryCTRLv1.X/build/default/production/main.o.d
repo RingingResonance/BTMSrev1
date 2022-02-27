@@ -1,9 +1,9 @@
 build/default/production/main.o:  \
 main.c  \
+common.h  \
 chipconfig.h  \
 IRQs.h  \
-sysIRQs.c  \
- common.h  \
+ sysIRQs.c  \
 DataIO.h  \
 Init.h  \
 display.h  \

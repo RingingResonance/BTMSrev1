@@ -17,7 +17,6 @@
 #ifndef TRAPIRQS_C
 #define TRAPIRQS_C
 
-#include <p30f3011.h>
 #include "IRQs.h"
 #include "common.h"
 #include "sysChecks.h"

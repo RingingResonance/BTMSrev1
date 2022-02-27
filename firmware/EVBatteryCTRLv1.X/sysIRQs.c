@@ -17,7 +17,6 @@
 #ifndef sysIRQS_C
 #define sysIRQS_C
 
-#include <p30f3011.h>
 #include "IRQs.h"
 #include "common.h"
 #include "DataIO.h"
@@ -38,7 +37,7 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
 
 /* Analog Input IRQ */
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
-    CPUact = 1;
+    CPUact = on;
     
     /* I have left commented out code in this section for showing the process
      * of converting analog inputs into voltages, currents, and temps.
@@ -135,10 +134,10 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         //ADC sample burn check. Only burn once when main power is on.
         if (!CONDbits.main_power && STINGbits.adc_sample_burn){
             ADCON1bits.ADON = 0;    // turn ADC off to save power.
-            STINGbits.adc_sample_burn = 0;      //Burn the first ADC sample on every power up of ADC.
+            STINGbits.adc_sample_burn = no;      //Burn the first ADC sample on every power up of ADC.
         }
         else {
-            STINGbits.adc_sample_burn = 1;      //We have burned the first set.
+            STINGbits.adc_sample_burn = yes;      //We have burned the first set.
         }
     }
     else {
@@ -169,8 +168,8 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
 
 /* Heartbeat IRQ, Once every Second. Lots of stuff goes on here. */
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
-    CPUact = 1;
-    //Check for reveive buffer overflow.
+    CPUact = on;
+    //Check for receive buffer overflow.
     if(U1STAbits.OERR){
         fault_log(0x2D);
         char garbage;
@@ -185,7 +184,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         while(U2STAbits.URXDA)garbage = U2RXREG;
         U2STAbits.OERR = 0; //Clear the fault bit so that receiving can continue.
     }
-    ADCON1bits.ADON = 1;    // turn ADC on to get a sample.
+    ADCON1bits.ADON = on;    // turn ADC on to get a sample.
     //Get open circuit voltage percentage if current is less than 0.1 amps
     volt_percent();
     //Calculate limit currents based on temperature.
@@ -229,7 +228,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     }
     // Check for charger disconnect.
     if(!chrgSwitch){
-        chrgLight = 0;  //charger light off.
+        chrgLight = off;  //charger light off.
         charge_power = 0;
         chrg_check = 0;
     }
@@ -243,24 +242,24 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     //Clear fault_shutdown if all power modes are turned off.
     if(!CONDbits.pwr_detect){
         shutdown_timer = 1;     //Acts like a resettable circuit breaker.
-        STINGbits.fault_shutdown = 0;
+        STINGbits.fault_shutdown = no;
     }
     
     //Blink Check Light if any faults are logged and any power modes are on regardless of what fault_shutdown says.
     if(CONDbits.pwr_detect){
         if(CONDbits.error_blink){
-            CONDbits.error_blink = 0;
-            errLight = 0;
+            CONDbits.error_blink = off;
+            errLight = off;
         }
         else{
-            CONDbits.error_blink = 1;    //Used for blinking stuff on displays.
-            if(vars.fault_count != 0){
-                errLight = 1;
+            CONDbits.error_blink = on;    //Used for blinking stuff on displays.
+            if(!vars.fault_count){
+                errLight = on;
             }
         }
     }
     else{
-        errLight = 0;
+        errLight = off;
     }
 
     //Get the absolute value of battery_usage and store it in absolute_battery_usage.
@@ -320,7 +319,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
 /* 0.125 second IRQ */
 //Used for some critical math timing operations. Cycles through every 1/8 sec.
 void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
-    CPUact = 1;
+    CPUact = on;
     dsky.watts = dsky.battery_crnt_average * dsky.battery_vltg_average;
     //Relay On Timers. Wait a little bit after turning on the relays before trying to regulate.
     if(chrg_rly_timer > 0 && chrg_rly_timer != 3)

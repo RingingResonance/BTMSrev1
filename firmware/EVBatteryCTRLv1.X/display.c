@@ -17,7 +17,6 @@
 #ifndef DKSY_C
 #define DKSY_C
 
-#include <p30f3011.h>
 #include "common.h"
 #include "display.h"
 #include "DataIO.h"

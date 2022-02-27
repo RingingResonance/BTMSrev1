@@ -17,7 +17,6 @@
 #ifndef SYSCHKS_C
 #define SYSCHKS_C
 
-#include <p30f3011.h>
 #include "sysChecks.h"
 #include "common.h"
 #include "eeprom.h"
@@ -48,8 +47,10 @@ void chargeDetect(void){
             dsky.chrg_voltage = ((sets.battery_rated_voltage - sets.dischrg_voltage) * sets.partial_charge) + sets.dischrg_voltage;
             //If partial charge is less than the open circuit voltage of the battery
             //then set partial charge voltage to just above the open circuit voltage
-            //so that we don't discharge the battery any while a charge is plugged in.
-            if(dsky.chrg_voltage < open_voltage && CONDbits.got_open_voltage) dsky.chrg_voltage = open_voltage + 0.05;
+            //so that we don't discharge the battery any while a charger is plugged in.
+            if(dsky.chrg_voltage < open_voltage && CONDbits.got_open_voltage) dsky.chrg_voltage = open_voltage + 0.01;
+            //If it ends up being higher than battery max charge voltage then clamp it.
+            if(dsky.chrg_voltage > sets.battery_rated_voltage) dsky.chrg_voltage = sets.battery_rated_voltage;
         }
         else if(vars.partial_chrg_cnt >= 10){
             vars.partial_chrg_cnt = 0;

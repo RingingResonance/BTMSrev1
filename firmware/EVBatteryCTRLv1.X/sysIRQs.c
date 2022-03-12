@@ -101,9 +101,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         //Do a battery check after each valid sample.
         //Check to make sure the battery and other systems are within safe operating conditions.
         //Shutdown and log the reason why if they aren't safe.
-        if(STINGbits.adc_sample_burn && !STINGbits.fault_shutdown){
-            explody_preventy_check();
-        }
+        if(STINGbits.adc_sample_burn && !STINGbits.fault_shutdown) explody_preventy_check();
         
         //Check to see if the system is ready to run.
         //If there is a fault, keep it from running.
@@ -111,7 +109,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             //Check for heater calibration event.
             heater_calibration();
             //Do power regulation and heater control.
-            if((vars.heat_cal_stage >= 3 || !vars.heat_cal_stage) && CONDbits.main_power && first_cal == fCalReady){
+            if((vars.heat_cal_stage > calibrating || !vars.heat_cal_stage) && CONDbits.main_power && first_cal == fCalReady){
                 outputReg();    //Output regulation routine
                 chargeReg();    //Charge input regulation routine
                 //Check for fault shutdown.
@@ -136,9 +134,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             ADCON1bits.ADON = 0;    // turn ADC off to save power.
             STINGbits.adc_sample_burn = no;      //Burn the first ADC sample on every power up of ADC.
         }
-        else {
-            STINGbits.adc_sample_burn = yes;      //We have burned the first set.
-        }
+        else STINGbits.adc_sample_burn = yes;      //We have burned the first set.
     }
     else {
         //Force use of all 0's if we haven't burned the first ADC sample after a startup.
@@ -210,22 +206,14 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         //When main_power is off count down in minutes.
         if(PowerOffTimerSec <= 0){
             PowerOffTimerSec = 59;
-            if(PowerOffTimer <= 0){
-                STINGbits.deep_sleep = 1; //set deep_sleep to 1. Power off the system to save power after all IRQ's are finished.
-            }
-            else{
-                PowerOffTimer--;
-            }
+            if(PowerOffTimer <= 0) STINGbits.deep_sleep = 1; //set deep_sleep to 1. Power off the system to save power after all IRQ's are finished.
+            else PowerOffTimer--;
         }
-        else{
-            PowerOffTimerSec--;
-        }
+        else PowerOffTimerSec--;
     }
     /***************************************************************************/
     //Over current shutdown timer stuff.
-    if(oc_shutdown_timer > 0 && dischr_current < sets.over_current_shutdown){
-        oc_shutdown_timer--;
-    }
+    if(oc_shutdown_timer > 0 && dischr_current < sets.over_current_shutdown) oc_shutdown_timer--;
     // Check for charger disconnect.
     if(!chrgSwitch){
         chrgLight = off;  //charger light off.
@@ -253,26 +241,19 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         }
         else{
             CONDbits.error_blink = on;    //Used for blinking stuff on displays.
-            if(!vars.fault_count){
-                errLight = on;
-            }
+            if(vars.fault_count) errLight = on;
         }
     }
-    else{
-        errLight = off;
-    }
+    else errLight = off;
 
     //Get the absolute value of battery_usage and store it in absolute_battery_usage.
     vars.absolute_battery_usage = absFloat(vars.battery_usage);
-    
     //Calculate the max capacity of the battery once the battery has been fully charged and fully discharged.
     if(voltage_percentage > 99 && power_session != 4){
         //battery_capacity = absolute_battery_usage;
         vars.battery_remaining = vars.battery_capacity;
-        //if(power_session != 4){
-            power_session = 4;
-            vars.battery_usage = 0;  //reset battery usage session.
-        //}
+        power_session = 4;
+        vars.battery_usage = 0;  //reset battery usage session.
     }
     //At about 82% voltage the battery is at about 50% actual capacity for lithium ion.
     else if(voltage_percentage < 83 && voltage_percentage > 81 && (power_session == 4 || power_session == 0)){
@@ -286,29 +267,23 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         power_session = 0;
         vars.battery_usage = 0;  //reset battery usage session.
     }
-
     //Don't let battery_remaining go below 0;
     //This should never happen in normal conditions. This is just a catch.
-    if(vars.battery_remaining < 0){
-        vars.battery_remaining = 0;
-    }
+    if(vars.battery_remaining < 0) vars.battery_remaining = 0;
     //*******************************************
-    //Don't let battery_remaining go above battery capacity, ever.
-    if(vars.battery_remaining > vars.battery_capacity + 0.005){
-        vars.battery_remaining = vars.battery_capacity + 0.005;        //Go slightly above. Just slightly.
-    }
-    //Don't let battery remaining go above the partial charge percentage when partial charging.
-    //To Do: This isn't exactly right because 90% Voltage != 90% total capacity!!! It's only a few % off so for now it's okay.
-    if(dsky.battery_voltage < (sets.partial_charge * sets.battery_rated_voltage) && p_charge && vars.battery_remaining > (vars.battery_capacity * sets.partial_charge)){
+    //Don't let battery_remaining go above battery capacity.
+    //Go slightly above. Just slightly.
+    if(vars.battery_remaining > vars.battery_capacity + 0.005) vars.battery_remaining = vars.battery_capacity + 0.005;
+    //Don't let 'battery_remaining' go above the partial charge percentage when partial charging.
+    //To Do: This isn't exactly right because, for example, ~90% Voltage != ~90% total capacity!!! 
+    //It's only a few % off so for now it's okay. Will implement real voltage curve calculation later.
+    if(dsky.battery_voltage < (sets.partial_charge * sets.battery_rated_voltage) 
+    && p_charge && vars.battery_remaining > (vars.battery_capacity * sets.partial_charge))
         vars.battery_remaining = (vars.battery_capacity * sets.partial_charge);
-    }
     //**************************************************
     //Circuit draw compensation.
     //Heart beat draws power even when the system is off. This logs that current draw.
-    if(!CONDbits.main_power){
-        vars.battery_remaining -= (sets.circuit_draw * 0.0002777);
-    }
-
+    if(!CONDbits.main_power) vars.battery_remaining -= (sets.circuit_draw * 0.0002777);
     //Calculate battery %
     dsky.chrg_percent = ((vars.battery_remaining / vars.battery_capacity) * 100);
 /****************************************/

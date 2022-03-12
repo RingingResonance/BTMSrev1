@@ -30,8 +30,8 @@ void default_sets(void){
     sets.partial_charge = 0.90;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
     sets.max_battery_voltage = 59.2;      //Max battery voltage before shutdown.
     sets.battery_rated_voltage = 58.8;           //Target max charge voltage
-    sets.dischrg_voltage = 39.2;        //Minimum battery voltage
-    sets.low_voltage_shutdown = 35;    //Battery Low Total Shutdown Voltage
+    sets.dischrg_voltage = 47.5;        //Minimum battery voltage
+    sets.low_voltage_shutdown = 43;    //Battery Low Total Shutdown Voltage
     sets.dischrg_C_rating = 2;           //Discharge C rating
     sets.limp_current = 5;              //Limp mode current in amps. Minimum current to regulate to.
     sets.chrg_C_rating = 0.5;          //Charge C rating.
@@ -59,7 +59,7 @@ void default_sets(void){
     //Some other stuff.
     sets.max_heat = 50;              //Heater watts that you want to use.
     sets.travel_dist = 0.012;         //Travel Distance in KM per tire rotation or between TAC ticks.
-    sets.circuit_draw = 0.05;        //Amount of current that Yeti himself draws at idle. Used for current calibration.
+    sets.circuit_draw = 0.014;        //Amount of current that Yeti himself draws at idle. Used for current calibration and idle mode logging.
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
     //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
     sets.page[0][0] = 2;  //%

@@ -64,7 +64,7 @@ void chargeDetect(void){
         }
         CONDbits.charger_detected = 1;  //Set this variable to 1 so that we only run this routine once per charger plugin.
     }
-    else {
+    else if(!chrgSwitch) {
         CONDbits.charger_detected = 0;  //If charger has been unplugged, clear this.
     }
 }
@@ -246,67 +246,59 @@ void fault_log(int f_code){
     CONDbits.failSave = 1;
 }
 
+//Heater failed to initialize.
+void heatStuffOff(void){
+    heatPWM = off;
+    heat_power = off;
+    heat_rly_timer = 3;     //Reset heat relay timer
+    heat_set = off;
+    vars.heat_cal_stage = error;
+    CONDbits.soft_power = off; //Go back to normal operation.
+    heatRelay = off;     //Heat Relay Off
+}
 //Check and calibrate heater to the wattage chosen by the user.
 void heater_calibration(void){
-        if (vars.heat_cal_stage == 2 && CONDbits.main_power){
-            float watts = 0;
-            watts = (dsky.battery_voltage * dsky.battery_current) * -1;
-            if (watts < sets.max_heat){
-            heatRelay = 1;     //Heat Relay On
-                if(heat_rly_timer == 0){
-                    heat_set++;
-                    heatPWM = heat_set;
-                    if (heat_set > 95){
-                        fault_log(0x0001);      //Log fault, heater is too small for the watts you want.
-                        vars.heat_cal_stage = 4;
-                        heatRelay = 0;     //Heat Relay Off
-                        heat_rly_timer = 3;     //Reset heat relay timer
-                        heat_set = 0;
-                    }
-                    if (heat_set > 50 && watts < 2){
-                        fault_log(0x0002);      //Log fault, no heater detected.
-                        vars.heat_cal_stage = 4;
-                        heatRelay = 0;     //Heat Relay Off
-                        heat_rly_timer = 3;     //Reset heat relay timer
-                        heat_set = 0;
-                    }
-                    if (heat_set < 5 && watts > 10){
-                        fault_log(0x0003);      //Log fault, short circuit on heater.
-                        vars.heat_cal_stage = 4;
-                        heatRelay = 0;     //Heat Relay Off
-                        heat_rly_timer = 3;     //Reset heat relay timer
-                        heat_set = 0;
-                    }
-                    if(CONDbits.failSave)save_vars();
+    if (vars.heat_cal_stage == 2 && CONDbits.main_power){
+        float watts = (dsky.battery_voltage * dsky.battery_current) * -1;
+        if (watts < sets.max_heat){
+        heatRelay = on;     //Heat Relay On
+            if(heat_rly_timer == 0){
+                heat_set++;
+                heatPWM = heat_set;
+                if (heat_set > 95){
+                    fault_log(0x01);      //Log fault, heater is too small for the watts you want.
+                    heatStuffOff();
                 }
-                if(heat_rly_timer == 3)
-                    heat_rly_timer = 2; //wait two 0.125ms cycles before allowing heat regulation to start.
+                if (heat_set > 50 && watts < 2){
+                    fault_log(0x02);      //Log fault, no heater detected.
+                    heatStuffOff();
+                }
+                if (heat_set < 5 && watts > 10){
+                    fault_log(0x03);      //Log fault, short circuit on heater.
+                    heatStuffOff();
+                }
+                if(CONDbits.failSave)save_vars();
             }
-            else{
-                vars.heat_cal_stage = 3; // Heater calibration completed.
-                heatPWM = 0000;        //Heater PWM output off.
-                CONDbits.soft_power = 0; //Go back to normal operation.
-                heatRelay = 0;     //Heat Relay Off
-                heat_rly_timer = 3;     //Reset heat relay timer
-            }
+            if(heat_rly_timer == 3)
+                heat_rly_timer = 2; //wait two 0.125ms cycles before allowing heat regulation to start.
+        }
+        else{
+            vars.heat_cal_stage = ready; // Heater calibration completed.
+            heatPWM = off;        //Heater PWM output off.
+            CONDbits.soft_power = off; //Go back to normal operation.
+            heatRelay = off;     //Heat Relay Off
+            heat_rly_timer = 3;     //Reset heat relay timer
+        }
     }
-    
-    if (vars.heat_cal_stage == 1){
-        heatPWM = 0000;    //Heater PWM output off.
+    if (vars.heat_cal_stage == initialize){
+        heatPWM = off;    //Heater PWM output off.
         Init();         //Re-init.
         io_off();    //Turn off all inputs and outputs.
         CONDbits.soft_power = 1; //Force device to run in soft power mode.
-        heat_set = 0;
-        heat_power = 0;
-        vars.heat_cal_stage = 2; //If heat_cal_stage is 2 then a calibration is in progress.
+        heat_set = off;
+        heat_power = off;
+        vars.heat_cal_stage = calibrating; //If heat_cal_stage is 2 then a calibration is in progress.
         heat_rly_timer = 3;     //Reset heat relay timer
-    }
-    //Heater calibration is in error.
-    if(vars.heat_cal_stage == 4){
-        heatPWM = 0000;
-        heat_set = 0;
-        heat_power = 0;
-        CONDbits.soft_power = 0; //Go back to normal operation.
     }
 }
 
@@ -377,24 +369,24 @@ void general_shutdown(void){
 //Turns off all outputs.
 void io_off(void){
 //    PORTDbits.RD3 = 0;      //output shutdown. Not Used In current Schematic.
-    outPWM = 0000;            //set output control
-    LATE = 0;               //Insure all PORTE outputs are off.
-    PWMCON1bits.PEN3L = 0;  //Set PWM3 Low side to standard output so that it can be set to 0
-    heatPWM = 0000;            //set heater control
-    chrgPWM = 0000;            //set charge control
-    ctRelay = 0;      //Main Contactor Relay Off
+    outPWM = off;            //set output control
+    LATE = off;               //Insure all PORTE outputs are off.
+    PWMCON1bits.PEN3L = off;  //Set PWM3 Low side to standard output so that it can be set to 0
+    heatPWM = off;            //set heater control
+    chrgPWM = off;            //set charge control
+    ctRelay = off;      //Main Contactor Relay Off
     contact_rly_timer = 3;  //reset contactor relay timer
-    fanRelay = 0;      //Fan Relay Off
-    chrgRelay = 0;      //Charger Relay Off
+    fanRelay = off;      //Fan Relay Off
+    chrgRelay = off;      //Charger Relay Off
     chrg_rly_timer = 3;     //reset charge relay timer
-    heatRelay = 0;     //Heat Relay Off
+    heatRelay = off;     //Heat Relay Off
     heat_rly_timer = 3;     //reset heat relay timer
-    AUXrelay = 0;      //Aux Power Relay Off
-    heat_power = 0;         //set heater control to 0
-    charge_power = 0;       //set charge control to 0
-    output_power = 0;       //set output control to 0
-    current_output = 0;
-    crnt_integral = 0;
+    AUXrelay = off;      //Aux Power Relay Off
+    heat_power = off;         //set heater control to 0
+    charge_power = off;       //set charge control to 0
+    output_power = off;       //set output control to 0
+    current_output = off;
+    crnt_integral = off;
 }
 
 #endif

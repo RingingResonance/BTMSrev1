@@ -36,6 +36,7 @@ float voltage_output = 0;
 float   temp_dischrg_rate;      //calculated discharge rate based off temp and capacity remaining. Is in %
 float   temp_chrg_rate;      //calculated discharge rate based off temp and capacity remaining. Is in %
 float   max_chrg_current;       //calculated charge rate based off temp and capacity remaining. Is in %
+int  chrg_check = 0;
 
 #endif	/* SUBS_H */
 

@@ -69,6 +69,14 @@ extern float absFloat(float);
 #define no 0
 #define on 1
 #define off 0
+#define clear 0
+
+//Heater calibration
+#define initialize 1
+#define calibrating 2
+#define ready 3
+#define error 4
+#define disabled 5
 
 /* NOTE: Try to keep memory usage below about 75% for the dsPIC30F3011 as the stack can use as much as 15% */
 /*****************************/
@@ -217,7 +225,6 @@ char vr_space = 0;
 char dsky_space = 0;
 char v_test = 0;
 char first_cal = 0;
-char chrg_check = 0;
 /*****************************/
 //Control Output
 int     output_power = 0;          //output power

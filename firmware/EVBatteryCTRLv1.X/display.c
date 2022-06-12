@@ -28,24 +28,26 @@
 void pageOut(int pageNum, int serial_port){
     int pageVar = 0;
     int varNum = 0;
+    int dodispatch = 0;
     for(pageVar=0;pageVar<6;pageVar++){
-        varNum = sets.page[pageNum][pageVar];
+        varNum = sets.page[serial_port][pageNum][pageVar];
         if(varNum < 8)dynaSpace[serial_port] = 1;       //Do not reserve a space for a sign char if we don't have to.
-        if(varNum == 8)config_space[serial_port] = 1;   //Reserve spaces for 0's when showing watts.
-        //Skip page if first Var is listed as '0'
+        if(varNum == 8)config_space[serial_port] = 1;   //Reserve spaces for 0's when showing watts so that text isn't jumping around.
+        //Skip page if first Var is listed as NULL, or if we get a NULL later then we are done.
         if((varNum + pageVar) == 0)break;
         //Check if loading custom data or not.
         if(varNum > 0xF9){
             load_string(sets.custom_data[varNum - 0xFA], serial_port);
         }
         else{
-            load_float(dsky.diskarrayFloat[varNum], serial_port);   //Load the number.
+            load_float(dsky.dskyarrayFloat[varNum], serial_port);   //Load the number.
             Buff_index[serial_port] -= 2;                           //Subtract 2 from buffer index.
             load_string(Vlookup[varNum], serial_port);              //Load the number's text.
             load_string(" ", serial_port);                          //Load a space afterwards.
         }
+        dodispatch = 1; //if we have at least one variable to display then dispatch.
     }
-    dispatch_Serial(serial_port);
+    if (dodispatch) dispatch_Serial(serial_port);
 }
 
 //Check if serial port is busy.

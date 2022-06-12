@@ -62,13 +62,32 @@ void default_sets(void){
     sets.circuit_draw = 0.014;        //Amount of current that Yeti himself draws at idle. Used for current calibration and idle mode logging.
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
     //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
-    sets.page[0][0] = 2;  //%
-    sets.page[0][1] = 3;  //V
-    sets.page[0][2] = 8;  //W
-    sets.page[0][3] = 4;  //TV
-    sets.page[0][4] = 10; //BT C
-    sets.page[0][5] = 11; //ST C
-    ram_chksum_update();         //Generate new checksum.
+    sets.page[PORT1][0][0] = 2;  //%
+    sets.page[PORT1][0][1] = 3;  //V
+    sets.page[PORT1][0][2] = 8;  //W
+    sets.page[PORT1][0][3] = 4;  //TV
+    sets.page[PORT1][0][4] = 10; //BT C
+    sets.page[PORT1][0][5] = 11; //ST C
+    //Port 2 display defaults
+    sets.page[PORT2][0][0] = 2;  //%
+    sets.page[PORT2][0][1] = 3;  //V
+    sets.page[PORT2][0][2] = 8;  //W
+    sets.page[PORT2][0][3] = 4;  //TV
+    sets.page[PORT2][0][4] = 10; //BT C
+    sets.page[PORT2][0][5] = 11; //ST C
+    sets.pageDelay[PORT2][0] = 1;
+    sets.pageDelay[PORT2][1] = 2;
+    sets.pageDelay[PORT2][2] = 3;
+    sets.pageDelay[PORT2][3] = 4;
+    sets.pageDelay[PORT1][0] = 5;
+    sets.pageDelay[PORT1][1] = 6;
+    sets.pageDelay[PORT1][2] = 7;
+    sets.pageDelay[PORT1][3] = 8;
+    sets.P1Venable = 0;         //Port 1 display out is disabled by default.
+    sets.P2Venable = 1;         //Port 2 display out is enabled by default.
+    sets.testBYTE = 0x3335;
+    vars.testBYTE = 0x46;
+    ram_chksum_update();        //Generate new checksum.
 }
 //Configure IO
 void configure_IO(void){
@@ -155,7 +174,8 @@ void configure_IO(void){
 /*****************************/
 /* For 0.125 second timing operations. */
     //PR2 = 0xE4E2;   //58,594
-    PR2 = 0x7075;     //28,789
+    //PR2 = 0x7075;     //28,789
+    PR2 = 0x383A;     //14,394
     TMR2 = 0x0000;
     T2CON = 0x0000;
     T2CONbits.TCKPS = 2;        //1:64 prescale

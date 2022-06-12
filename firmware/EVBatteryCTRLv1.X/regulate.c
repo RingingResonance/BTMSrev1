@@ -22,7 +22,6 @@
 #include "Init.h"
 
 float Temperature_I_Calc(float lowTCutout, float lowBeginReduce, float highTCutout, float highBeginReduce){
-    float percentOut;
     if(dsky.battery_temp < lowBeginReduce) percentOut = (dsky.battery_temp - lowTCutout) / (lowBeginReduce - lowTCutout);
     else if (dsky.battery_temp > highBeginReduce) percentOut = 1 + (-1 * (dsky.battery_temp - highTCutout) / (highBeginReduce - highTCutout));
     else return 1;
@@ -39,7 +38,7 @@ void temperatureCalc(void){
     if(dischrg_current < sets.limp_current) dischrg_current = sets.limp_current;
 
     //Calculate max charge current based off battery temp and battery remaining.
-    float chrg_remaining = (vars.battery_capacity - vars.battery_remaining);
+    chrg_remaining = (vars.battery_capacity - vars.battery_remaining);
     if(chrg_remaining < 0.2) chrg_remaining = 0.2;  //Minimum charge current is 0.2 * charge C rating.
     chrg_current = (sets.chrg_C_rating * chrg_remaining) 
     * Temperature_I_Calc(sets.chrg_min_temp, sets.chrg_reduce_low_temp, sets.chrg_max_temp, sets.chrg_reduce_high_temp);

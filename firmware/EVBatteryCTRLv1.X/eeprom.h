@@ -29,6 +29,9 @@ void get_settings(void);
 
 int upperMem = 0;
 int printSets = 0;
+int eRead = 0;
+char offset = 0;
+int address = 0;
 
 #endif	/* DATAIO_H */
 

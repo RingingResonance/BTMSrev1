@@ -62,8 +62,7 @@ void volt_percent(void){
 
 //Find current compensation value.
 void current_cal(void){
-    float signswpd_avg_cnt = 0;
-    signswpd_avg_cnt = dsky.battery_crnt_average * -1;
+    float signswpd_avg_cnt = dsky.battery_crnt_average * -1;
     //do the current cal.
     if(curnt_cal_stage == 4){
         current_compensate = (signswpd_avg_cnt - sets.circuit_draw);

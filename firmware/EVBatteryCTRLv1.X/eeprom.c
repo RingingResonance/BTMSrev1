@@ -22,15 +22,13 @@
 #include "common.h"
 
 void get_variables(void){
-    int var_exist = eeprom_read(cfg_space + 1);
-    if(var_exist == 0x7654) {
+    if(eeprom_read(cfg_space) == 0x7654) {
         read_vars();
     }
 }
 
 void get_settings(void){
-    int var_exist = eeprom_read(0x0000);
-    if(var_exist == 0x4567){
+    if(eeprom_read(0x0000) == 0x4567){
         int x = 0;
         for(;;){
             if(!read_sets()){
@@ -41,7 +39,7 @@ void get_settings(void){
             else break;
         }
     }
-    else if(var_exist == 0xFFFF){
+    else if(eeprom_read(0x0000) == 0xFFFF){
         //If no settings were previously stored in EEPROM then it should be safe to load defaults.
         prgm_chksum_update();//If a first read is detected, update the prog_checksum.
         default_sets();
@@ -51,7 +49,7 @@ void get_settings(void){
 //Save settings to EEPROM
 void save_sets(void){
     int x;
-    for(x=0;x<(cfg_space);x++){
+    for(x=0;x<cfg_space;x++){
         eeprom_write(x, sets.settingsArray[x]);
     }
     //Write this in memory so we know we have written data at least once before.
@@ -63,7 +61,7 @@ void save_sets(void){
 int read_sets(void){
     if(check_nvmem())return 0;          //First check to make sure EEPROM checksum hasn't changed since last write.
     int x;
-    for(x=0;x<(cfg_space);x++){
+    for(x=0;x<cfg_space;x++){
         sets.settingsArray[x] = eeprom_read(x);
     }
     //Now generate and compare checksums of settings ram and settings EEPROM to ensure a correct copy of data.
@@ -75,12 +73,11 @@ int read_sets(void){
 //Save vars to EEPROM
 void save_vars(void){
     int x;
-    int caddr = cfg_space + 1;
-    for(x=0;x<(vr_space);x++){
-        eeprom_write(x + caddr, vars.variablesArray[x]);
+    for(x=0;x<vr_space;x++){
+        eeprom_write(x+cfg_space, vars.variablesArray[x]);
     }
     //Write this in memory so we know we have written data at least once before.
-    eeprom_write(caddr,0x7654);
+    eeprom_write(cfg_space,0x7654);
     nvm_chksum_update();
     CONDbits.failSave = 0;
 }
@@ -89,9 +86,8 @@ void save_vars(void){
 int read_vars(void){
     if(check_nvmem())return 0;
     int x;
-    int caddr = cfg_space + 1;
-    for(x=0;x<(vr_space);x++){
-        vars.variablesArray[x] = eeprom_read(x + caddr);
+    for(x=0;x<vr_space;x++){
+        vars.variablesArray[x] = eeprom_read(x+cfg_space);
     }
     return 1;
 }
@@ -107,6 +103,7 @@ int eeprom_erase(int addrs){
     else{
         __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
         IPC2bits.ADIP = 0;  //Disable analog IRQs.
+        __asm__ ("PUSH w1");
         adrfinal = addrs * 2;
         adrfinal += 0xFC00;
         //Erase location.
@@ -121,6 +118,7 @@ int eeprom_erase(int addrs){
         __asm__ ("BSET NVMCON,#0x0F");
         __asm__ ("NOP");
         __asm__ ("NOP");
+        __asm__ ("POP w1");
         while(NVMCONbits.WR) //Wait here until write is finished.
         DISICNT = 0;    //ReEnable all non-critical IRQs.
         IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
@@ -136,13 +134,16 @@ int eeprom_write(int addrs, int data){
     else{
         __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
         IPC2bits.ADIP = 0;  //Disable analog IRQs.
+        __asm__ ("PUSH w0");
+        __asm__ ("PUSH w1");
+        __asm__ ("PUSH w2");
         addrs *=  2;
         addrs += 0xFC00;
         //Write to location.
         //DO NOT TOUCH THIS, EVERYTHING MUST BE DONE IN THIS EXACT ORDER OR IT WILL NOT WORK!!!
         TBLPAG = 0x7F;     //ADDRESS UPPER
         //__asm__ ("MOV W1,TBLPAG");
-        WREG2 = data; //DATA
+        WREG2 = data;    //DATA
         WREG0 = addrs;   //ADDRESS LOWER
         //ESPECIALLY DON'T TOUCH THE ORDER THAT THE WREGs GET WRITTEN TO.
         __asm__ ("TBLWTL w2,[w0]");
@@ -155,6 +156,9 @@ int eeprom_write(int addrs, int data){
         __asm__ ("BSET NVMCON,#0x0F");
         __asm__ ("NOP");
         __asm__ ("NOP");
+        __asm__ ("POP w2");
+        __asm__ ("POP w1");
+        __asm__ ("POP w0");
         while(NVMCONbits.WR) //Wait here until write is finished.
         DISICNT = 0;        //ReEnable all non-critical IRQs.
         IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
@@ -162,24 +166,30 @@ int eeprom_write(int addrs, int data){
     }
 }
 
-int memread(int offset, int address){
+int memread(char Moffset, int Maddress){
+    offset = Moffset; //Save to memory instead of W register.
+    address = Maddress; //This is really bad, but the compiler sometimes reuses WREG's while I'm using them manually (which is bad enough).
     __asm__ volatile ("DISI #0x3FFF");   //Disable all non-critical IRQs.
     IPC2bits.ADIP = 0;  //Disable analog IRQs.
+    __asm__ ("PUSH w4");
+    __asm__ ("PUSH w0");
     TBLPAG = offset;    //Offset in memory
     WREG0 = address;    //Address to read from
     __asm__ ("TBLRDH [w0],w4");
     __asm__ ("NOP");
     __asm__ ("NOP");
-    upperMem = WREG4;
+    upperMem = WREG4;   //Get upper 8 bits from program memory, NOT EEPROM/NVM
     TBLPAG = offset;    //Offset in memory
     WREG0 = address;    //Address to read from
     __asm__ ("TBLRDL [w0],w4");
     __asm__ ("NOP");
     __asm__ ("NOP");
-    int x = WREG4;
-    DISICNT = 0;        //ReEnable all non-critical IRQs.
+    eRead = WREG4;
+    __asm__ ("POP w0");
+    __asm__ ("POP w4");
     IPC2bits.ADIP = 7;  //ReEnable analog IRQs.
-    return x; //WREG4 will contain data read from NVmem
+    DISICNT = 0;        //ReEnable all non-critical IRQs.
+    return eRead; //WREG4 will contain data read from NVmem
 }
 
 int eeprom_read(int addrs){
@@ -187,7 +197,7 @@ int eeprom_read(int addrs){
         return 0;       //error reading, address out of range. Return what we hope to be a safe value.
     }
     else{
-        return memread(0x7F, (0xFC00 + (addrs * 2)));
+        return memread(0x7F, (0xFC00+(addrs*2)));
     }
 }
 

@@ -45,7 +45,7 @@
 #define chrgPWM PDC2
 //Memory Defines
 /* This assums the compiler puts the stack at the end of memory space just after
- * the user variables and the stack point counts up */
+ * the user variables and the stack pointer counts up */
 #define ramSize 0x03FF
 #define ramAddressStart 0x0800
 #define stackFaultDefault ramSize + ramAddressStart
@@ -87,65 +87,69 @@ extern float absFloat(float);
 struct Settings{
     //Analog input constants
     int     settingsArray[1];
-    float   R1_resistance;            //R1 resistance in Kohms
-    float   R2_resistance;             //R2 resistance in Kohms
+    float   R1_resistance;              //R1 resistance in Kohms
+    float   R2_resistance;              //R2 resistance in Kohms
     float   bt_vlt_adjst;               //battery voltage input compensation in volts.
     /*****************************/
     //Battery Ratings and setpoints
-    float   partial_charge;            //Percentage of voltage to charge the battery up to. Set to 0 to disable.
-    float   max_battery_voltage;    //Max battery voltage before shutdown.     
-    float   battery_rated_voltage;           //Target max charge voltage
-    float   dischrg_voltage;        //Minimum battery voltage
-    float   low_voltage_shutdown;    //Battery Low Total Shutdown Voltage
+    float   partial_charge;             //Percentage of voltage to charge the battery up to. Set to 0 to disable.
+    float   max_battery_voltage;        //Max battery voltage before shutdown.     
+    float   battery_rated_voltage;      //Target max charge voltage
+    float   dischrg_voltage;            //Minimum battery voltage
+    float   low_voltage_shutdown;       //Battery Low Total Shutdown Voltage
     float   dischrg_C_rating;           //Discharge C rating
-    float   limp_current;              //Limp mode current in amps
-    float   chrg_C_rating;          //Charge C rating.
-    float   amp_hour_rating;         //Battery amp hour rating.
-    float   over_current_shutdown;        //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
-    float   absolute_max_current;      //Max regulating current.
+    float   limp_current;               //Limp mode current in amps
+    float   chrg_C_rating;              //Charge C rating.
+    float   amp_hour_rating;            //Battery amp hour rating.
+    float   over_current_shutdown;      //Shutdown current. Sometimes the regulator isn't fast enough and this happens.
+    float   absolute_max_current;       //Max regulating current.
     //Charge temps.
-    float   chrg_min_temp;          //Battery minimum charge temperature. Stop Charging at this temp.
-    float   chrg_reduce_low_temp;      //Reduce charge current when lower than this temp.
-    float   chrg_max_temp;          //Battery max charge temp. Stop charging at this temp.
-    float   chrg_reduce_high_temp; //Reduce charge current when higher than this temp.
-    float   chrg_target_temp;      //Battery heater charge target temp. Keeps us nice and warm in the winter time.
+    float   chrg_min_temp;              //Battery minimum charge temperature. Stop Charging at this temp.
+    float   chrg_reduce_low_temp;       //Reduce charge current when lower than this temp.
+    float   chrg_max_temp;              //Battery max charge temp. Stop charging at this temp.
+    float   chrg_reduce_high_temp;      //Reduce charge current when higher than this temp.
+    float   chrg_target_temp;           //Battery heater charge target temp. Keeps us nice and warm in the winter time.
     //Discharge temps.
-    float   dischrg_min_temp;       //Battery minimum discharge temperature.
+    float   dischrg_min_temp;           //Battery minimum discharge temperature.
     float   dischrg_reduce_low_temp;    //Reduced current discharge low temperature.
-    float   dischrg_max_temp;       //Battery max discharge temperature.
-    float   dischrg_reduce_high_temp;       //Battery reduced discharge high temperature.
-    float   dischrg_target_temp;      //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
+    float   dischrg_max_temp;           //Battery max discharge temperature.
+    float   dischrg_reduce_high_temp;   //Battery reduced discharge high temperature.
+    float   dischrg_target_temp;        //Battery heater discharge target temp. Keeps us nice and warm in the winter time.
     //Shutdown temps.
     float   battery_shutdown_temp;      //Max battery temp before shutting down everything.
     float   ctrlr_shutdown_temp;        //Max motor or motor controller temp shutdown.
     //Fan ctrl temps.
-    float   ctrlr_fan_start;               //Turns on cooling fan.
+    float   ctrlr_fan_start;            //Turns on cooling fan.
     float   batt_fan_start;
     //Some other stuff.
-    float   max_heat;              //Heater watts that you want to use.
-    float   travel_dist;         //Travel Distance in CM per tire rotation.
-    float   circuit_draw;        //Amount of current that Yeti himself draws. Used for current calibration.
+    float   max_heat;           //Heater watts that you want to use.
+    float   travel_dist;        //Travel Distance in CM per tire rotation.
+    float   circuit_draw;       //Amount of current that Yeti himself draws. Used for current calibration.
     int     PowerOffAfter;      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
-    int     flash_chksum_old;           //System Flash Checksum as stored in NV-mem
-    char    custom_data[3][6];         //3 blocks of 6 chars of custom user text or data, terminated by a NULL char. (0xF9 - 0xFF)
-    char    page[4][6];              //Display page holder. (Page#)(Variable to Display: A '0' at the start = Skip Page)
-    char    pageDelay[5];            //Page delay. (Page#Delay in 1/8 seconds) 0 = instant
-}sets; //32
+    int     flash_chksum_old;   //System Flash Checksum as stored in NV-mem
+    char    P1Venable;
+    char    P2Venable;
+    char    custom_data[4][6];  //4 blocks of 6 chars of custom user text or data, terminated by a NULL char. (0xF9 - 0xFF)
+    char    page[2][4][6];      //Display page holder. (port)(Page#)(Variable to Display: A '0' at the start = Skip Page)
+    char    pageDelay[2][4];    //Page delay. (Page#Delay in 1/8 seconds) 0 = full speed.
+    int     testBYTE;
+}sets;
 
-#pragma pack(1)
 struct Variables{
     int     variablesArray[1];
+// Calculated Battery Ratings
+    float   battery_capacity;           //Calculated total battery capacity in ah
+    float   absolute_battery_usage;     //Max total power used from battery.
+    float   voltage_percentage_old;     //Voltage percentage from the last time we where on.
+    float   battery_usage;              //Calculated Ah usage in/out of battery
+    float   battery_remaining;          //Calculated remaining capacity in battery.
     // Fault Codes.
     int     fault_codes[10];
     int     fault_count;
-// Calculated Battery Ratings
-    float  battery_capacity;           //Calculated total battery capacity in ah
-    float   absolute_battery_usage;     //Max total power used from battery.
+    // Other stuff.
     int     partial_chrg_cnt;           //How many times have we plugged in the charger since the last full charge?
-    float   voltage_percentage_old;     //Voltage percentage from the last time we where on.
-    float  battery_usage;              //Calculated Ah usage in/out of battery
-    float  battery_remaining;          //Calculated remaining capacity in battery.
-    int     heat_cal_stage;             //0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 5 is disable heater.
+    char     heat_cal_stage;             //0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 5 is disable heater.
+    char     testBYTE;
 }vars;
 
 const char VSPC[] = " ";
@@ -165,10 +169,9 @@ const char V0E[] = "AA";
 const char * const Vlookup[] = {VSPC,V01,V02,V03,V04,V05,V06,V07,V08,V09,V0A,V0A,V0A,V0D,V0E};
 
 //Variables that can be sent out the serial port.
-#pragma pack(1)
 struct dskyvars{
     int     dskyarray[1];           //For sending raw data
-    float   diskarrayFloat[1];      //For sending float data to display
+    float   dskyarrayFloat[1];      //For sending float data to display
     float   speed;                  //1: 8char 00.0xxx How fast are we going?
     float   chrg_percent;           //2: 6char 00.0% Percentage of battery charge
     float   battery_voltage;        //3: 6char 00.0V Battery voltage
@@ -188,7 +191,7 @@ struct dskyvars{
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
 float   vltg_dvid = 0;              //Value for calculating the ratio of the input voltage divider.
-#define calc_125 0.00003472 //Value for calculating the total current in and out of battery every second.
+#define calc_125 0.00003472         //Value for calculating the total current in and out of battery every second.
 int     ADCON3upper8 = 0;
 int     ADCON3lower8 = 0;
 /*****************************/
@@ -225,6 +228,10 @@ char vr_space = 0;
 char dsky_space = 0;
 char v_test = 0;
 char first_cal = 0;
+int P1Page = 0;
+int P2Page = 0;
+char P1Vtimer = 0;
+char P2Vtimer = 0;
 /*****************************/
 //Control Output
 int     output_power = 0;          //output power
@@ -252,6 +259,8 @@ typedef struct tagCONDBITS {
   unsigned failSave:1;
   unsigned chkInProgress:1;
   unsigned gotBatteryAmps:1;
+  unsigned P1display:1;
+  unsigned P2display:1;
 } CONDBITS;
 volatile CONDBITS CONDbits;
 

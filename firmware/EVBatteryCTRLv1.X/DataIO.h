@@ -21,11 +21,12 @@
 #define PORT2 1
 #define simple 1
 #define full 0
-#define bffize 60
+#define bfsize 60
 
 extern unsigned int BaudCalc(double, double);
 extern void load_float(float, int);
 extern void load_string(const char*, int);
+extern void copy_string(char*, int);
 extern void dispatch_Serial(int);
 extern char four_bit_hex_cnvt(int);
 extern void Buffrst(int);
@@ -44,10 +45,10 @@ char bufsize[2]= {0,0};
 char nibble[2][4];
 char float_out[2][7];
 char  Buff_count[2] = {0,0};
-int  Buff_index[2] = {0,0};
-char Buffer[2][bffize];
-int  StempIndex[2] = {0,0};
-int  FtempIndex[2] = {0,0};
+unsigned int  Buff_index[2] = {0,0};
+char Buffer[2][bfsize];
+unsigned int  StempIndex[2] = {0,0};
+unsigned int  FtempIndex[2] = {0,0};
 char config_space[2] = {0,0};
 float tx_float[2] = {0,0};
 char tx_temp[2] = {0,0};

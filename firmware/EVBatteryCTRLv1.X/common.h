@@ -21,6 +21,8 @@
 //#include <libpic30.h>
 //#include <xc.h>
 
+//Firmware Version String
+#define version "\n\rV1.0A\n\r"
 //IO inputs
 #define keySwitch !PORTFbits.RF1
 #define chrgSwitch PORTEbits.RE8
@@ -49,7 +51,7 @@
 #define ramSize 0x03FF
 #define ramAddressStart 0x0800
 #define stackFaultDefault ramSize + ramAddressStart
-#define ramFree (ramSize + ramAddressStart) - 15
+#define ramFree (ramSize + ramAddressStart) - 15 //Minus 15 bytes of ram. If the stack intrudes on this then it should throw an error code before a complete system crash.
 
 // Tm = 32767 * (1 / (((clkSpeedmhz * PLL) / 4) / tiksPerIRQ))
 //#define IPS 29.48;   //million instructions per second.
@@ -72,6 +74,7 @@ extern float absFloat(float);
 #define clear 0
 
 //Heater calibration
+#define notrun 0
 #define initialize 1
 #define calibrating 2
 #define ready 3
@@ -125,11 +128,13 @@ struct Settings{
     float   max_heat;           //Heater watts that you want to use.
     float   travel_dist;        //Travel Distance in CM per tire rotation.
     float   circuit_draw;       //Amount of current that Yeti himself draws. Used for current calibration.
-    int     PowerOffAfter;      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
-    int     flash_chksum_old;   //System Flash Checksum as stored in NV-mem
-    char    P1Venable;
-    char    P2Venable;
-    char    custom_data[4][6];  //4 blocks of 6 chars of custom user text or data, terminated by a NULL char. (0xF9 - 0xFF)
+    unsigned int     PowerOffAfter;      //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
+    unsigned int     flash_chksum_old;   //System Flash Checksum as stored in NV-mem
+    char    PxVenable[2];
+    char    custom_data1[6];    //4 blocks of 6 chars of custom user text or data, can be terminated by a NULL char. (0xFC - 0xFF)
+    char    custom_data2[6];
+    char    custom_data3[6];
+    char    custom_data4[6];
     char    page[2][4][6];      //Display page holder. (port)(Page#)(Variable to Display: A '0' at the start = Skip Page)
     char    pageDelay[2][4];    //Page delay. (Page#Delay in 1/8 seconds) 0 = full speed.
     int     testBYTE;
@@ -144,10 +149,10 @@ struct Variables{
     float   battery_usage;              //Calculated Ah usage in/out of battery
     float   battery_remaining;          //Calculated remaining capacity in battery.
     // Fault Codes.
-    int     fault_codes[10];
-    int     fault_count;
+    unsigned int     fault_codes[10];
+    unsigned int     fault_count;
     // Other stuff.
-    int     partial_chrg_cnt;           //How many times have we plugged in the charger since the last full charge?
+    unsigned int     partial_chrg_cnt;           //How many times have we plugged in the charger since the last full charge?
     char     heat_cal_stage;             //0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 5 is disable heater.
     char     testBYTE;
 }vars;
@@ -187,6 +192,7 @@ struct dskyvars{
     float   peak_pwr_crnt;          //D: 9char -00.0PWA Current at peak output power
     float   battery_crnt_average;   //E: 8char -00.0AA Battery charge/discharge average current
 }dsky;
+#define varLimit 0x000E
 
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
@@ -228,15 +234,13 @@ char vr_space = 0;
 char dsky_space = 0;
 char v_test = 0;
 char first_cal = 0;
-int P1Page = 0;
-int P2Page = 0;
-char P1Vtimer = 0;
-char P2Vtimer = 0;
+unsigned int PxPage[2];
+char PxVtimer[2];
 /*****************************/
 //Control Output
-int     output_power = 0;          //output power
-int     charge_power = 0;           //charge rate
-int     heat_power = 0;             //heater power
+unsigned int     output_power = 0;          //output power
+unsigned int     charge_power = 0;           //charge rate
+unsigned int     heat_power = 0;             //heater power
 /*****************************/
 
 /* Boolean Variables */

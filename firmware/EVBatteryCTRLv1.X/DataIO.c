@@ -79,7 +79,7 @@ void load_hex(int numb, int serial_port){
     int x;
     for(x=0;x<4;x++){
         Buffer[serial_port][Buff_index[serial_port]] = four_bit_hex_cnvt(nibble[serial_port][x]);
-        if (Buff_index[serial_port] < bffize-1)
+        if (Buff_index[serial_port] < bfsize-1)
             Buff_index[serial_port]++;
     }
     Buff_count[serial_port] = Buff_index[serial_port];
@@ -102,18 +102,19 @@ void load_string(const char *string_point, int serial_port){
     StempIndex[serial_port] = 0;
     while (string_point[StempIndex[serial_port]] != 0){
         Buffer[serial_port][Buff_index[serial_port]] = string_point[StempIndex[serial_port]];
-        if (Buff_index[serial_port] < bffize-1)
+        if (Buff_index[serial_port] < bfsize-1)
             Buff_index[serial_port]++;
         StempIndex[serial_port]++;
     }
     Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
 }
+
 //Copy float data to buffer.
 void cpyFLT(int serial_port){
     Buffer[serial_port][Buff_index[serial_port]] = float_out[serial_port][FtempIndex[serial_port]];
     //Do not overrun the buffer.
-    if (Buff_index[serial_port] < bffize-1)Buff_index[serial_port]++;
+    if (Buff_index[serial_port] < bfsize-1)Buff_index[serial_port]++;
 }
 /* Sends a float to buffer. */
 void load_float(float f_data, int serial_port){

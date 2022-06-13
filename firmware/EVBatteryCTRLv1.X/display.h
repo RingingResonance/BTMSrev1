@@ -19,6 +19,7 @@
 
 extern void Command_Interp(int);
 extern void fault_read(int);
+extern void displayOut(int);
 void pageOut(int, int);
 
 int tempPoint[2] = {0,0};

@@ -106,8 +106,8 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
         //Check to see if the system is ready to run.
         //If there is a fault, keep it from running.
         if(!STINGbits.deep_sleep && !STINGbits.fault_shutdown){
-            //Check for heater calibration event.
-            heater_calibration();
+            //do heater calibration 
+            if(vars.heat_cal_stage != disabled)heater_calibration();
             //Do power regulation and heater control.
             if((vars.heat_cal_stage > calibrating || !vars.heat_cal_stage) && CONDbits.main_power && first_cal == fCalReady){
                 outputReg();    //Output regulation routine
@@ -338,28 +338,8 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     }
     //*************************************************************
     //Do display stuff.
-    if(sets.P1Venable){
-        if(P1Vtimer == 0){
-            if (sets.page[PORT1][P1Page][0]) P1Page = 0;    //If we get a NULL for first variable then skip go back to page 0
-            pageOut(P1Page, PORT1);
-            P1Vtimer = sets.pageDelay[PORT1][P1Page] - 1;
-            if (P1Vtimer < 0) P1Vtimer = 0;
-            if(P1Page < 4) P1Page++;
-            else P1Page = 0;
-        }
-        else P1Vtimer--;
-    }
-    if(sets.P2Venable){
-        if(P2Vtimer == 0){
-            if (sets.page[PORT2][P2Page][0]) P2Page = 0;    //If we get a NULL for first variable then skip go back to page 0
-            pageOut(P2Page, PORT2);
-            P2Vtimer = sets.pageDelay[PORT2][P2Page] - 1;
-            if (P2Vtimer < 0) P2Vtimer = 0;
-            if(P2Page < 4) P2Page++;
-            else P2Page = 0;
-        }
-        else P2Vtimer--;
-    }
+    displayOut(PORT1);
+    displayOut(PORT2);
     /****************************************/
     /* End the IRQ. */
 	IFS0bits.T2IF = 0;   

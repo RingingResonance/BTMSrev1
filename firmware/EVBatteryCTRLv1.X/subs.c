@@ -67,9 +67,8 @@ void current_cal(void){
     if(curnt_cal_stage == 4){
         current_compensate = (signswpd_avg_cnt - sets.circuit_draw);
         curnt_cal_stage = 5;        //Current Cal Complete
-        if(vars.heat_cal_stage != 5){
-            vars.heat_cal_stage = 1;     //Do a heater cal after we have done current cal unless it is disabled.
-        }
+        //Do a heater cal after we have done current cal unless it is disabled.
+        if(vars.heat_cal_stage != disabled) vars.heat_cal_stage = initialize;
         CONDbits.soft_power = off;
         //Done with current cal.
     }

@@ -18,22 +18,30 @@ F - Read fault codes.
 
 C - Clears fault codes and errors.
 
-M - Turns on Battery safety monitor. On by default.
-
-m - Turns off Battery safety monitor. On by default.
-
 P - Turns on main power output. Software power switch.
 
 p - Turns off main power output. Software power switch.
 
 Z - Overide partial charge and set to fully charge battery one time.
 
-U - increase v_test -- this is a debug command. It increases the PWM duty cycle for the main output by one tick.
+S - Go into deep sleep state.
 
-u - decrease v_test -- this is a debug command. It decreases the PWM duty cycle for the main output by one tick.
+E - Local echo on.
+
+e - Local echo off.
+
+H - Test and turn automatic battery heater on.
+
+h - Turn automatic battery heater off.
 
 ~ - Reset Settings to default values stored in program memory.
 
 $ - Generate and Check Program Memory Checksum.
 
-& - Generate and Check EEPROM Checksum.
+& - Generate and Check EEPROM/NVMEM Checksum.
+
+! - Download EEPROM/NVMEM data through serial port.
+
+@ - Upload EEPROM/NVMEM data through serial port.
+
+* - Get firmware version.

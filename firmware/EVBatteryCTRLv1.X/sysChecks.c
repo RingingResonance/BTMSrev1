@@ -180,11 +180,11 @@ void analog_sanity(void){
     //Battery temperature.
     if(adcBTemp > 0xFFFD){
         fault_log(0x21);
-        vars.heat_cal_stage = 5;     //Disable Heater if we can't get battery temperature.
+        vars.heat_cal_stage = disabled;     //Disable Heater if we can't get battery temperature.
     }
     if(adcBTemp < 0x0002){
         fault_log(0x22);
-        vars.heat_cal_stage = 5;     //Disable Heater if we can't get battery temperature.
+        vars.heat_cal_stage = disabled;     //Disable Heater if we can't get battery temperature.
     }
     //motor controller temperature.
     //We can live with these temps in error so don't bother disabling or shutting anything down here. Just log the error.
@@ -252,13 +252,13 @@ void heatStuffOff(void){
     heat_power = off;
     heat_rly_timer = 3;     //Reset heat relay timer
     heat_set = off;
-    vars.heat_cal_stage = error;
+    if(vars.heat_cal_stage != disabled)vars.heat_cal_stage = error;
     CONDbits.soft_power = off; //Go back to normal operation.
     heatRelay = off;     //Heat Relay Off
 }
 //Check and calibrate heater to the wattage chosen by the user.
 void heater_calibration(void){
-    if (vars.heat_cal_stage == 2 && CONDbits.main_power){
+    if (vars.heat_cal_stage == calibrating && CONDbits.main_power){
         float watts = (dsky.battery_voltage * dsky.battery_current) * -1;
         if (watts < sets.max_heat){
         heatRelay = on;     //Heat Relay On

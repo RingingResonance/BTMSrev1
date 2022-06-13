@@ -24,28 +24,56 @@
 #include "eeprom.h"
 #include "checksum.h"
 
+void displayOut(int serial_port){
+    if(sets.PxVenable[serial_port] && !portBSY[serial_port] && CONDbits.main_power){
+        if(PxVtimer[serial_port] == 0){
+            pageOut(PxPage[serial_port], serial_port);
+            PxVtimer[serial_port] = sets.pageDelay[serial_port][PxPage[serial_port]] - 1;
+            if (PxVtimer[serial_port] < 0) PxVtimer[serial_port] = 0;
+            if(PxPage[serial_port] < 4 && sets.page[serial_port][PxPage[serial_port]][0]) PxPage[serial_port]++; //If we get a NULL for first variable then skip go back to page 0
+            else PxPage[serial_port] = 0;
+        }
+        else PxVtimer[serial_port]--;
+    }
+}
+
 //Loads one of the serial buffers with user defined data and then dispatches it.
 void pageOut(int pageNum, int serial_port){
-    int pageVar = 0;
-    int varNum = 0;
-    int dodispatch = 0;
+    unsigned int pageVar = 0;
+    unsigned int varNum = 0;
+    unsigned int dodispatch = 0;
     for(pageVar=0;pageVar<6;pageVar++){
         varNum = sets.page[serial_port][pageNum][pageVar];
+        varNum &= 0xFF;
         if(varNum < 8)dynaSpace[serial_port] = 1;       //Do not reserve a space for a sign char if we don't have to.
         if(varNum == 8)config_space[serial_port] = 1;   //Reserve spaces for 0's when showing watts so that text isn't jumping around.
         //Skip page if first Var is listed as NULL, or if we get a NULL later then we are done.
-        if((varNum + pageVar) == 0)break;
+        if(varNum == 0)break;
         //Check if loading custom data or not.
-        if(varNum > 0xF9){
-            load_string(sets.custom_data[varNum - 0xFA], serial_port);
+        if(varNum > 0x00FB){
+            switch(varNum){
+                case 0x00FC:
+                    load_string(sets.custom_data1, serial_port);
+                break;
+                case 0x00FD:
+                    load_string(sets.custom_data2, serial_port);
+                break;
+                case 0x00FE:
+                    load_string(sets.custom_data3, serial_port);
+                break;
+                case 0x00FF:
+                    load_string(sets.custom_data4, serial_port);
+                break;
+            }
+            dodispatch = 1; //if we have at least one variable to display then dispatch.
         }
-        else{
+        else if(varNum <= varLimit){
             load_float(dsky.dskyarrayFloat[varNum], serial_port);   //Load the number.
             Buff_index[serial_port] -= 2;                           //Subtract 2 from buffer index.
             load_string(Vlookup[varNum], serial_port);              //Load the number's text.
             load_string(" ", serial_port);                          //Load a space afterwards.
+            dodispatch = 1; //if we have at least one variable to display then dispatch.
         }
-        dodispatch = 1; //if we have at least one variable to display then dispatch.
     }
     if (dodispatch) dispatch_Serial(serial_port);
 }
@@ -117,11 +145,11 @@ void Command_Interp(int serial_port){
     //Command Handler.
     if (cmdRDY[serial_port]){
         //Send command receive "@"
-        load_string("@", serial_port);
+        if(Lecho[serial_port])load_string("@", serial_port);
         //Check for faults.
         if(vars.fault_count > 0){
             //Send fault alert "!"
-            load_string("!", serial_port);
+            if(Lecho[serial_port])load_string("!", serial_port);
         }
         switch(CMD_buff[serial_port][tempPoint[serial_port]]){
             case 0x0D:
@@ -150,7 +178,7 @@ void Command_Interp(int serial_port){
                 load_string("\r\n", serial_port);
             break;
             case '%':
-                load_string("\r\nSettings and Vars Saved.\r\n", serial_port);
+                if(Lecho[serial_port])load_string("\r\nSettings and Vars Saved.\r\n", serial_port);
                 save_sets();
                 save_vars();  //Save settings to NV-memory
             break;
@@ -159,30 +187,12 @@ void Command_Interp(int serial_port){
                 eeprom_erase(0x0000);   //Erase address 0x0000 to 0xFFFF
                 nvm_chksum_update();    //Update EEPROM checksum.
             break;
-            case 't':
-                pageOut(0, serial_port);    //Test page.
-            break;
-            case 'T':
-                load_string("\n\rRated:", serial_port);
-                load_float(sets.amp_hour_rating, serial_port);
-                load_string("\n\rRemaining:", serial_port);
-                load_float(vars.battery_remaining, serial_port);
-                load_string("\n\rCapacity:", serial_port);
-                load_float(vars.battery_capacity, serial_port);
-                load_string("\n\r", serial_port);
-            break;
-            case 'V':
-                load_string("\n\rGotVolt? ", serial_port);
-                load_float(CONDbits.got_open_voltage, serial_port);
-                load_string("\n\rOpenVlt: ", serial_port);
-                load_float(voltage_percentage, serial_port);
-                load_string("\n\r", serial_port);
-            break;
             case 'H':
-                vars.heat_cal_stage = 1;
+                vars.heat_cal_stage = initialize;
             break;
             case 'h':
-                vars.heat_cal_stage = 5;
+                vars.heat_cal_stage = disabled;
+                save_vars();
             break;
             case 'E':
                 Lecho[serial_port] = 1;
@@ -197,22 +207,32 @@ void Command_Interp(int serial_port){
                 fault_read(serial_port);          //Read all fault codes.
             break;
             case 'P':
-                load_string("P On \r\n", serial_port);
+                if(Lecho[serial_port])load_string("P On \r\n", serial_port);
                 CONDbits.cmd_power = 1;
             break;
             case 'p':
-                load_string("P Off\r\n", serial_port);
+                if(Lecho[serial_port])load_string("P Off\r\n", serial_port);
                 v_test = 0;
                 CONDbits.cmd_power = 0;
+            break;
+            case 'O':
+                if(Lecho[serial_port])load_string("HUD On \r\n", serial_port);
+                sets.PxVenable[serial_port] = 1;
+                ram_chksum_update();        //Generate new checksum.
+            break;
+            case 'o':
+                if(Lecho[serial_port])load_string("HUD Off\r\n", serial_port);
+                sets.PxVenable[serial_port] = 0;
+                ram_chksum_update();        //Generate new checksum.
             break;
             case 'C':
                 vars.fault_count = 0;
                 STINGbits.fault_shutdown = 0;
-                if(vars.heat_cal_stage != 5)
-                    vars.heat_cal_stage = 0;
+                if(vars.heat_cal_stage != disabled)
+                    vars.heat_cal_stage = notrun;
                 STINGbits.osc_fail_event = 0;
                 save_vars();
-                load_string("Faults Cleared.\r\n", serial_port);
+                if(Lecho[serial_port])load_string("Faults Cleared.\r\n", serial_port);
             break;
             case 'Z':
                 p_charge = 0;
@@ -224,8 +244,14 @@ void Command_Interp(int serial_port){
                     vars.partial_chrg_cnt = 10;
                 }
             break;
+            case '*':   //Print firmware version.
+                load_string(version, serial_port);
+            break;
+            case '!':
+                
+            break;
             default:
-                load_string("Unknown Command.\r\n", serial_port);
+                if(Lecho[serial_port])load_string("Unknown Command.\r\n", serial_port);
             break;
         }
         CMD_Point[serial_port] = 0;

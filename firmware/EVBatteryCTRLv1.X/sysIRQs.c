@@ -337,9 +337,6 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
         vars.battery_remaining += (calc_125 * dsky.battery_current);
     }
     //*************************************************************
-    //Do display stuff.
-    displayOut(PORT1);
-    displayOut(PORT2);
     /****************************************/
     /* End the IRQ. */
 	IFS0bits.T2IF = 0;   

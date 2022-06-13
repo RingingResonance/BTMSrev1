@@ -49,6 +49,7 @@ void __attribute__((interrupt, no_auto_psv)) _T3Interrupt (void){
 }
 
 /* Non-critical systems. Timer 4 IRQ */
+//For low priority CPU intensive processes and checks.
 void __attribute__((interrupt, no_auto_psv)) _T4Interrupt (void){
     CPUact = 1;
     //Check settings ram in background. (lowest priority IRQ))
@@ -72,6 +73,11 @@ void __attribute__((interrupt, no_auto_psv)) _T4Interrupt (void){
 //Heavy process IRQ
 //For low priority CPU intensive processes and checks.
 void __attribute__((interrupt, no_auto_psv)) _T5Interrupt (void){
+    CPUact = 1;
+    //Do display stuff.
+    displayOut(PORT1);
+    displayOut(PORT2);
+    //End IRQ
     IFS1bits.T5IF = 0;
 }
 

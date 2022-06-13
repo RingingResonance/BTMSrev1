@@ -195,12 +195,21 @@ void configure_IO(void){
 /* Configure Timer 4 */
 /* Non-Critical Timing. */
 /*****************************/
-/* For exactly 1 second timing operations. */
+/* For low priority 1 second timing operations. */
     PR4 = 0xE0EA;   //57,578
     //PR3 = 0x7271;     //29,297
     TMR4 = 0x0000;
     T4CON = 0x0000;
     T4CONbits.TCKPS = 3;        //1:256 prescale
+    
+/*****************************/
+/* Configure Timer 5 */
+/*****************************/
+/* For low priority 0.125 second timing operations. */
+    PR5 = 0x383A;     //14,394
+    TMR5 = 0x0000;
+    T5CON = 0x0000;
+    T5CONbits.TCKPS = 2;        //1:64 prescale
 
 /*****************************/
 /* Configure and Enable analog inputs */
@@ -227,7 +236,7 @@ void configure_IO(void){
     IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC1bits.T3IP = 2;      //Timer 3 IRQ for wheel rotate timeout. Not critical.
     IPC5bits.T4IP = 1;      //Checksum timer IRQ
-    IPC5bits.T5IP = 1;      //Non-critical processes. Not currently used for anything.
+    IPC5bits.T5IP = 1;      //Non-critical processes. Used for HUD.
     IPC5bits.INT2IP = 1;    //Not yet used.
 }
 void Init(void){
@@ -275,6 +284,7 @@ void Init(void){
     IEC0bits.T2IE = 1;	// Enable interrupts for timer 2
     IEC0bits.T3IE = 1;	// Enable interrupts for timer 3
     IEC1bits.T4IE = 1;	// Enable interrupts for timer 4
+    IEC1bits.T5IE = 1;	// Enable interrupts for timer 5
     IEC0bits.ADIE = 1;  // Enable ADC IRQs.
     INTCON2bits.INT0EP = 0;
     INTCON2bits.INT2EP = 0;
@@ -288,6 +298,7 @@ void Init(void){
     T1CONbits.TON = 1;      // Start Timer 1
     T3CONbits.TON = 1;      // Start Timer 3
     T4CONbits.TON = 1;      // Start Timer 4
+    T5CONbits.TON = 1;      // Start Timer 5
     U1MODEbits.UARTEN = 1;  //enable UART1
     U1STAbits.UTXEN = 1;    //enable UART1 TX
     U2MODEbits.UARTEN = 1;  //enable UART2
@@ -311,7 +322,7 @@ void sys_debug(void){
     IEC1bits.U2TXIE = 1; //Enable interrupts for UART2 Tx.
     DISICNT = 0;
 /*****************************/
-/* Enable our devices. */
+/* Disable our devices. */
 /*****************************/
     ADCON1bits.ADON = 0;    // Disable ADC
     PTCONbits.PTEN = 0;     // Disable PWM
@@ -319,6 +330,7 @@ void sys_debug(void){
     T1CONbits.TON = 0;      // Disable Timer 1
     T3CONbits.TON = 0;      // Disable Timer 3
     T4CONbits.TON = 0;      // Disable Timer 4
+    T5CONbits.TON = 0;      // Disable Timer 5
     U1MODEbits.UARTEN = 1;  //enable UART1
     U1STAbits.UTXEN = 1;    //enable UART1 TX
     U2MODEbits.UARTEN = 1;  //enable UART2
@@ -333,11 +345,13 @@ void low_power_mode(void){
     T2CONbits.TON = 0;      // Stop Timer 2
     T3CONbits.TON = 0;      // Stop Timer 3
     T4CONbits.TON = 0;      // Stop Timer 4
+    T5CONbits.TON = 0;      // Stop Timer 5
     // disable interrupts
     IEC1bits.INT1IE = 0;    //disable Wheel rotate IRQ
     IEC0bits.T2IE = 0;      //disable interrupts for timer 2
     IEC0bits.T3IE = 0;	// Disable interrupts for timer 3
     IEC1bits.T4IE = 0;	// Disable interrupts for timer 4
+    IEC1bits.T5IE = 0;	// Disable interrupts for timer 5
     INTCON2bits.INT1EP = 0;
     INTCON2bits.INT2EP = 0;
     //Set check_timer to just a few seconds before check.

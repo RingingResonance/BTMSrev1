@@ -63,24 +63,24 @@ void default_sets(void){
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
     //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
     //Port 2 display defaults
-    sets.custom_data1[0] = 'J';
-    sets.custom_data1[1] = 'R';
-    sets.custom_data1[2] = 'C';
-    sets.custom_data1[3] = 0x00;
-    sets.page[PORT2][0][0] = 0xFC;  //%
-    sets.page[PORT2][0][1] = 3;  //V
-    sets.page[PORT2][0][2] = 8;  //W
-    sets.page[PORT2][0][3] = 4;  //TV
-    sets.page[PORT2][0][4] = 10; //BT C
-    sets.page[PORT2][0][5] = 11; //ST C
-    sets.page[PORT2][1][0] = 1;  //%
-    sets.page[PORT2][1][1] = 5;  //V
-    sets.page[PORT2][1][2] = 6;  //W
-    sets.page[PORT2][1][3] = 7;  //TV
-    sets.page[PORT2][1][4] = 9; //BT C
-    sets.page[PORT2][1][5] = 14; //ST C
-    sets.pageDelay[PORT2][0] = 2;
-    sets.pageDelay[PORT2][1] = 8;
+    sets.custom_data1[0] = 0x0C; //Clear display.
+    sets.custom_data1[1] = 0x12; //Auto Return Off.
+    sets.custom_data1[2] = 0x0E; //Cursor Off.
+    sets.custom_data1[3] = 0x16; //Cursor Home.
+    sets.custom_data1[3] = 0x00; //NULL terminator.
+    sets.custom_data2[0] = 0x0A; //Newline.
+    sets.custom_data2[1] = 0x0D; //Return.
+    sets.custom_data2[2] = 0x00; //NULL terminator.
+    sets.page[PORT2][0][0] = 0xFC;  //Display Init
+    sets.page[PORT2][0][1] = 3;  //V 6char
+    sets.page[PORT2][0][2] = 8;  //W 9char
+    sets.page[PORT2][0][3] = 9;  //BT 7char
+    sets.page[PORT2][0][4] = 0xFD; //NEWLINE + RETURN.
+    sets.page[PORT2][0][5] = 2;  //%  6char
+    sets.page[PORT2][1][0] = 1;  //Speed 8char
+    sets.page[PORT2][1][1] = 0;  //NULL
+    sets.pageDelay[PORT2][0] = 0;
+    sets.pageDelay[PORT2][1] = 4;
     sets.pageDelay[PORT2][2] = 0;
     sets.pageDelay[PORT2][3] = 0;
     sets.PxVenable[PORT1] = 0;         //Port 1 display out is disabled by default.
@@ -225,18 +225,18 @@ void configure_IO(void){
     ADCSSL = 0x008F;
 
     //Configure IRQ Priorities
-    IPC2bits.ADIP = 7;      //Analog inputs and regulation routines, Important
-    IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing
-    IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is important.
-    IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh...
-    IPC0bits.INT0IP = 3;    //Charger detect IRQ, need to know basis
+    IPC2bits.ADIP = 7;      //Analog inputs and regulation routines, Most Important.
+    IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing, Greater priority.
+    IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is somewhat important.
+    IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh, not terribly important.
+    IPC0bits.INT0IP = 3;    //Charger detect IRQ, only for waking up the system.
     IPC2bits.U1TXIP = 3;    //TX 1 IRQ, Text can wait
     IPC6bits.U2TXIP = 3;    //TX 2 IRQ, Text can wait
     IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
     IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC1bits.T3IP = 2;      //Timer 3 IRQ for wheel rotate timeout. Not critical.
-    IPC5bits.T4IP = 1;      //Checksum timer IRQ
-    IPC5bits.T5IP = 1;      //Non-critical processes. Used for HUD.
+    IPC5bits.T5IP = 2;      //0.125 Sec Non-critical. Used for HUD, not important for system functionality.
+    IPC5bits.T4IP = 1;      //1 Sec Checksum timer IRQ, CPU intensive and other's need more priority.
     IPC5bits.INT2IP = 1;    //Not yet used.
 }
 void Init(void){

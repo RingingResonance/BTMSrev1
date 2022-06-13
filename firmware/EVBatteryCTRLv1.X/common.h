@@ -184,7 +184,7 @@ struct dskyvars{
     float   peak_power;             //5: 7char 00.0PW Peak output power
     float   peak_pwr_vlts;          //6: 8char 00.0PWV Voltage at peak output power
     float   battery_vltg_average;   //7: 7char 00.0AV Battery average voltage
-    float   watts;                  //8: 7char -0000W watts in or out of battery.
+    float   watts;                  //8: 9char -0000W watts in or out of battery.
     float   battery_current;        //9: 7char -00.0A Battery charge/discharge current
     float   battery_temp;           //A: 7char -00.0C Battery Temperature
     float   my_temp;                //B: 7char -00.0C Controller board Temperature

@@ -70,8 +70,8 @@ void __attribute__((interrupt, no_auto_psv)) _T4Interrupt (void){
     IFS1bits.T4IF = 0;
 }
 
-//Heavy process IRQ
-//For low priority CPU intensive processes and checks.
+//Another Heavy process IRQ
+//For low priority CPU intensive processes and checks, and 0.125 second non-critical timing.
 void __attribute__((interrupt, no_auto_psv)) _T5Interrupt (void){
     CPUact = 1;
     //Do display stuff.

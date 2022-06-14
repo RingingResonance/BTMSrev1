@@ -17,8 +17,8 @@
 #ifndef INIT_C
 #define INIT_C
 
-
 #include "common.h"
+#include "defines.h"
 #include "Init.h"
 
 void default_sets(void){
@@ -63,10 +63,9 @@ void default_sets(void){
     sets.PowerOffAfter = 120;    //Power off the system after this many minutes of not being plugged in or keyed on. 120 minutes is 2 hours.
     //page[2][5][6];              //Display page holder. (PORT)(Page#)(Variable to Display: A '0' at the start = Skip Page)
     //Port 2 display defaults
-    sets.custom_data1[0] = 0x0C; //Clear display.
-    sets.custom_data1[1] = 0x12; //Auto Return Off.
-    sets.custom_data1[2] = 0x0E; //Cursor Off.
-    sets.custom_data1[3] = 0x16; //Cursor Home.
+    sets.custom_data1[0] = 0x12; //Auto Return Off.
+    sets.custom_data1[1] = 0x0E; //Cursor Off.
+    sets.custom_data1[2] = 0x16; //Cursor Home.
     sets.custom_data1[3] = 0x00; //NULL terminator.
     sets.custom_data2[0] = 0x0A; //Newline.
     sets.custom_data2[1] = 0x0D; //Return.
@@ -113,18 +112,20 @@ void configure_IO(void){
     OSCCONbits.LPOSCEN = 0;
     /**************************/
     /**************************/
-    /* General IO */
-    TRISC = 0x0000;
-    LATC = 0;
+    /* General 1 IO */
+    GENERAL1_TRIS = 0x0000;
+    GENERAL1_LAT = 0;
+    GENERAL1_TRIS = 0; 
     /**************************/
     /* PWM outputs and charge detect input. */
-    TRISE = 0xFFEF; //set porte to all inputs except RE4
-    LATE = 0;
+    PWM_TRIS = 0xFFEF; //set porte to all inputs except RE4
+    PWM_LAT = 0;
+    PWM_PORT = 0;      //Make sure PORTE is 0
     /**************************/
-    /* General IO */
-    TRISF = 0xFFBE; //set portf to all inputs and two output.
-    LATF = 0;
-
+    /* General 2 IO */
+    GENERAL2_TRIS = 0xFFBE;
+    GENERAL2_LAT = 0;
+    GENERAL2_TRIS = 0; 
 /*****************************/
 /* Configure PWM */
 /*****************************/
@@ -190,7 +191,7 @@ void configure_IO(void){
     TMR3 = 0x0000;
     T3CON = 0x0000;
     T3CONbits.TCKPS = 3;        //1:256 prescale
-    
+
 /*****************************/
 /* Configure Timer 4 */
 /* Non-Critical Timing. */

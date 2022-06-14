@@ -8,9 +8,9 @@
 #ifndef ERRORCODES_H
 #define	ERRORCODES_H
 
-const char code01[] = "Heat too small";
+const char code01[] = "Heater too small";
 const char code02[] = "No heater detected";
-const char code03[] = "Heat too large";
+const char code03[] = "Heater too large";
 const char code04[] = "Low Batt";
 const char code05[] = "Dischrg OC";
 const char code06[] = "Chrg OC";
@@ -29,13 +29,13 @@ const char code12[] = "PLL UL";
 const char code13[] = "BrnOut";
 const char code14[] = "WDT rst";
 const char code15[] = "TRAP rst";
-const char code16[] = "Opcode inval rst";
+const char code16[] = "Opcode rst";
 const char code17[] = "MCLR rst";
 const char code18[] = "Illegal Instruct";
 const char code19[] = "Sys Reset";
 const char code1A[] = "Invalid port";
 const char code1B[] = "No chrg crnt";
-const char code1C[] = "PC > 100%";
+const char code1C[] = "PChg > 100%";
 const char code1D[] = "VH BV";
 const char code1E[] = "VL BV";
 const char code1F[] = "VH BC";
@@ -52,8 +52,8 @@ const char code29[] = "Prgm Chksum Err";
 const char code2A[] = "NVmem Chksum Err";
 const char code2B[] = "Sets Chksum Err";
 const char code2C[] = "NVsets Chksum Mismatch";
-const char code2D[] = "PORT1 OERR";
-const char code2E[] = "PORT2 OERR";
+const char code2D[] = "PORT1 ERR";
+const char code2E[] = "PORT2 ERR";
 const char codeDefault[] = "Unknown";
 
 const char * const errArray[] = {code01,code02,code03,code04,code05,code06,code07,code08,code09,code0A,code0B,code0C

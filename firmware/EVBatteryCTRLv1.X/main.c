@@ -21,6 +21,7 @@
  * it doesn't work. Either I'm doing it wrong or it's broken, but what I have here WORKS SO DON'T TOUCH IT.
  */
 
+#include "defines.h"
 #include "chipconfig.h"
 #include "IRQs.h"
 #include "sysIRQs.c"
@@ -48,14 +49,16 @@
 ***********************************************************/
 int main(void){
     CONDbits.EnableChIRQ = 1;
-    /* General IO. */
-    TRISD = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
-    LATD = 0;
+    /* General 3 IO. */
+    GENERAL3_TRIS = 0xFFF1; //set portd to all inputs except for RD2(KEEPALIVE), RD3(UNUSED), and RD1(mainContactor)
+    GENERAL3_LAT = 0;
+    GENERAL3_PORT = 0; 
     keepAlive = 1; //Enable Keep Alive signal. System keeps itself on while main_power is enabled.
     /* Analog inputs and general IO */
     //Initialize PORTB first.
-    TRISB = 0x008F;          //set portb to mix analog inputs and digital outputs.
-    LATB = 0;               //clear portb
+    ANALOG_TRIS = 0x008F;          //set portb to mix analog inputs and digital outputs.
+    ANALOG_LAT = 0;       
+    ANALOG_PORT = 0; //clear portb
     CPUact = 1;             //Turn on CPU ACT light.
     //Calculate space required for eeprom storage.
     cfg_space = sizeof(sets) / 2;

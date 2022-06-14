@@ -109,9 +109,9 @@ Program Memory  [Origin = 0x100, Length = 0x3f00]
 
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
-.text                        0x100              0x3254          0x4b7e  (19326)
-.const                      0x3354               0x366           0x519  (1305)
-.dinit                      0x36ba                0x22            0x33  (51)
+.text                        0x100              0x3264          0x4b96  (19350)
+.const                      0x3364               0x364           0x516  (1302)
+.dinit                      0x36c8                0x14            0x1e  (30)
 
                  Total program memory used (bytes):         0x50ca  (20682) 85%
 
@@ -144,10 +144,10 @@ Data Memory  [Origin = 0x800, Length = 0x400]
 
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
-.nbss                        0x800                   0           0x2c6  (710)
-.ndata                       0xac6                   0            0x1c  (28)
+.nbss                        0x800                   0           0x2c2  (706)
+.ndata                       0xac2                   0             0x8  (8)
 
-                 Total data memory used (bytes):          0x2e2  (738) 72%
+                 Total data memory used (bytes):          0x2ca  (714) 69%
 
 
 Dynamic Memory Usage
@@ -155,9 +155,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                        0xae2                               0x11e  (286)
+stack                        0xaca                               0x136  (310)
 
-                 Maximum dynamic memory (bytes):          0x11e  (286)
+                 Maximum dynamic memory (bytes):          0x136  (310)
 
 
 External Symbols in Data Memory (by address):
@@ -173,200 +173,190 @@ External Symbols in Data Memory (by address):
                     0x0954                  _voltage_percentage
                     0x0958                  _current_compensate
                     0x095c                  _dischr_current
-                    0x0960                  _p_charge
-                    0x0962                  _wheelTime
-                    0x0966                  _analog_avg_cnt
-                    0x0968                  _avgVolt
-                    0x096c                  _avgCurnt
-                    0x0970                  _avgBTemp
-                    0x0974                  _avgMTemp
-                    0x0978                  _avgSTemp
-                    0x097c                  _avg_cnt
-                    0x097e                  _bt_crnt_avg_temp
-                    0x0982                  _bt_vltg_avg_temp
-                    0x0986                  _curnt_cal_stage
-                    0x0987                  _start_timer
-                    0x0988                  _diag_count
-                    0x0989                  _PowerOffTimer
-                    0x098a                  _cfg_space
-                    0x098b                  _vr_space
-                    0x098c                  _dsky_space
-                    0x098d                  _v_test
-                    0x098e                  _first_cal
-                    0x0990                  _PxPage
-                    0x0994                  _PxVtimer
-                    0x0996                  _output_power
-                    0x0998                  _charge_power
-                    0x099a                  _heat_power
-                    0x099c                  _COND
-                    0x099e                  _CONDbits
-                    0x09a0                  _STING
-                    0x09a2                  _STINGbits
-                    0x09a3                  _CMD_buff
-                    0x09ae                  _CMD_Point
-                    0x09b2                  _cmdRDY
-                    0x09b4                  _cmdOVFL
-                    0x09b6                  _Terr
-                    0x09b8                  _bufsize
-                    0x09ba                  _nibble
-                    0x09c2                  _float_out
-                    0x09d0                  _Buff_count
-                    0x09d2                  _Buff_index
-                    0x09d6                  _Buffer
-                    0x0a4e                  _StempIndex
-                    0x0a52                  _FtempIndex
-                    0x0a56                  _config_space
-                    0x0a58                  _tx_float
-                    0x0a60                  _tx_temp
-                    0x0a62                  _portBSY
-                    0x0a64                  _writingbuff
-                    0x0a66                  _dynaSpace
-                    0x0a68                  _tempPoint
-                    0x0a6c                  _flt_index
-                    0x0a70                  _upperMem
-                    0x0a72                  _printSets
-                    0x0a74                  _eRead
-                    0x0a76                  _offset
-                    0x0a78                  _address
-                    0x0a7a                  _flash_chksum
-                    0x0a7c                  _rom_chksum
-                    0x0a7e                  _nvSets_chksum
-                    0x0a80                  _ramSets_chksum
-                    0x0a82                  _ramSets_chksum_old
-                    0x0a84                  _check_timer
-                    0x0a86                  _ram_err_count
-                    0x0a88                  _heat_set
-                    0x0a8a                  _oc_shutdown_timer
-                    0x0a8c                  _shutdown_timer
-                    0x0a8e                  _dischrg_current
-                    0x0a92                  _chrg_current
-                    0x0a96                  _dischrg_read
-                    0x0a9a                  _analog_smpl_time
-                    0x0a9e                  _crnt_error
-                    0x0aa2                  _crnt_integral
-                    0x0aa6                  _current_output
-                    0x0aaa                  _voltage_output
-                    0x0aae                  _temp_dischrg_rate
-                    0x0ab2                  _temp_chrg_rate
-                    0x0ab6                  _max_chrg_current
-                    0x0aba                  _percentOut
-                    0x0abe                  _chrg_remaining
-                    0x0ac2                  _chrg_check
-                    0x0ac6                  _BAUD1
-                    0x0aca                  _BAUD2
-                    0x0ace                  _heat_rly_timer
-                    0x0acf                  _contact_rly_timer
-                    0x0ad0                  _chrg_rly_timer
-                    0x0ad1                  _power_session
-                    0x0ad2                  _PowerOffTimerSec
-                    0x0ad3                  _Lecho
-                    0x0ad6                  _crnt_proportion
-                    0x0ada                  _vltg_proportion
-                    0x0ade                  _temp_proportion
+                    0x0960                  _wheelTime
+                    0x0964                  _avgVolt
+                    0x0968                  _avgCurnt
+                    0x096c                  _avgBTemp
+                    0x0970                  _avgMTemp
+                    0x0974                  _avgSTemp
+                    0x0978                  _bt_crnt_avg_temp
+                    0x097c                  _bt_vltg_avg_temp
+                    0x0980                  _p_charge
+                    0x0981                  _avg_cnt
+                    0x0982                  _analog_avg_cnt
+                    0x0983                  _curnt_cal_stage
+                    0x0984                  _start_timer
+                    0x0985                  _diag_count
+                    0x0986                  _PowerOffTimer
+                    0x0987                  _cfg_space
+                    0x0988                  _vr_space
+                    0x0989                  _dsky_space
+                    0x098a                  _v_test
+                    0x098b                  _first_cal
+                    0x098c                  _output_power
+                    0x098e                  _charge_power
+                    0x0990                  _heat_power
+                    0x0992                  _COND
+                    0x0994                  _CONDbits
+                    0x0996                  _STING
+                    0x0998                  _STINGbits
+                    0x099a                  _tx_float
+                    0x09a2                  _CMD_Point
+                    0x09a6                  _Buff_index
+                    0x09aa                  _StempIndex
+                    0x09ae                  _FtempIndex
+                    0x09b2                  _CMD_buff
+                    0x09bc                  _cmdRDY
+                    0x09be                  _cmdOVFL
+                    0x09c0                  _Terr
+                    0x09c2                  _bufsize
+                    0x09c4                  _nibble
+                    0x09cc                  _float_out
+                    0x09da                  _Buff_count
+                    0x09dc                  _Buffer
+                    0x0a54                  _config_space
+                    0x0a56                  _tx_temp
+                    0x0a58                  _portBSY
+                    0x0a5a                  _writingbuff
+                    0x0a5c                  _dynaSpace
+                    0x0a5e                  _tempPoint
+                    0x0a62                  _flt_index
+                    0x0a66                  _PxPage
+                    0x0a6a                  _PxVtimer
+                    0x0a6c                  _upperMem
+                    0x0a6e                  _printSets
+                    0x0a70                  _eRead
+                    0x0a72                  _offset
+                    0x0a74                  _address
+                    0x0a76                  _flash_chksum
+                    0x0a78                  _rom_chksum
+                    0x0a7a                  _nvSets_chksum
+                    0x0a7c                  _ramSets_chksum
+                    0x0a7e                  _ramSets_chksum_old
+                    0x0a80                  _check_timer
+                    0x0a82                  _ram_err_count
+                    0x0a84                  _heat_set
+                    0x0a86                  _oc_shutdown_timer
+                    0x0a88                  _shutdown_timer
+                    0x0a8a                  _dischrg_current
+                    0x0a8e                  _chrg_current
+                    0x0a92                  _dischrg_read
+                    0x0a96                  _analog_smpl_time
+                    0x0a9a                  _crnt_error
+                    0x0a9e                  _crnt_integral
+                    0x0aa2                  _current_output
+                    0x0aa6                  _voltage_output
+                    0x0aaa                  _temp_dischrg_rate
+                    0x0aae                  _temp_chrg_rate
+                    0x0ab2                  _max_chrg_current
+                    0x0ab6                  _percentOut
+                    0x0aba                  _chrg_remaining
+                    0x0abe                  _chrg_check
+                    0x0ac2                  _heat_rly_timer
+                    0x0ac3                  _contact_rly_timer
+                    0x0ac4                  _chrg_rly_timer
+                    0x0ac5                  _power_session
+                    0x0ac6                  _PowerOffTimerSec
+                    0x0ac7                  _Lecho
 
 External Symbols in Data Memory (by name):
 
                     0x094e                  _ADCON3lower8
                     0x094c                  _ADCON3upper8
-                    0x0ac6                  _BAUD1
-                    0x0aca                  _BAUD2
-                    0x09d0                  _Buff_count
-                    0x09d2                  _Buff_index
-                    0x09d6                  _Buffer
-                    0x09ae                  _CMD_Point
-                    0x09a3                  _CMD_buff
-                    0x099c                  _COND
-                    0x099e                  _CONDbits
-                    0x0a52                  _FtempIndex
-                    0x0ad3                  _Lecho
-                    0x0989                  _PowerOffTimer
-                    0x0ad2                  _PowerOffTimerSec
-                    0x0990                  _PxPage
-                    0x0994                  _PxVtimer
-                    0x09a0                  _STING
-                    0x09a2                  _STINGbits
-                    0x0a4e                  _StempIndex
-                    0x09b6                  _Terr
-                    0x0a78                  _address
-                    0x0966                  _analog_avg_cnt
-                    0x0a9a                  _analog_smpl_time
-                    0x0970                  _avgBTemp
-                    0x096c                  _avgCurnt
-                    0x0974                  _avgMTemp
-                    0x0978                  _avgSTemp
-                    0x0968                  _avgVolt
-                    0x097c                  _avg_cnt
-                    0x097e                  _bt_crnt_avg_temp
-                    0x0982                  _bt_vltg_avg_temp
-                    0x09b8                  _bufsize
-                    0x098a                  _cfg_space
-                    0x0998                  _charge_power
-                    0x0a84                  _check_timer
-                    0x0ac2                  _chrg_check
-                    0x0a92                  _chrg_current
-                    0x0abe                  _chrg_remaining
-                    0x0ad0                  _chrg_rly_timer
+                    0x09da                  _Buff_count
+                    0x09a6                  _Buff_index
+                    0x09dc                  _Buffer
+                    0x09a2                  _CMD_Point
+                    0x09b2                  _CMD_buff
+                    0x0992                  _COND
+                    0x0994                  _CONDbits
+                    0x09ae                  _FtempIndex
+                    0x0ac7                  _Lecho
+                    0x0986                  _PowerOffTimer
+                    0x0ac6                  _PowerOffTimerSec
+                    0x0a66                  _PxPage
+                    0x0a6a                  _PxVtimer
+                    0x0996                  _STING
+                    0x0998                  _STINGbits
+                    0x09aa                  _StempIndex
+                    0x09c0                  _Terr
+                    0x0a74                  _address
+                    0x0982                  _analog_avg_cnt
+                    0x0a96                  _analog_smpl_time
+                    0x096c                  _avgBTemp
+                    0x0968                  _avgCurnt
+                    0x0970                  _avgMTemp
+                    0x0974                  _avgSTemp
+                    0x0964                  _avgVolt
+                    0x0981                  _avg_cnt
+                    0x0978                  _bt_crnt_avg_temp
+                    0x097c                  _bt_vltg_avg_temp
+                    0x09c2                  _bufsize
+                    0x0987                  _cfg_space
+                    0x098e                  _charge_power
+                    0x0a80                  _check_timer
+                    0x0abe                  _chrg_check
+                    0x0a8e                  _chrg_current
+                    0x0aba                  _chrg_remaining
+                    0x0ac4                  _chrg_rly_timer
                     0x0944                  _chrge_rate
-                    0x09b4                  _cmdOVFL
-                    0x09b2                  _cmdRDY
-                    0x0a56                  _config_space
-                    0x0acf                  _contact_rly_timer
-                    0x0a9e                  _crnt_error
-                    0x0aa2                  _crnt_integral
-                    0x0ad6                  _crnt_proportion
-                    0x0986                  _curnt_cal_stage
+                    0x09be                  _cmdOVFL
+                    0x09bc                  _cmdRDY
+                    0x0a54                  _config_space
+                    0x0ac3                  _contact_rly_timer
+                    0x0a9a                  _crnt_error
+                    0x0a9e                  _crnt_integral
+                    0x0983                  _curnt_cal_stage
                     0x0958                  _current_compensate
-                    0x0aa6                  _current_output
-                    0x0988                  _diag_count
+                    0x0aa2                  _current_output
+                    0x0985                  _diag_count
                     0x095c                  _dischr_current
-                    0x0a8e                  _dischrg_current
-                    0x0a96                  _dischrg_read
+                    0x0a8a                  _dischrg_current
+                    0x0a92                  _dischrg_read
                     0x0906                  _dsky
-                    0x098c                  _dsky_space
-                    0x0a66                  _dynaSpace
-                    0x0a74                  _eRead
-                    0x098e                  _first_cal
-                    0x0a7a                  _flash_chksum
-                    0x09c2                  _float_out
-                    0x0a6c                  _flt_index
-                    0x099a                  _heat_power
-                    0x0ace                  _heat_rly_timer
-                    0x0a88                  _heat_set
-                    0x0ab6                  _max_chrg_current
-                    0x09ba                  _nibble
-                    0x0a7e                  _nvSets_chksum
-                    0x0a8a                  _oc_shutdown_timer
-                    0x0a76                  _offset
+                    0x0989                  _dsky_space
+                    0x0a5c                  _dynaSpace
+                    0x0a70                  _eRead
+                    0x098b                  _first_cal
+                    0x0a76                  _flash_chksum
+                    0x09cc                  _float_out
+                    0x0a62                  _flt_index
+                    0x0990                  _heat_power
+                    0x0ac2                  _heat_rly_timer
+                    0x0a84                  _heat_set
+                    0x0ab2                  _max_chrg_current
+                    0x09c4                  _nibble
+                    0x0a7a                  _nvSets_chksum
+                    0x0a86                  _oc_shutdown_timer
+                    0x0a72                  _offset
                     0x0950                  _open_voltage
-                    0x0996                  _output_power
-                    0x0960                  _p_charge
-                    0x0aba                  _percentOut
-                    0x0a62                  _portBSY
-                    0x0ad1                  _power_session
-                    0x0a72                  _printSets
-                    0x0a80                  _ramSets_chksum
-                    0x0a82                  _ramSets_chksum_old
-                    0x0a86                  _ram_err_count
-                    0x0a7c                  _rom_chksum
+                    0x098c                  _output_power
+                    0x0980                  _p_charge
+                    0x0ab6                  _percentOut
+                    0x0a58                  _portBSY
+                    0x0ac5                  _power_session
+                    0x0a6e                  _printSets
+                    0x0a7c                  _ramSets_chksum
+                    0x0a7e                  _ramSets_chksum_old
+                    0x0a82                  _ram_err_count
+                    0x0a78                  _rom_chksum
                     0x0800                  _sets
-                    0x0a8c                  _shutdown_timer
-                    0x0987                  _start_timer
-                    0x0a68                  _tempPoint
-                    0x0ab2                  _temp_chrg_rate
-                    0x0aae                  _temp_dischrg_rate
-                    0x0ade                  _temp_proportion
-                    0x0a58                  _tx_float
-                    0x0a60                  _tx_temp
-                    0x0a70                  _upperMem
-                    0x098d                  _v_test
+                    0x0a88                  _shutdown_timer
+                    0x0984                  _start_timer
+                    0x0a5e                  _tempPoint
+                    0x0aae                  _temp_chrg_rate
+                    0x0aaa                  _temp_dischrg_rate
+                    0x099a                  _tx_float
+                    0x0a56                  _tx_temp
+                    0x0a6c                  _upperMem
+                    0x098a                  _v_test
                     0x08d6                  _vars
                     0x0948                  _vltg_dvid
-                    0x0ada                  _vltg_proportion
-                    0x0aaa                  _voltage_output
+                    0x0aa6                  _voltage_output
                     0x0954                  _voltage_percentage
-                    0x098b                  _vr_space
-                    0x0962                  _wheelTime
-                    0x0a64                  _writingbuff
+                    0x0988                  _vr_space
+                    0x0960                  _wheelTime
+                    0x0a5a                  _writingbuff
 
 External Symbols in Program Memory (by address):
 
@@ -377,350 +367,350 @@ External Symbols in Program Memory (by address):
                   0x0001c8                  __INT0Interrupt
                   0x0001d2                  __ADCInterrupt
                   0x00044c                  __T1Interrupt
-                  0x0007b2                  __T2Interrupt
-                  0x000906                  __INT1Interrupt
-                  0x00095c                  __T3Interrupt
-                  0x000972                  __T4Interrupt
-                  0x0009bc                  __T5Interrupt
-                  0x0009e2                  __U1RXInterrupt
-                  0x000a04                  __U2RXInterrupt
-                  0x000a26                  __U1TXInterrupt
-                  0x000a70                  __U2TXInterrupt
-                  0x000abe                  __FLTAInterrupt
-                  0x000ae6                  __OscillatorFail
-                  0x000b2e                  __AddressError
-                  0x000b56                  __StackError
-                  0x000b82                  __MathError
-                  0x000baa                  __ReservedTrap7
-                  0x000bd0                  _power_off
-                  0x000be2                  _absFloat
-                  0x000c08                  _volt_zero
-                  0x000c1a                  _volt_percent
-                  0x000cac                  _current_cal
-                  0x000cf2                  _Buffrst
-                  0x000d2c                  _four_bit_hex_cnvt
-                  0x000d5c                  _port_check
-                  0x000d9a                  _load_hex
-                  0x000ef0                  _dispatch_Serial
-                  0x000f26                  _load_string
-                  0x000fe0                  _cpyFLT
-                  0x001040                  _load_float
-                  0x00134a                  _BaudCalc
-                  0x001386                  _default_sets
-                  0x0014da                  _configure_IO
-                  0x0016a2                  _Init
-                  0x00172c                  _sys_debug
-                  0x001762                  _low_power_mode
-                  0x00178a                  _low_battery_shutdown
-                  0x0017ac                  _displayOut
-                  0x001888                  _pageOut
-                  0x00199e                  _portBusyIdle
-                  0x0019b8                  _fault_read
-                  0x001a94                  _Command_Interp
-                  0x001f08                  _get_variables
-                  0x001f1c                  _get_settings
-                  0x001f50                  _save_sets
-                  0x001f7e                  _read_sets
-                  0x001fbc                  _save_vars
-                  0x001ff0                  _read_vars
-                  0x002026                  _eeprom_erase
-                  0x00208c                  _eeprom_write
-                  0x002102                  _memread
-                  0x002158                  _eeprom_read
-                  0x00217a                  _ram_chksum_update
-                  0x002186                  _prgm_chksum_update
-                  0x002192                  _nvm_chksum_update
-                  0x0021a2                  _check_ramSets
-                  0x0021bc                  _check_nvmSets
-                  0x0021da                  _check_prog
-                  0x002208                  _check_nvmem
-                  0x002226                  _flash_checksum
-                  0x0022d4                  _eeprom_checksum
-                  0x002312                  _nvmSets_checksum
-                  0x002350                  _ramSets_checksum
-                  0x002396                  _chargeDetect
-                  0x0024bc                  _initialCal
-                  0x0025a8                  _death_loop
-                  0x0025b6                  _first_check
-                  0x0025ca                  _main_power_check
-                  0x00263e                  _analog_sanity
-                  0x0026c2                  _reset_check
-                  0x002732                  _fault_log
-                  0x00275c                  _heatStuffOff
-                  0x00277a                  _heater_calibration
-                  0x002858                  _explody_preventy_check
-                  0x002916                  _currentCheck
-                  0x002996                  _general_shutdown
-                  0x0029a8                  _io_off
-                  0x0029e0                  _Temperature_I_Calc
-                  0x002aaa                  _temperatureCalc
-                  0x002b6a                  _outputReg
-                  0x002d64                  _chargeReg
-                  0x002ef0                  _heat_control
-                  0x002f7e                  _main
-                  0x002fc2                  __DefaultInterrupt
-                  0x002fc8                  ___subsf3
-                  0x002fca                  ___addsf3
-                  0x003084                  ___divsf3
-                  0x003108                  ___eqsf2
-                  0x003108                  ___ltsf2
-                  0x003108                  ___lesf2
-                  0x00310c                  ___gtsf2
-                  0x00310c                  ___gesf2
-                  0x003110                  ___fixsfsi
-                  0x003152                  ___fixunssfsi
-                  0x003188                  ___floatsisf
-                  0x00318e                  ___floatunsisf
-                  0x003192                  __fpack
-                  0x0031de                  __funpack
-                  0x003208                  __funpack2
-                  0x003218                  __fPropagateNaN
-                  0x00322a                  __fbopExit
-                  0x003232                  __fbopReturnNaN
-                  0x003238                  ___mulsf3
-                  0x0032a0                  __fcompare
-                  0x0032d6                  ___floatdisf
-                  0x0032f6                  ___floatundisf
-                  0x003354                  _VSPC
-                  0x003356                  _V01
-                  0x00335a                  _V02
-                  0x00335c                  _V03
-                  0x00335e                  _V04
-                  0x003361                  _V05
-                  0x003364                  _V06
-                  0x003368                  _V07
-                  0x00336b                  _V08
-                  0x00336d                  _V09
-                  0x00336f                  _V0A
-                  0x003371                  _V0D
-                  0x003375                  _V0E
-                  0x003378                  _Vlookup
-                  0x003396                  _code01
-                  0x0033a5                  _code02
-                  0x0033b8                  _code03
-                  0x0033c7                  _code04
-                  0x0033d0                  _code05
-                  0x0033db                  _code06
-                  0x0033e3                  _code07
-                  0x0033eb                  _code08
-                  0x0033f3                  _code09
-                  0x0033fb                  _code0A
-                  0x003403                  _code0B
-                  0x003410                  _code0C
-                  0x003418                  _code0D
-                  0x003421                  _code0E
-                  0x00342a                  _code0F
-                  0x003432                  _code10
-                  0x00343a                  _code11
-                  0x003440                  _code12
-                  0x003447                  _code13
-                  0x00344e                  _code14
-                  0x003456                  _code15
-                  0x00345f                  _code16
-                  0x003470                  _code17
-                  0x003479                  _code18
-                  0x00348a                  _code19
-                  0x003494                  _code1A
-                  0x0034a1                  _code1B
-                  0x0034ae                  _code1C
-                  0x0034b8                  _code1D
-                  0x0034be                  _code1E
-                  0x0034c4                  _code1F
-                  0x0034ca                  _code20
-                  0x0034d0                  _code21
-                  0x0034d6                  _code22
-                  0x0034dc                  _code23
-                  0x0034e3                  _code24
-                  0x0034ea                  _code25
-                  0x0034f0                  _code26
-                  0x0034f6                  _code27
-                  0x003504                  _code28
-                  0x003512                  _code29
-                  0x003522                  _code2A
-                  0x003533                  _code2B
-                  0x003543                  _code2C
-                  0x00355a                  _code2D
-                  0x003565                  _code2E
-                  0x003570                  _codeDefault
-                  0x003578                  _errArray
+                  0x0007b0                  __T2Interrupt
+                  0x000904                  __INT1Interrupt
+                  0x00095a                  __T3Interrupt
+                  0x000970                  __T4Interrupt
+                  0x0009ba                  __T5Interrupt
+                  0x0009e0                  __U1RXInterrupt
+                  0x000a02                  __U2RXInterrupt
+                  0x000a24                  __U1TXInterrupt
+                  0x000a6c                  __U2TXInterrupt
+                  0x000ab8                  __FLTAInterrupt
+                  0x000ae0                  __OscillatorFail
+                  0x000b26                  __AddressError
+                  0x000b4e                  __StackError
+                  0x000b7a                  __MathError
+                  0x000ba2                  __ReservedTrap7
+                  0x000bc8                  _power_off
+                  0x000bda                  _absFloat
+                  0x000c00                  _volt_zero
+                  0x000c12                  _volt_percent
+                  0x000ca4                  _current_cal
+                  0x000cea                  _Buffrst
+                  0x000d24                  _four_bit_hex_cnvt
+                  0x000d54                  _port_check
+                  0x000d92                  _load_hex
+                  0x000ee8                  _dispatch_Serial
+                  0x000f1e                  _load_string
+                  0x000fd8                  _cpyFLT
+                  0x001038                  _load_float
+                  0x001342                  _BaudCalc
+                  0x00137e                  _default_sets
+                  0x0014ce                  _configure_IO
+                  0x0016be                  _Init
+                  0x001748                  _sys_debug
+                  0x00177e                  _low_power_mode
+                  0x0017a6                  _low_battery_shutdown
+                  0x0017c8                  _displayOut
+                  0x0018a4                  _pageOut
+                  0x0019ba                  _portBusyIdle
+                  0x0019d4                  _fault_read
+                  0x001ab0                  _Command_Interp
+                  0x001f22                  _get_variables
+                  0x001f36                  _get_settings
+                  0x001f6a                  _save_sets
+                  0x001f98                  _read_sets
+                  0x001fd6                  _save_vars
+                  0x00200a                  _read_vars
+                  0x002040                  _eeprom_erase
+                  0x0020ac                  _eeprom_write
+                  0x002128                  _memread
+                  0x002182                  _eeprom_read
+                  0x0021a4                  _ram_chksum_update
+                  0x0021b0                  _prgm_chksum_update
+                  0x0021bc                  _nvm_chksum_update
+                  0x0021cc                  _check_ramSets
+                  0x0021e6                  _check_nvmSets
+                  0x002204                  _check_prog
+                  0x002232                  _check_nvmem
+                  0x002250                  _flash_checksum
+                  0x0022fe                  _eeprom_checksum
+                  0x00233c                  _nvmSets_checksum
+                  0x00237a                  _ramSets_checksum
+                  0x0023c0                  _chargeDetect
+                  0x0024e2                  _initialCal
+                  0x0025ce                  _death_loop
+                  0x0025dc                  _first_check
+                  0x0025f0                  _main_power_check
+                  0x002662                  _analog_sanity
+                  0x0026e6                  _reset_check
+                  0x002756                  _fault_log
+                  0x002780                  _heatStuffOff
+                  0x00279e                  _heater_calibration
+                  0x00287c                  _explody_preventy_check
+                  0x002938                  _currentCheck
+                  0x0029b8                  _general_shutdown
+                  0x0029ca                  _io_off
+                  0x002a02                  _Temperature_I_Calc
+                  0x002acc                  _temperatureCalc
+                  0x002b8c                  _outputReg
+                  0x002d72                  _chargeReg
+                  0x002efc                  _heat_control
+                  0x002f8a                  _main
+                  0x002fd2                  __DefaultInterrupt
+                  0x002fd8                  ___subsf3
+                  0x002fda                  ___addsf3
+                  0x003094                  ___divsf3
+                  0x003118                  ___eqsf2
+                  0x003118                  ___ltsf2
+                  0x003118                  ___lesf2
+                  0x00311c                  ___gtsf2
+                  0x00311c                  ___gesf2
+                  0x003120                  ___fixsfsi
+                  0x003162                  ___fixunssfsi
+                  0x003198                  ___floatsisf
+                  0x00319e                  ___floatunsisf
+                  0x0031a2                  __fpack
+                  0x0031ee                  __funpack
+                  0x003218                  __funpack2
+                  0x003228                  __fPropagateNaN
+                  0x00323a                  __fbopExit
+                  0x003242                  __fbopReturnNaN
+                  0x003248                  ___mulsf3
+                  0x0032b0                  __fcompare
+                  0x0032e6                  ___floatdisf
+                  0x003306                  ___floatundisf
+                  0x003364                  _VSPC
+                  0x003366                  _V01
+                  0x00336a                  _V02
+                  0x00336c                  _V03
+                  0x00336e                  _V04
+                  0x003371                  _V05
+                  0x003374                  _V06
+                  0x003378                  _V07
+                  0x00337b                  _V08
+                  0x00337d                  _V09
+                  0x00337f                  _V0A
+                  0x003381                  _V0D
+                  0x003385                  _V0E
+                  0x003388                  _Vlookup
+                  0x0033a6                  _code01
+                  0x0033b7                  _code02
+                  0x0033ca                  _code03
+                  0x0033db                  _code04
+                  0x0033e4                  _code05
+                  0x0033ef                  _code06
+                  0x0033f7                  _code07
+                  0x0033ff                  _code08
+                  0x003407                  _code09
+                  0x00340f                  _code0A
+                  0x003417                  _code0B
+                  0x003424                  _code0C
+                  0x00342c                  _code0D
+                  0x003435                  _code0E
+                  0x00343e                  _code0F
+                  0x003446                  _code10
+                  0x00344e                  _code11
+                  0x003454                  _code12
+                  0x00345b                  _code13
+                  0x003462                  _code14
+                  0x00346a                  _code15
+                  0x003473                  _code16
+                  0x00347e                  _code17
+                  0x003487                  _code18
+                  0x003498                  _code19
+                  0x0034a2                  _code1A
+                  0x0034af                  _code1B
+                  0x0034bc                  _code1C
+                  0x0034c8                  _code1D
+                  0x0034ce                  _code1E
+                  0x0034d4                  _code1F
+                  0x0034da                  _code20
+                  0x0034e0                  _code21
+                  0x0034e6                  _code22
+                  0x0034ec                  _code23
+                  0x0034f3                  _code24
+                  0x0034fa                  _code25
+                  0x003500                  _code26
+                  0x003506                  _code27
+                  0x003514                  _code28
+                  0x003522                  _code29
+                  0x003532                  _code2A
+                  0x003543                  _code2B
+                  0x003553                  _code2C
+                  0x00356a                  _code2D
+                  0x003574                  _code2E
+                  0x00357e                  _codeDefault
+                  0x003586                  _errArray
                   0xf8000a                  __FGS.sec
 
 External Symbols in Program Memory (by name):
 
-                  0x00134a                  _BaudCalc
-                  0x000cf2                  _Buffrst
-                  0x001a94                  _Command_Interp
-                  0x0016a2                  _Init
-                  0x0029e0                  _Temperature_I_Calc
-                  0x003356                  _V01
-                  0x00335a                  _V02
-                  0x00335c                  _V03
-                  0x00335e                  _V04
-                  0x003361                  _V05
-                  0x003364                  _V06
-                  0x003368                  _V07
-                  0x00336b                  _V08
-                  0x00336d                  _V09
-                  0x00336f                  _V0A
-                  0x003371                  _V0D
-                  0x003375                  _V0E
-                  0x003354                  _VSPC
-                  0x003378                  _Vlookup
+                  0x001342                  _BaudCalc
+                  0x000cea                  _Buffrst
+                  0x001ab0                  _Command_Interp
+                  0x0016be                  _Init
+                  0x002a02                  _Temperature_I_Calc
+                  0x003366                  _V01
+                  0x00336a                  _V02
+                  0x00336c                  _V03
+                  0x00336e                  _V04
+                  0x003371                  _V05
+                  0x003374                  _V06
+                  0x003378                  _V07
+                  0x00337b                  _V08
+                  0x00337d                  _V09
+                  0x00337f                  _V0A
+                  0x003381                  _V0D
+                  0x003385                  _V0E
+                  0x003364                  _VSPC
+                  0x003388                  _Vlookup
                   0x0001d2                  __ADCInterrupt
-                  0x000b2e                  __AddressError
-                  0x002fc2                  __DefaultInterrupt
+                  0x000b26                  __AddressError
+                  0x002fd2                  __DefaultInterrupt
                   0xf8000a                  __FGS.sec
-                  0x000abe                  __FLTAInterrupt
+                  0x000ab8                  __FLTAInterrupt
                   0x0001c8                  __INT0Interrupt
-                  0x000906                  __INT1Interrupt
-                  0x000b82                  __MathError
-                  0x000ae6                  __OscillatorFail
-                  0x000baa                  __ReservedTrap7
-                  0x000b56                  __StackError
+                  0x000904                  __INT1Interrupt
+                  0x000b7a                  __MathError
+                  0x000ae0                  __OscillatorFail
+                  0x000ba2                  __ReservedTrap7
+                  0x000b4e                  __StackError
                   0x00044c                  __T1Interrupt
-                  0x0007b2                  __T2Interrupt
-                  0x00095c                  __T3Interrupt
-                  0x000972                  __T4Interrupt
-                  0x0009bc                  __T5Interrupt
-                  0x0009e2                  __U1RXInterrupt
-                  0x000a26                  __U1TXInterrupt
-                  0x000a04                  __U2RXInterrupt
-                  0x000a70                  __U2TXInterrupt
-                  0x002fca                  ___addsf3
-                  0x003084                  ___divsf3
-                  0x003108                  ___eqsf2
-                  0x003110                  ___fixsfsi
-                  0x003152                  ___fixunssfsi
-                  0x0032d6                  ___floatdisf
-                  0x003188                  ___floatsisf
-                  0x0032f6                  ___floatundisf
-                  0x00318e                  ___floatunsisf
-                  0x00310c                  ___gesf2
-                  0x00310c                  ___gtsf2
-                  0x003108                  ___lesf2
-                  0x003108                  ___ltsf2
-                  0x003238                  ___mulsf3
-                  0x002fc8                  ___subsf3
+                  0x0007b0                  __T2Interrupt
+                  0x00095a                  __T3Interrupt
+                  0x000970                  __T4Interrupt
+                  0x0009ba                  __T5Interrupt
+                  0x0009e0                  __U1RXInterrupt
+                  0x000a24                  __U1TXInterrupt
+                  0x000a02                  __U2RXInterrupt
+                  0x000a6c                  __U2TXInterrupt
+                  0x002fda                  ___addsf3
+                  0x003094                  ___divsf3
+                  0x003118                  ___eqsf2
+                  0x003120                  ___fixsfsi
+                  0x003162                  ___fixunssfsi
+                  0x0032e6                  ___floatdisf
+                  0x003198                  ___floatsisf
+                  0x003306                  ___floatundisf
+                  0x00319e                  ___floatunsisf
+                  0x00311c                  ___gesf2
+                  0x00311c                  ___gtsf2
+                  0x003118                  ___lesf2
+                  0x003118                  ___ltsf2
+                  0x003248                  ___mulsf3
+                  0x002fd8                  ___subsf3
                   0x000152                  __data_init
                   0x000152                  __data_init_standard
-                  0x003218                  __fPropagateNaN
-                  0x00322a                  __fbopExit
-                  0x003232                  __fbopReturnNaN
-                  0x0032a0                  __fcompare
-                  0x003192                  __fpack
-                  0x0031de                  __funpack
-                  0x003208                  __funpack2
+                  0x003228                  __fPropagateNaN
+                  0x00323a                  __fbopExit
+                  0x003242                  __fbopReturnNaN
+                  0x0032b0                  __fcompare
+                  0x0031a2                  __fpack
+                  0x0031ee                  __funpack
+                  0x003218                  __funpack2
                   0x00013c                  __psv_init
                   0x000100                  __resetPRI
-                  0x000be2                  _absFloat
-                  0x00263e                  _analog_sanity
-                  0x002396                  _chargeDetect
-                  0x002d64                  _chargeReg
-                  0x0021bc                  _check_nvmSets
-                  0x002208                  _check_nvmem
-                  0x0021da                  _check_prog
-                  0x0021a2                  _check_ramSets
-                  0x003396                  _code01
-                  0x0033a5                  _code02
-                  0x0033b8                  _code03
-                  0x0033c7                  _code04
-                  0x0033d0                  _code05
-                  0x0033db                  _code06
-                  0x0033e3                  _code07
-                  0x0033eb                  _code08
-                  0x0033f3                  _code09
-                  0x0033fb                  _code0A
-                  0x003403                  _code0B
-                  0x003410                  _code0C
-                  0x003418                  _code0D
-                  0x003421                  _code0E
-                  0x00342a                  _code0F
-                  0x003432                  _code10
-                  0x00343a                  _code11
-                  0x003440                  _code12
-                  0x003447                  _code13
-                  0x00344e                  _code14
-                  0x003456                  _code15
-                  0x00345f                  _code16
-                  0x003470                  _code17
-                  0x003479                  _code18
-                  0x00348a                  _code19
-                  0x003494                  _code1A
-                  0x0034a1                  _code1B
-                  0x0034ae                  _code1C
-                  0x0034b8                  _code1D
-                  0x0034be                  _code1E
-                  0x0034c4                  _code1F
-                  0x0034ca                  _code20
-                  0x0034d0                  _code21
-                  0x0034d6                  _code22
-                  0x0034dc                  _code23
-                  0x0034e3                  _code24
-                  0x0034ea                  _code25
-                  0x0034f0                  _code26
-                  0x0034f6                  _code27
-                  0x003504                  _code28
-                  0x003512                  _code29
-                  0x003522                  _code2A
-                  0x003533                  _code2B
-                  0x003543                  _code2C
-                  0x00355a                  _code2D
-                  0x003565                  _code2E
-                  0x003570                  _codeDefault
-                  0x0014da                  _configure_IO
-                  0x000fe0                  _cpyFLT
-                  0x002916                  _currentCheck
-                  0x000cac                  _current_cal
-                  0x0025a8                  _death_loop
-                  0x001386                  _default_sets
-                  0x000ef0                  _dispatch_Serial
-                  0x0017ac                  _displayOut
-                  0x0022d4                  _eeprom_checksum
-                  0x002026                  _eeprom_erase
-                  0x002158                  _eeprom_read
-                  0x00208c                  _eeprom_write
-                  0x003578                  _errArray
-                  0x002858                  _explody_preventy_check
-                  0x002732                  _fault_log
-                  0x0019b8                  _fault_read
-                  0x0025b6                  _first_check
-                  0x002226                  _flash_checksum
-                  0x000d2c                  _four_bit_hex_cnvt
-                  0x002996                  _general_shutdown
-                  0x001f1c                  _get_settings
-                  0x001f08                  _get_variables
-                  0x00275c                  _heatStuffOff
-                  0x002ef0                  _heat_control
-                  0x00277a                  _heater_calibration
-                  0x0024bc                  _initialCal
-                  0x0029a8                  _io_off
-                  0x001040                  _load_float
-                  0x000d9a                  _load_hex
-                  0x000f26                  _load_string
-                  0x00178a                  _low_battery_shutdown
-                  0x001762                  _low_power_mode
-                  0x002f7e                  _main
-                  0x0025ca                  _main_power_check
-                  0x002102                  _memread
-                  0x002312                  _nvmSets_checksum
-                  0x002192                  _nvm_chksum_update
-                  0x002b6a                  _outputReg
-                  0x001888                  _pageOut
-                  0x00199e                  _portBusyIdle
-                  0x000d5c                  _port_check
-                  0x000bd0                  _power_off
-                  0x002186                  _prgm_chksum_update
-                  0x002350                  _ramSets_checksum
-                  0x00217a                  _ram_chksum_update
-                  0x001f7e                  _read_sets
-                  0x001ff0                  _read_vars
-                  0x0026c2                  _reset_check
-                  0x001f50                  _save_sets
-                  0x001fbc                  _save_vars
-                  0x00172c                  _sys_debug
-                  0x002aaa                  _temperatureCalc
-                  0x000c1a                  _volt_percent
-                  0x000c08                  _volt_zero
+                  0x000bda                  _absFloat
+                  0x002662                  _analog_sanity
+                  0x0023c0                  _chargeDetect
+                  0x002d72                  _chargeReg
+                  0x0021e6                  _check_nvmSets
+                  0x002232                  _check_nvmem
+                  0x002204                  _check_prog
+                  0x0021cc                  _check_ramSets
+                  0x0033a6                  _code01
+                  0x0033b7                  _code02
+                  0x0033ca                  _code03
+                  0x0033db                  _code04
+                  0x0033e4                  _code05
+                  0x0033ef                  _code06
+                  0x0033f7                  _code07
+                  0x0033ff                  _code08
+                  0x003407                  _code09
+                  0x00340f                  _code0A
+                  0x003417                  _code0B
+                  0x003424                  _code0C
+                  0x00342c                  _code0D
+                  0x003435                  _code0E
+                  0x00343e                  _code0F
+                  0x003446                  _code10
+                  0x00344e                  _code11
+                  0x003454                  _code12
+                  0x00345b                  _code13
+                  0x003462                  _code14
+                  0x00346a                  _code15
+                  0x003473                  _code16
+                  0x00347e                  _code17
+                  0x003487                  _code18
+                  0x003498                  _code19
+                  0x0034a2                  _code1A
+                  0x0034af                  _code1B
+                  0x0034bc                  _code1C
+                  0x0034c8                  _code1D
+                  0x0034ce                  _code1E
+                  0x0034d4                  _code1F
+                  0x0034da                  _code20
+                  0x0034e0                  _code21
+                  0x0034e6                  _code22
+                  0x0034ec                  _code23
+                  0x0034f3                  _code24
+                  0x0034fa                  _code25
+                  0x003500                  _code26
+                  0x003506                  _code27
+                  0x003514                  _code28
+                  0x003522                  _code29
+                  0x003532                  _code2A
+                  0x003543                  _code2B
+                  0x003553                  _code2C
+                  0x00356a                  _code2D
+                  0x003574                  _code2E
+                  0x00357e                  _codeDefault
+                  0x0014ce                  _configure_IO
+                  0x000fd8                  _cpyFLT
+                  0x002938                  _currentCheck
+                  0x000ca4                  _current_cal
+                  0x0025ce                  _death_loop
+                  0x00137e                  _default_sets
+                  0x000ee8                  _dispatch_Serial
+                  0x0017c8                  _displayOut
+                  0x0022fe                  _eeprom_checksum
+                  0x002040                  _eeprom_erase
+                  0x002182                  _eeprom_read
+                  0x0020ac                  _eeprom_write
+                  0x003586                  _errArray
+                  0x00287c                  _explody_preventy_check
+                  0x002756                  _fault_log
+                  0x0019d4                  _fault_read
+                  0x0025dc                  _first_check
+                  0x002250                  _flash_checksum
+                  0x000d24                  _four_bit_hex_cnvt
+                  0x0029b8                  _general_shutdown
+                  0x001f36                  _get_settings
+                  0x001f22                  _get_variables
+                  0x002780                  _heatStuffOff
+                  0x002efc                  _heat_control
+                  0x00279e                  _heater_calibration
+                  0x0024e2                  _initialCal
+                  0x0029ca                  _io_off
+                  0x001038                  _load_float
+                  0x000d92                  _load_hex
+                  0x000f1e                  _load_string
+                  0x0017a6                  _low_battery_shutdown
+                  0x00177e                  _low_power_mode
+                  0x002f8a                  _main
+                  0x0025f0                  _main_power_check
+                  0x002128                  _memread
+                  0x00233c                  _nvmSets_checksum
+                  0x0021bc                  _nvm_chksum_update
+                  0x002b8c                  _outputReg
+                  0x0018a4                  _pageOut
+                  0x0019ba                  _portBusyIdle
+                  0x000d54                  _port_check
+                  0x000bc8                  _power_off
+                  0x0021b0                  _prgm_chksum_update
+                  0x00237a                  _ramSets_checksum
+                  0x0021a4                  _ram_chksum_update
+                  0x001f98                  _read_sets
+                  0x00200a                  _read_vars
+                  0x0026e6                  _reset_check
+                  0x001f6a                  _save_sets
+                  0x001fd6                  _save_vars
+                  0x001748                  _sys_debug
+                  0x002acc                  _temperatureCalc
+                  0x000c12                  _volt_percent
+                  0x000c00                  _volt_zero
 
 Memory Configuration
 
@@ -777,7 +767,7 @@ LOAD c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libfx-elf.a
                   0x000002          0x2 SHORT 0x0 ((ABSOLUTE (__reset) >> 0x10) & 0x7f)
                   0x000003          0x2 SHORT 0x0
 
-.text             0x000100       0x3254
+.text             0x000100       0x3264
  *(.init)
  .init            0x000100         0x4c c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\liblega-pic30-elf.a(crt0_standard.o)
                   0x000100                  __resetPRI
@@ -789,151 +779,151 @@ LOAD c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libfx-elf.a
  *(.user_init)
  *(.handle)
  *(.isr*)
- .isr.text        0x0001c8       0x2dfa build/default/production/main.o
+ .isr.text        0x0001c8       0x2e0a build/default/production/main.o
                   0x0001c8                  __INT0Interrupt
                   0x0001d2                  __ADCInterrupt
                   0x00044c                  __T1Interrupt
-                  0x0007b2                  __T2Interrupt
-                  0x000906                  __INT1Interrupt
-                  0x00095c                  __T3Interrupt
-                  0x000972                  __T4Interrupt
-                  0x0009bc                  __T5Interrupt
-                  0x0009e2                  __U1RXInterrupt
-                  0x000a04                  __U2RXInterrupt
-                  0x000a26                  __U1TXInterrupt
-                  0x000a70                  __U2TXInterrupt
-                  0x000abe                  __FLTAInterrupt
-                  0x000ae6                  __OscillatorFail
-                  0x000b2e                  __AddressError
-                  0x000b56                  __StackError
-                  0x000b82                  __MathError
-                  0x000baa                  __ReservedTrap7
-                  0x000bd0                  _power_off
-                  0x000be2                  _absFloat
-                  0x000c08                  _volt_zero
-                  0x000c1a                  _volt_percent
-                  0x000cac                  _current_cal
-                  0x000cf2                  _Buffrst
-                  0x000d2c                  _four_bit_hex_cnvt
-                  0x000d5c                  _port_check
-                  0x000d9a                  _load_hex
-                  0x000ef0                  _dispatch_Serial
-                  0x000f26                  _load_string
-                  0x000fe0                  _cpyFLT
-                  0x001040                  _load_float
-                  0x00134a                  _BaudCalc
-                  0x001386                  _default_sets
-                  0x0014da                  _configure_IO
-                  0x0016a2                  _Init
-                  0x00172c                  _sys_debug
-                  0x001762                  _low_power_mode
-                  0x00178a                  _low_battery_shutdown
-                  0x0017ac                  _displayOut
-                  0x001888                  _pageOut
-                  0x00199e                  _portBusyIdle
-                  0x0019b8                  _fault_read
-                  0x001a94                  _Command_Interp
-                  0x001f08                  _get_variables
-                  0x001f1c                  _get_settings
-                  0x001f50                  _save_sets
-                  0x001f7e                  _read_sets
-                  0x001fbc                  _save_vars
-                  0x001ff0                  _read_vars
-                  0x002026                  _eeprom_erase
-                  0x00208c                  _eeprom_write
-                  0x002102                  _memread
-                  0x002158                  _eeprom_read
-                  0x00217a                  _ram_chksum_update
-                  0x002186                  _prgm_chksum_update
-                  0x002192                  _nvm_chksum_update
-                  0x0021a2                  _check_ramSets
-                  0x0021bc                  _check_nvmSets
-                  0x0021da                  _check_prog
-                  0x002208                  _check_nvmem
-                  0x002226                  _flash_checksum
-                  0x0022d4                  _eeprom_checksum
-                  0x002312                  _nvmSets_checksum
-                  0x002350                  _ramSets_checksum
-                  0x002396                  _chargeDetect
-                  0x0024bc                  _initialCal
-                  0x0025a8                  _death_loop
-                  0x0025b6                  _first_check
-                  0x0025ca                  _main_power_check
-                  0x00263e                  _analog_sanity
-                  0x0026c2                  _reset_check
-                  0x002732                  _fault_log
-                  0x00275c                  _heatStuffOff
-                  0x00277a                  _heater_calibration
-                  0x002858                  _explody_preventy_check
-                  0x002916                  _currentCheck
-                  0x002996                  _general_shutdown
-                  0x0029a8                  _io_off
-                  0x0029e0                  _Temperature_I_Calc
-                  0x002aaa                  _temperatureCalc
-                  0x002b6a                  _outputReg
-                  0x002d64                  _chargeReg
-                  0x002ef0                  _heat_control
-                  0x002f7e                  _main
- .isr             0x002fc2          0x4 default_isr
-                  0x002fc2                  __DefaultInterrupt
+                  0x0007b0                  __T2Interrupt
+                  0x000904                  __INT1Interrupt
+                  0x00095a                  __T3Interrupt
+                  0x000970                  __T4Interrupt
+                  0x0009ba                  __T5Interrupt
+                  0x0009e0                  __U1RXInterrupt
+                  0x000a02                  __U2RXInterrupt
+                  0x000a24                  __U1TXInterrupt
+                  0x000a6c                  __U2TXInterrupt
+                  0x000ab8                  __FLTAInterrupt
+                  0x000ae0                  __OscillatorFail
+                  0x000b26                  __AddressError
+                  0x000b4e                  __StackError
+                  0x000b7a                  __MathError
+                  0x000ba2                  __ReservedTrap7
+                  0x000bc8                  _power_off
+                  0x000bda                  _absFloat
+                  0x000c00                  _volt_zero
+                  0x000c12                  _volt_percent
+                  0x000ca4                  _current_cal
+                  0x000cea                  _Buffrst
+                  0x000d24                  _four_bit_hex_cnvt
+                  0x000d54                  _port_check
+                  0x000d92                  _load_hex
+                  0x000ee8                  _dispatch_Serial
+                  0x000f1e                  _load_string
+                  0x000fd8                  _cpyFLT
+                  0x001038                  _load_float
+                  0x001342                  _BaudCalc
+                  0x00137e                  _default_sets
+                  0x0014ce                  _configure_IO
+                  0x0016be                  _Init
+                  0x001748                  _sys_debug
+                  0x00177e                  _low_power_mode
+                  0x0017a6                  _low_battery_shutdown
+                  0x0017c8                  _displayOut
+                  0x0018a4                  _pageOut
+                  0x0019ba                  _portBusyIdle
+                  0x0019d4                  _fault_read
+                  0x001ab0                  _Command_Interp
+                  0x001f22                  _get_variables
+                  0x001f36                  _get_settings
+                  0x001f6a                  _save_sets
+                  0x001f98                  _read_sets
+                  0x001fd6                  _save_vars
+                  0x00200a                  _read_vars
+                  0x002040                  _eeprom_erase
+                  0x0020ac                  _eeprom_write
+                  0x002128                  _memread
+                  0x002182                  _eeprom_read
+                  0x0021a4                  _ram_chksum_update
+                  0x0021b0                  _prgm_chksum_update
+                  0x0021bc                  _nvm_chksum_update
+                  0x0021cc                  _check_ramSets
+                  0x0021e6                  _check_nvmSets
+                  0x002204                  _check_prog
+                  0x002232                  _check_nvmem
+                  0x002250                  _flash_checksum
+                  0x0022fe                  _eeprom_checksum
+                  0x00233c                  _nvmSets_checksum
+                  0x00237a                  _ramSets_checksum
+                  0x0023c0                  _chargeDetect
+                  0x0024e2                  _initialCal
+                  0x0025ce                  _death_loop
+                  0x0025dc                  _first_check
+                  0x0025f0                  _main_power_check
+                  0x002662                  _analog_sanity
+                  0x0026e6                  _reset_check
+                  0x002756                  _fault_log
+                  0x002780                  _heatStuffOff
+                  0x00279e                  _heater_calibration
+                  0x00287c                  _explody_preventy_check
+                  0x002938                  _currentCheck
+                  0x0029b8                  _general_shutdown
+                  0x0029ca                  _io_off
+                  0x002a02                  _Temperature_I_Calc
+                  0x002acc                  _temperatureCalc
+                  0x002b8c                  _outputReg
+                  0x002d72                  _chargeReg
+                  0x002efc                  _heat_control
+                  0x002f8a                  _main
+ .isr             0x002fd2          0x4 default_isr
+                  0x002fd2                  __DefaultInterrupt
  *(.libc)
  *(.libm)
  *(.libdsp)
  *(.lib*)
  .libpic30_crt_start_mode
-                  0x002fc6          0x2 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
-                  0x002fc6                  __crt_start_mode
-                  0x002fc6                  __crt_start_mode_normal
- .libm.subsf3     0x002fc8         0xbc c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(addsf3.eo)
-                  0x002fc8                  ___subsf3
-                  0x002fca                  ___addsf3
- .libm.divfs3     0x003084         0x84 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(divsf3.eo)
-                  0x003084                  ___divsf3
- .libm.eqsf2      0x003108          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(feqltle.eo)
-                  0x003108                  ___eqsf2
-                  0x003108                  ___ltsf2
-                  0x003108                  ___lesf2
- .libm.gtsf2      0x00310c          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fgtge.eo)
-                  0x00310c                  ___gesf2
-                  0x00310c                  ___gtsf2
- .libm.fixsfsi    0x003110         0x42 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fixsfsi.eo)
-                  0x003110                  _(float, int, long long, short, float, short, int)
+                  0x002fd6          0x2 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\liblega-pic30-elf.a(crt_start_mode_normal.Leo)
+                  0x002fd6                  __crt_start_mode
+                  0x002fd6                  __crt_start_mode_normal
+ .libm.subsf3     0x002fd8         0xbc c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(addsf3.eo)
+                  0x002fd8                  ___subsf3
+                  0x002fda                  ___addsf3
+ .libm.divfs3     0x003094         0x84 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(divsf3.eo)
+                  0x003094                  ___divsf3
+ .libm.eqsf2      0x003118          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(feqltle.eo)
+                  0x003118                  ___eqsf2
+                  0x003118                  ___ltsf2
+                  0x003118                  ___lesf2
+ .libm.gtsf2      0x00311c          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fgtge.eo)
+                  0x00311c                  ___gesf2
+                  0x00311c                  ___gtsf2
+ .libm.fixsfsi    0x003120         0x42 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fixsfsi.eo)
+                  0x003120                  _(float, int, long long, short, float, short, int)
  .libm.fixunssfsi
-                  0x003152         0x36 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fixunssfsi.eo)
-                  0x003152                  ___fixunssfsi
+                  0x003162         0x36 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fixunssfsi.eo)
+                  0x003162                  ___fixunssfsi
  .libm.floatsisf
-                  0x003188          0x6 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
-                  0x003188                  ___floatsisf
+                  0x003198          0x6 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatsisf.eo)
+                  0x003198                  ___floatsisf
  .libm.floatunsisf
-                  0x00318e          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
-                  0x00318e                  ___floatunsisf
- .libm.fpack      0x003192         0x4c c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fpack.eo)
-                  0x003192                  __fpack
- .libm.funpack    0x0031de         0x2a c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(funpack.eo)
-                  0x0031de                  __funpack
+                  0x00319e          0x4 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatunsisf.eo)
+                  0x00319e                  ___floatunsisf
+ .libm.fpack      0x0031a2         0x4c c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fpack.eo)
+                  0x0031a2                  __fpack
+ .libm.funpack    0x0031ee         0x2a c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(funpack.eo)
+                  0x0031ee                  __funpack
  .libm.funpack2
-                  0x003208         0x10 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(funpack2.eo)
-                  0x003208                  __funpack2
+                  0x003218         0x10 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(funpack2.eo)
+                  0x003218                  __funpack2
  .libm.fPropagateNaN
-                  0x003218         0x12 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x003218                  __fPropagateNaN
+                  0x003228         0x12 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x003228                  __fPropagateNaN
  .libm.fbobExit
-                  0x00322a          0x8 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x00322a                  __fbopExit
+                  0x00323a          0x8 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x00323a                  __fbopExit
  .libm.fbopReturnNaN
-                  0x003232          0x6 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
-                  0x003232                  __fbopReturnNaN
- .libm.mulsf3     0x003238         0x68 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
-                  0x003238                  ___mulsf3
+                  0x003242          0x6 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(futil.eo)
+                  0x003242                  __fbopReturnNaN
+ .libm.mulsf3     0x003248         0x68 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(mulsf3.eo)
+                  0x003248                  ___mulsf3
  .libm.fcompare
-                  0x0032a0         0x36 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fcompare.eo)
-                  0x0032a0                  __fcompare
+                  0x0032b0         0x36 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(fcompare.eo)
+                  0x0032b0                  __fcompare
  .libm.floatdisf
-                  0x0032d6         0x20 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
-                  0x0032d6                  ___floatdisf
+                  0x0032e6         0x20 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatdisf.eo)
+                  0x0032e6                  ___floatdisf
  .libm.floatundisf
-                  0x0032f6         0x5e c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
-                  0x0032f6                  ___floatundisf
+                  0x003306         0x5e c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
+                  0x003306                  ___floatundisf
 
 usercode
  *(usercode)
@@ -982,26 +972,26 @@ userdata
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x64d3
+.debug_info       0x000000       0x6475
  *(.debug_info)
- .debug_info      0x000000       0x64d3 build/default/production/main.o
+ .debug_info      0x000000       0x6475 build/default/production/main.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0x269
+.debug_abbrev     0x000000        0x254
  *(.debug_abbrev)
- .debug_abbrev    0x000000        0x269 build/default/production/main.o
+ .debug_abbrev    0x000000        0x254 build/default/production/main.o
 
-.debug_line       0x000000        0x88e
+.debug_line       0x000000        0x891
  *(.debug_line)
- .debug_line      0x000000        0x88e build/default/production/main.o
+ .debug_line      0x000000        0x891 build/default/production/main.o
 
 .debug_frame      0x000000        0xc22
  *(.debug_frame)
  .debug_frame     0x000000        0xc22 build/default/production/main.o
 
-.debug_str        0x000000        0x53e
+.debug_str        0x000000        0x50e
  *(.debug_str)
- .debug_str       0x000000        0x53e build/default/production/main.o
+ .debug_str       0x000000        0x50e build/default/production/main.o
 
 .debug_loc
  *(.debug_loc)
@@ -1010,10 +1000,10 @@ userdata
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0xe45
+                  0x000000        0xdf5
  *(.debug_pubnames)
  .debug_pubnames
-                  0x000000        0xe45 build/default/production/main.o
+                  0x000000        0xdf5 build/default/production/main.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -1573,8 +1563,8 @@ __c30_signature
  __c30_signature
                   0x00050e          0x6 c:/program files (x86)/microchip/xc16/v1.31/bin/bin/../../lib\libm-elf.a(floatundisf.eo)
 
-.nbss               0x0800        0x2c6
- .nbss              0x0800        0x2c6 build/default/production/main.o
+.nbss               0x0800        0x2c2
+ .nbss              0x0800        0x2c2 build/default/production/main.o
                     0x0800                  _sets
                     0x08d6                  _vars
                     0x0906                  _dsky
@@ -1586,99 +1576,94 @@ __c30_signature
                     0x0954                  _voltage_percentage
                     0x0958                  _current_compensate
                     0x095c                  _dischr_current
-                    0x0960                  _p_charge
-                    0x0962                  _wheelTime
-                    0x0966                  _analog_avg_cnt
-                    0x0968                  _avgVolt
-                    0x096c                  _avgCurnt
-                    0x0970                  _avgBTemp
-                    0x0974                  _avgMTemp
-                    0x0978                  _avgSTemp
-                    0x097c                  _avg_cnt
-                    0x097e                  _bt_crnt_avg_temp
-                    0x0982                  _bt_vltg_avg_temp
-                    0x0986                  _curnt_cal_stage
-                    0x0987                  _start_timer
-                    0x0988                  _diag_count
-                    0x0989                  _PowerOffTimer
-                    0x098a                  _cfg_space
-                    0x098b                  _vr_space
-                    0x098c                  _dsky_space
-                    0x098d                  _v_test
-                    0x098e                  _first_cal
-                    0x0990                  _PxPage
-                    0x0994                  _PxVtimer
-                    0x0996                  _output_power
-                    0x0998                  _charge_power
-                    0x099a                  _heat_power
-                    0x099c                  _COND
-                    0x099e                  _CONDbits
-                    0x09a0                  _STING
-                    0x09a2                  _STINGbits
-                    0x09a3                  _CMD_buff
-                    0x09ae                  _CMD_Point
-                    0x09b2                  _cmdRDY
-                    0x09b4                  _cmdOVFL
-                    0x09b6                  _Terr
-                    0x09b8                  _bufsize
-                    0x09ba                  _nibble
-                    0x09c2                  _float_out
-                    0x09d0                  _Buff_count
-                    0x09d2                  _Buff_index
-                    0x09d6                  _Buffer
-                    0x0a4e                  _StempIndex
-                    0x0a52                  _FtempIndex
-                    0x0a56                  _config_space
-                    0x0a58                  _tx_float
-                    0x0a60                  _tx_temp
-                    0x0a62                  _portBSY
-                    0x0a64                  _writingbuff
-                    0x0a66                  _dynaSpace
-                    0x0a68                  _tempPoint
-                    0x0a6c                  _flt_index
-                    0x0a70                  _upperMem
-                    0x0a72                  _printSets
-                    0x0a74                  _eRead
-                    0x0a76                  _offset
-                    0x0a78                  _address
-                    0x0a7a                  _flash_chksum
-                    0x0a7c                  _rom_chksum
-                    0x0a7e                  _nvSets_chksum
-                    0x0a80                  _ramSets_chksum
-                    0x0a82                  _ramSets_chksum_old
-                    0x0a84                  _check_timer
-                    0x0a86                  _ram_err_count
-                    0x0a88                  _heat_set
-                    0x0a8a                  _oc_shutdown_timer
-                    0x0a8c                  _shutdown_timer
-                    0x0a8e                  _dischrg_current
-                    0x0a92                  _chrg_current
-                    0x0a96                  _dischrg_read
-                    0x0a9a                  _analog_smpl_time
-                    0x0a9e                  _crnt_error
-                    0x0aa2                  _crnt_integral
-                    0x0aa6                  _current_output
-                    0x0aaa                  _voltage_output
-                    0x0aae                  _temp_dischrg_rate
-                    0x0ab2                  _temp_chrg_rate
-                    0x0ab6                  _max_chrg_current
-                    0x0aba                  _percentOut
-                    0x0abe                  _chrg_remaining
-                    0x0ac2                  _chrg_check
+                    0x0960                  _wheelTime
+                    0x0964                  _avgVolt
+                    0x0968                  _avgCurnt
+                    0x096c                  _avgBTemp
+                    0x0970                  _avgMTemp
+                    0x0974                  _avgSTemp
+                    0x0978                  _bt_crnt_avg_temp
+                    0x097c                  _bt_vltg_avg_temp
+                    0x0980                  _p_charge
+                    0x0981                  _avg_cnt
+                    0x0982                  _analog_avg_cnt
+                    0x0983                  _curnt_cal_stage
+                    0x0984                  _start_timer
+                    0x0985                  _diag_count
+                    0x0986                  _PowerOffTimer
+                    0x0987                  _cfg_space
+                    0x0988                  _vr_space
+                    0x0989                  _dsky_space
+                    0x098a                  _v_test
+                    0x098b                  _first_cal
+                    0x098c                  _output_power
+                    0x098e                  _charge_power
+                    0x0990                  _heat_power
+                    0x0992                  _COND
+                    0x0994                  _CONDbits
+                    0x0996                  _STING
+                    0x0998                  _STINGbits
+                    0x099a                  _tx_float
+                    0x09a2                  _CMD_Point
+                    0x09a6                  _Buff_index
+                    0x09aa                  _StempIndex
+                    0x09ae                  _FtempIndex
+                    0x09b2                  _CMD_buff
+                    0x09bc                  _cmdRDY
+                    0x09be                  _cmdOVFL
+                    0x09c0                  _Terr
+                    0x09c2                  _bufsize
+                    0x09c4                  _nibble
+                    0x09cc                  _float_out
+                    0x09da                  _Buff_count
+                    0x09dc                  _Buffer
+                    0x0a54                  _config_space
+                    0x0a56                  _tx_temp
+                    0x0a58                  _portBSY
+                    0x0a5a                  _writingbuff
+                    0x0a5c                  _dynaSpace
+                    0x0a5e                  _tempPoint
+                    0x0a62                  _flt_index
+                    0x0a66                  _PxPage
+                    0x0a6a                  _PxVtimer
+                    0x0a6c                  _upperMem
+                    0x0a6e                  _printSets
+                    0x0a70                  _eRead
+                    0x0a72                  _offset
+                    0x0a74                  _address
+                    0x0a76                  _flash_chksum
+                    0x0a78                  _rom_chksum
+                    0x0a7a                  _nvSets_chksum
+                    0x0a7c                  _ramSets_chksum
+                    0x0a7e                  _ramSets_chksum_old
+                    0x0a80                  _check_timer
+                    0x0a82                  _ram_err_count
+                    0x0a84                  _heat_set
+                    0x0a86                  _oc_shutdown_timer
+                    0x0a88                  _shutdown_timer
+                    0x0a8a                  _dischrg_current
+                    0x0a8e                  _chrg_current
+                    0x0a92                  _dischrg_read
+                    0x0a96                  _analog_smpl_time
+                    0x0a9a                  _crnt_error
+                    0x0a9e                  _crnt_integral
+                    0x0aa2                  _current_output
+                    0x0aa6                  _voltage_output
+                    0x0aaa                  _temp_dischrg_rate
+                    0x0aae                  _temp_chrg_rate
+                    0x0ab2                  _max_chrg_current
+                    0x0ab6                  _percentOut
+                    0x0aba                  _chrg_remaining
+                    0x0abe                  _chrg_check
 
-.ndata              0x0ac6         0x1c
- .ndata             0x0ac6         0x1c build/default/production/main.o
-                    0x0ac6                  _BAUD1
-                    0x0aca                  _BAUD2
-                    0x0ace                  _heat_rly_timer
-                    0x0acf                  _contact_rly_timer
-                    0x0ad0                  _chrg_rly_timer
-                    0x0ad1                  _power_session
-                    0x0ad2                  _PowerOffTimerSec
-                    0x0ad3                  _Lecho
-                    0x0ad6                  _crnt_proportion
-                    0x0ada                  _vltg_proportion
-                    0x0ade                  _temp_proportion
+.ndata              0x0ac2          0x8
+ .ndata             0x0ac2          0x8 build/default/production/main.o
+                    0x0ac2                  _heat_rly_timer
+                    0x0ac3                  _contact_rly_timer
+                    0x0ac4                  _chrg_rly_timer
+                    0x0ac5                  _power_session
+                    0x0ac6                  _PowerOffTimerSec
+                    0x0ac7                  _Lecho
 
 .config_ICS       0xf8000c          0x2
  .config_ICS      0xf8000c          0x2 build/default/production/main.o
@@ -1784,70 +1769,70 @@ __c30_signature
  .ivt._ReservedTrap7
                   0x000012          0x2 build/default/production/main.o
 
-.const              0xb354        0x366 load address 0x003354  
- .const             0xb354        0x366 build/default/production/main.o
-                    0xb354                  _VSPC
-                    0xb356                  _V01
-                    0xb35a                  _V02
-                    0xb35c                  _V03
-                    0xb35e                  _V04
-                    0xb361                  _V05
-                    0xb364                  _V06
-                    0xb368                  _V07
-                    0xb36b                  _V08
-                    0xb36d                  _V09
-                    0xb36f                  _V0A
-                    0xb371                  _V0D
-                    0xb375                  _V0E
-                    0xb378                  _Vlookup
-                    0xb396                  _code01
-                    0xb3a5                  _code02
-                    0xb3b8                  _code03
-                    0xb3c7                  _code04
-                    0xb3d0                  _code05
-                    0xb3db                  _code06
-                    0xb3e3                  _code07
-                    0xb3eb                  _code08
-                    0xb3f3                  _code09
-                    0xb3fb                  _code0A
-                    0xb403                  _code0B
-                    0xb410                  _code0C
-                    0xb418                  _code0D
-                    0xb421                  _code0E
-                    0xb42a                  _code0F
-                    0xb432                  _code10
-                    0xb43a                  _code11
-                    0xb440                  _code12
-                    0xb447                  _code13
-                    0xb44e                  _code14
-                    0xb456                  _code15
-                    0xb45f                  _code16
-                    0xb470                  _code17
-                    0xb479                  _code18
-                    0xb48a                  _code19
-                    0xb494                  _code1A
-                    0xb4a1                  _code1B
-                    0xb4ae                  _code1C
-                    0xb4b8                  _code1D
-                    0xb4be                  _code1E
-                    0xb4c4                  _code1F
-                    0xb4ca                  _code20
-                    0xb4d0                  _code21
-                    0xb4d6                  _code22
-                    0xb4dc                  _code23
-                    0xb4e3                  _code24
-                    0xb4ea                  _code25
-                    0xb4f0                  _code26
-                    0xb4f6                  _code27
-                    0xb504                  _code28
-                    0xb512                  _code29
-                    0xb522                  _code2A
-                    0xb533                  _code2B
-                    0xb543                  _code2C
-                    0xb55a                  _code2D
-                    0xb565                  _code2E
-                    0xb570                  _codeDefault
-                    0xb578                  _errArray
+.const              0xb364        0x364 load address 0x003364  
+ .const             0xb364        0x364 build/default/production/main.o
+                    0xb364                  _VSPC
+                    0xb366                  _V01
+                    0xb36a                  _V02
+                    0xb36c                  _V03
+                    0xb36e                  _V04
+                    0xb371                  _V05
+                    0xb374                  _V06
+                    0xb378                  _V07
+                    0xb37b                  _V08
+                    0xb37d                  _V09
+                    0xb37f                  _V0A
+                    0xb381                  _V0D
+                    0xb385                  _V0E
+                    0xb388                  _Vlookup
+                    0xb3a6                  _code01
+                    0xb3b7                  _code02
+                    0xb3ca                  _code03
+                    0xb3db                  _code04
+                    0xb3e4                  _code05
+                    0xb3ef                  _code06
+                    0xb3f7                  _code07
+                    0xb3ff                  _code08
+                    0xb407                  _code09
+                    0xb40f                  _code0A
+                    0xb417                  _code0B
+                    0xb424                  _code0C
+                    0xb42c                  _code0D
+                    0xb435                  _code0E
+                    0xb43e                  _code0F
+                    0xb446                  _code10
+                    0xb44e                  _code11
+                    0xb454                  _code12
+                    0xb45b                  _code13
+                    0xb462                  _code14
+                    0xb46a                  _code15
+                    0xb473                  _code16
+                    0xb47e                  _code17
+                    0xb487                  _code18
+                    0xb498                  _code19
+                    0xb4a2                  _code1A
+                    0xb4af                  _code1B
+                    0xb4bc                  _code1C
+                    0xb4c8                  _code1D
+                    0xb4ce                  _code1E
+                    0xb4d4                  _code1F
+                    0xb4da                  _code20
+                    0xb4e0                  _code21
+                    0xb4e6                  _code22
+                    0xb4ec                  _code23
+                    0xb4f3                  _code24
+                    0xb4fa                  _code25
+                    0xb500                  _code26
+                    0xb506                  _code27
+                    0xb514                  _code28
+                    0xb522                  _code29
+                    0xb532                  _code2A
+                    0xb543                  _code2B
+                    0xb553                  _code2C
+                    0xb56a                  _code2D
+                    0xb574                  _code2E
+                    0xb57e                  _codeDefault
+                    0xb586                  _errArray
 
-.dinit            0x0036ba         0x22
- .dinit           0x0036ba         0x22 data_init
+.dinit            0x0036c8         0x14
+ .dinit           0x0036c8         0x14 data_init

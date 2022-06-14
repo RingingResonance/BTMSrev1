@@ -24,6 +24,8 @@ void pageOut(int, int);
 
 int tempPoint[2] = {0,0};
 int flt_index[2] = {0,0};
+unsigned int PxPage[2];
+char PxVtimer[2];
 
 #endif	/* DATAIO_H */
 

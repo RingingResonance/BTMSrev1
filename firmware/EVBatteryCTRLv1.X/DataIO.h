@@ -30,24 +30,17 @@ extern void copy_string(char*, int);
 extern void dispatch_Serial(int);
 extern char four_bit_hex_cnvt(int);
 extern void Buffrst(int);
+extern void BuffNull(int);
 void load_hex(int, int);
 
 //Serial port stuff
 #define Clength 4   //Command Buff Length - 1
 float tx_float[2] = {0,0};
-unsigned int CMD_Point[2] = {0,0};  //Command Pointer
-unsigned int Buff_index[2] = {0,0};
-unsigned int StempIndex[2] = {0,0};
-unsigned int FtempIndex[2] = {0,0};
-char CMD_buff[2][5];              //Command Buffer
-char cmdRDY[2] = {0,0};
-char cmdOVFL[2] = {0,0};
-char Lecho[2] = {1,1};              //Local echo is on by default
-char Terr[2] = {0,0};
-char bufsize[2] = {0,0};
+unsigned int Buff_index[2];
+unsigned int StempIndex[2];
+unsigned int FtempIndex[2];
 char nibble[2][4];
 char float_out[2][7];
-char Buff_count[2] = {0,0};
 char Buffer[2][bfsize];
 char config_space[2] = {0,0};
 char tx_temp[2] = {0,0};

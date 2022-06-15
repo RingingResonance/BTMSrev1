@@ -36,18 +36,22 @@ void temperatureCalc(void){
     dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining) 
     * Temperature_I_Calc(sets.dischrg_min_temp, sets.dischrg_reduce_low_temp, sets.dischrg_max_temp, sets.dischrg_reduce_high_temp);
     if(dischrg_current < sets.limp_current) dischrg_current = sets.limp_current;
-
     //Calculate max charge current based off battery temp and battery remaining.
     chrg_remaining = (vars.battery_capacity - vars.battery_remaining);
     if(chrg_remaining < 0.2) chrg_remaining = 0.2;  //Minimum charge current is 0.2 * charge C rating.
     chrg_current = (sets.chrg_C_rating * chrg_remaining) 
     * Temperature_I_Calc(sets.chrg_min_temp, sets.chrg_reduce_low_temp, sets.chrg_max_temp, sets.chrg_reduce_high_temp);
-
 }
 
 void outputReg(void){
     ////Check for key power or command power signal, but not soft power signal.
     if((keySwitch || CONDbits.cmd_power)){
+        //Turn cmd_power off if keySwitch is turned on then off.
+        if(keySwitch)STINGbits.sw_off = on;
+        else if (!keySwitch && STINGbits.sw_off){
+            CONDbits.cmd_power = off;
+            STINGbits.sw_off = off;
+        }
         ctRelay = on;          //contactor relay on, but only if fault shutdown is 0
         AUXrelay = on;         //Turn on AUX 
         if(contact_rly_timer == 3)
@@ -125,7 +129,7 @@ void chargeReg(void){
             STINGbits.fault_shutdown = yes;
             chrg_check = clear;
             chrgRelay = off;          //charger relay off. Don't waste power on a relay that is doing nothing.
-            //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current.
+            //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current or it's voltage is below the battery's voltage.
         }
         else if(chrg_check > 0) chrg_check--;
         
@@ -137,7 +141,7 @@ void chargeReg(void){
 
         //Regulate the charger input.
         if(!chrg_rly_timer){
-            // Charge regulation routine. Clean this up, it needs to use integral math for regulation!!!
+            // Charge regulation routine. Clean this up, it needs to use integral math for regulation.
             if(((charge_power > 0) && (dsky.battery_voltage >= (dsky.chrg_voltage))) || 
             (dsky.battery_current > (chrg_current + 0.02)))charge_power--;
             else if(((charge_power < 101) && (dsky.battery_voltage < dsky.chrg_voltage - 0.07)) || 

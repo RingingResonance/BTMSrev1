@@ -21,12 +21,12 @@
 #include "DataIO.h"
 
 void Buffrst(int serial_port){
-    if (Buff_index[serial_port] >= Buff_count[serial_port]){
-            Buff_index[serial_port] = 0;
-            Buff_count[serial_port] = 0;
-            portBSY[serial_port] = 0;//Inhibits writing to buffer while the serial port is transmitting buffer.
-        }
+    if (Buffer[serial_port][Buff_index[serial_port]] == NULL){
+        Buff_index[serial_port] = clear;
+        portBSY[serial_port] = clear;  //Inhibits writing to buffer while the serial port is transmitting buffer.
+    }
 }
+
 //*************************************************************************************************
 //Converts four bit hex numbers to ASCII
 char four_bit_hex_cnvt(int numb){
@@ -47,7 +47,7 @@ void port_check(int serial_port){
     //Check if valid port has been selected.
     if (serial_port > 0x01){
         fault_log(0x1A);        //Log invalid port error.
-        FtempIndex[serial_port] = 0;
+        FtempIndex[serial_port] = clear;
         return;
     }
     //check if port is busy sending data.
@@ -71,43 +71,42 @@ void load_hex(int numb, int serial_port){
     nibble[serial_port][1] = (numb & 0x0F00)/256;
     nibble[serial_port][2] = (numb & 0x00F0)/16;
     nibble[serial_port][3] = (numb & 0x000F);
-    writingbuff[serial_port] = 1;
+    writingbuff[serial_port] = yes;
     Buffer[serial_port][Buff_index[serial_port]] = '0';
-    Buff_index[serial_port]++;
+    if (Buff_index[serial_port] < bfsize-1)Buff_index[serial_port]++;
     Buffer[serial_port][Buff_index[serial_port]] = 'x';
-    Buff_index[serial_port]++;
+    if (Buff_index[serial_port] < bfsize-1)Buff_index[serial_port]++;
     int x;
     for(x=0;x<4;x++){
         Buffer[serial_port][Buff_index[serial_port]] = four_bit_hex_cnvt(nibble[serial_port][x]);
         if (Buff_index[serial_port] < bfsize-1)
             Buff_index[serial_port]++;
     }
-    Buff_count[serial_port] = Buff_index[serial_port];
-    writingbuff[serial_port] = 0;
+    writingbuff[serial_port] = no;
 }
 //Start the data transfer from one of the buffers to the selected serial port
 //Dispatch the data in the buffers to the display by creating a TX IRQ
 void dispatch_Serial(int serial_port){
-    if(portBSY[serial_port])return;             //If port it busy, don't dispatch a second time.
-    portBSY[serial_port] = 1;
-    Buff_index[serial_port] = 0;                //Start Index at 0.
-    if(serial_port) IFS1bits.U2TXIF = 1;        //Start transmitting by manually sending an IRQ.
-    else IFS0bits.U1TXIF = 1;                   //Start transmitting by manually sending an IRQ.
+    if(portBSY[serial_port])return;             //If port is busy, don't dispatch a second time.
+    portBSY[serial_port] = yes;                 //Tell everyone else that port is now busy.
+    Buffer[serial_port][Buff_index[serial_port]] = NULL;   //Put NULL char at end of string.
+    Buff_index[serial_port] = clear;               //Start Index at 0.
+    if(serial_port) IFS1bits.U2TXIF = set;        //Start transmitting by manually sending an IRQ.
+    else IFS0bits.U1TXIF = set;                   //Start transmitting by manually sending an IRQ.
 }
 
 //Send a string of text to a buffer that can then be dispatched to a serial port.
 void load_string(const char *string_point, int serial_port){
     port_check(serial_port);
-    writingbuff[serial_port] = 1;
-    StempIndex[serial_port] = 0;
-    while (string_point[StempIndex[serial_port]] != 0){
+    writingbuff[serial_port] = yes;
+    StempIndex[serial_port] = clear;
+    while (string_point[StempIndex[serial_port]]){
         Buffer[serial_port][Buff_index[serial_port]] = string_point[StempIndex[serial_port]];
         if (Buff_index[serial_port] < bfsize-1)
             Buff_index[serial_port]++;
         StempIndex[serial_port]++;
     }
-    Buff_count[serial_port] = Buff_index[serial_port];
-    writingbuff[serial_port] = 0;
+    writingbuff[serial_port] = no;
 }
 
 //Copy float data to buffer.
@@ -181,18 +180,14 @@ void load_float(float f_data, int serial_port){
         }
     }
     config_space[serial_port] = 0;
-    Buff_count[serial_port] = Buff_index[serial_port];
     writingbuff[serial_port] = 0;
 }
 
 unsigned int BaudCalc(double BD, double mlt){
     /* Calculate baud rate. */
-    double INS;
-    double OutPut;
-    unsigned int Oputs;
-    INS = mlt * 1000000;
-    OutPut = ((INS/BD)/16)-1;
-    Oputs = OutPut;
+    double INS = mlt * 1000000;
+    double OutPut = ((INS/BD)/16)-1;
+    unsigned int Oputs = OutPut;
     return Oputs;             //Weird things happen when you try to calculate
                               //a float directly into an int. Don't do this.
     /************************/

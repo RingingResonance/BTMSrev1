@@ -66,24 +66,21 @@ void default_sets(void){
     sets.custom_data1[0] = 0x12; //Auto Return Off.
     sets.custom_data1[1] = 0x0E; //Cursor Off.
     sets.custom_data1[2] = 0x16; //Cursor Home.
-    sets.custom_data1[3] = 0x00; //NULL terminator.
-    sets.custom_data2[0] = 0x0A; //Newline.
-    sets.custom_data2[1] = 0x0D; //Return.
-    sets.custom_data2[2] = 0x00; //NULL terminator.
+    sets.custom_data1[3] = NULL; //NULL terminator.
     sets.page[PORT2][0][0] = 0xFC;  //Display Init
     sets.page[PORT2][0][1] = 3;  //V 6char
-    sets.page[PORT2][0][2] = 8;  //W 9char
+    sets.page[PORT2][0][2] = 8;  //W 7char
     sets.page[PORT2][0][3] = 9;  //BT 7char
-    sets.page[PORT2][0][4] = 0xFD; //NEWLINE + RETURN.
+    sets.page[PORT2][0][4] = 15; //NEWLINE + RETURN.
     sets.page[PORT2][0][5] = 2;  //%  6char
-    sets.page[PORT2][1][0] = 1;  //Speed 8char
-    sets.page[PORT2][1][1] = 0;  //NULL
+    sets.page[PORT2][1][0] = 1;  //Speed 6char
+    sets.page[PORT2][1][1] = NULL;  //NULL terminator
     sets.pageDelay[PORT2][0] = 0;
-    sets.pageDelay[PORT2][1] = 4;
+    sets.pageDelay[PORT2][1] = 4;   //0.5 seconds.
     sets.pageDelay[PORT2][2] = 0;
     sets.pageDelay[PORT2][3] = 0;
-    sets.PxVenable[PORT1] = 0;         //Port 1 display out is disabled by default.
-    sets.PxVenable[PORT2] = 1;         //Port 2 display out is enabled by default.
+    sets.PxVenable[PORT1] = off;         //Port 1 display out is disabled by default.
+    sets.PxVenable[PORT2] = on;         //Port 2 display out is enabled by default.
     sets.testBYTE = 0x3335;
     vars.testBYTE = 0x46;
     ram_chksum_update();        //Generate new checksum.
@@ -111,11 +108,17 @@ void configure_IO(void){
     OSCCONbits.OSWEN = 1;
     OSCCONbits.LPOSCEN = 0;
     /**************************/
+    //Disable IRQ on change
+    CNEN1 = 0;
+    CNEN2 = 0;
+    //Disable IRQ on change pullups
+    CNPU1 = 0;
+    CNPU2 = 0;
     /**************************/
     /* General 1 IO */
     GENERAL1_TRIS = 0x0000;
     GENERAL1_LAT = 0;
-    GENERAL1_TRIS = 0; 
+    GENERAL1_PORT = 0;
     /**************************/
     /* PWM outputs and charge detect input. */
     PWM_TRIS = 0xFFEF; //set porte to all inputs except RE4
@@ -125,7 +128,7 @@ void configure_IO(void){
     /* General 2 IO */
     GENERAL2_TRIS = 0xFFBE;
     GENERAL2_LAT = 0;
-    GENERAL2_TRIS = 0; 
+    GENERAL2_PORT = 0;
 /*****************************/
 /* Configure PWM */
 /*****************************/
@@ -230,13 +233,13 @@ void configure_IO(void){
     IPC1bits.T2IP = 6;      //0.125 second IRQ for some math timing, Greater priority.
     IPC4bits.INT1IP = 5;    //Wheel rotate IRQ, timing is somewhat important.
     IPC0bits.T1IP = 4;      //Heartbeat IRQ, eh, not terribly important.
-    IPC0bits.INT0IP = 3;    //Charger detect IRQ, only for waking up the system.
+    IPC5bits.T5IP = 4;      //0.125 Sec Non-critical. Used for HUD, not important for system functionality.
     IPC2bits.U1TXIP = 3;    //TX 1 IRQ, Text can wait
     IPC6bits.U2TXIP = 3;    //TX 2 IRQ, Text can wait
     IPC2bits.U1RXIP = 2;    //RX 1 IRQ, Text can wait
     IPC6bits.U2RXIP = 2;    //RX 2 IRQ, Text can wait
     IPC1bits.T3IP = 2;      //Timer 3 IRQ for wheel rotate timeout. Not critical.
-    IPC5bits.T5IP = 2;      //0.125 Sec Non-critical. Used for HUD, not important for system functionality.
+    IPC0bits.INT0IP = 1;    //Charger detect IRQ, only for waking up the system.
     IPC5bits.T4IP = 1;      //1 Sec Checksum timer IRQ, CPU intensive and other's need more priority.
     IPC5bits.INT2IP = 1;    //Not yet used.
 }

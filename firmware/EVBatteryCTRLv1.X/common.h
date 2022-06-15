@@ -112,8 +112,9 @@ const char V09[] = "A";
 const char V0A[] = "C";
 const char V0D[] = "PWA";
 const char V0E[] = "AA";
+const char V0F[] = "\n\r";  //Newline + Return
 
-const char * const Vlookup[] = {VSPC,V01,V02,V03,V04,V05,V06,V07,V08,V09,V0A,V0A,V0A,V0D,V0E};
+const char * const Vlookup[] = {VSPC,V01,V02,V03,V04,V05,V06,V07,V08,V09,V0A,V0A,V0A,V0D,V0E,V0F};
 
 //Variables that can be sent out the serial port.
 struct dskyvars{
@@ -126,7 +127,7 @@ struct dskyvars{
     float   peak_power;             //5: 7char 00.0PW Peak output power
     float   peak_pwr_vlts;          //6: 8char 00.0PWV Voltage at peak output power
     float   battery_vltg_average;   //7: 7char 00.0AV Battery average voltage
-    float   watts;                  //8: 9char -0000W watts in or out of battery.
+    float   watts;                  //8: 7char -0000W watts in or out of battery.
     float   battery_current;        //9: 7char -00.0A Battery charge/discharge current
     float   battery_temp;           //A: 7char -00.0C Battery Temperature
     float   my_temp;                //B: 7char -00.0C Controller board Temperature
@@ -134,7 +135,7 @@ struct dskyvars{
     float   peak_pwr_crnt;          //D: 9char -00.0PWA Current at peak output power
     float   battery_crnt_average;   //E: 8char -00.0AA Battery charge/discharge average current
 }dsky;
-#define varLimit 0x000E
+#define varLimit 0x000F
 
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
@@ -148,14 +149,13 @@ float voltage_percentage;     //Battery Open Circuit Voltage Percentage.
 float current_compensate;     //Current compensation.
 float dischr_current = 0;
 float wheelTime = 0;       //Time it takes for a single rotation of the wheel.
-float avgVolt = 0;    //averaged voltage input
+float avgVolt = 0;     //averaged voltage input
 float avgCurnt = 0;    //averaged current input
 float avgBTemp = 0;    //averaged battery temperature
 float avgMTemp = 0;    //averaged motor temperature
 float avgSTemp = 0;    //averaged self temperature
 float bt_crnt_avg_temp = 0;
 float bt_vltg_avg_temp = 0;
-char p_charge = 0;
 char avg_cnt = 0;
 char analog_avg_cnt = 0;
 char heat_rly_timer = 3;     //3 is resting, setting to 2 starts the countdown, 0 = relay is ready
@@ -215,6 +215,8 @@ typedef struct tagSTINGBITS {
   unsigned init_done:1;
   unsigned fault_shutdown:1; //General shutdown event.
   unsigned osc_fail_event:1;
+  unsigned p_charge:1;
+  unsigned sw_off:1;
 } STINGBITS;
 volatile STINGBITS STINGbits;
 

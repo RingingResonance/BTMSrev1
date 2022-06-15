@@ -37,13 +37,13 @@ void chargeDetect(void){
         //If parial_charge is set to 0% then we disable and charge the battery up to full every time.
         if(sets.partial_charge == 0){
             dsky.chrg_voltage = sets.battery_rated_voltage;
-            p_charge = 0;
+            STINGbits.p_charge = 0;
         }
         //Do a full charge every 10 cycles so that we can ballance the cells.
         //Need to make this configure-able by the user at runtime.
         if(vars.partial_chrg_cnt < 10){
             vars.partial_chrg_cnt++;
-            p_charge = 1;
+            STINGbits.p_charge = 1;
             dsky.chrg_voltage = ((sets.battery_rated_voltage - sets.dischrg_voltage) * sets.partial_charge) + sets.dischrg_voltage;
             //If partial charge is less than the open circuit voltage of the battery
             //then set partial charge voltage to just above the open circuit voltage
@@ -52,9 +52,10 @@ void chargeDetect(void){
             //If it ends up being higher than battery max charge voltage then clamp it.
             if(dsky.chrg_voltage > sets.battery_rated_voltage) dsky.chrg_voltage = sets.battery_rated_voltage;
         }
+        //Do full charge.
         else if(vars.partial_chrg_cnt >= 10){
             vars.partial_chrg_cnt = 0;
-            p_charge = 0;
+            STINGbits.p_charge = 0;
             dsky.chrg_voltage = sets.battery_rated_voltage;
         }
 

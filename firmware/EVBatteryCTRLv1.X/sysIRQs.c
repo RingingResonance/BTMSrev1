@@ -272,13 +272,11 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     if(vars.battery_remaining < 0) vars.battery_remaining = 0;
     //*******************************************
     //Don't let battery_remaining go above battery capacity.
-    //Go slightly above. Just slightly.
-    if(vars.battery_remaining > vars.battery_capacity + 0.005) vars.battery_remaining = vars.battery_capacity + 0.005;
+    if(vars.battery_remaining > vars.battery_capacity) vars.battery_remaining = vars.battery_capacity;
     //Don't let 'battery_remaining' go above the partial charge percentage when partial charging.
     //To Do: This isn't exactly right because, for example, ~90% Voltage != ~90% total capacity!!! 
     //It's only a few % off so for now it's okay. Will implement real voltage curve calculation later.
-    if(dsky.battery_voltage < (sets.partial_charge * sets.battery_rated_voltage) 
-    && p_charge && vars.battery_remaining > (vars.battery_capacity * sets.partial_charge))
+    if(STINGbits.p_charge && (vars.battery_remaining > (vars.battery_capacity * sets.partial_charge)))
         vars.battery_remaining = (vars.battery_capacity * sets.partial_charge);
     //**************************************************
     //Circuit draw compensation.

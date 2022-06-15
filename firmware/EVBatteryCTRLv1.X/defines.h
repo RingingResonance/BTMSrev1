@@ -76,7 +76,11 @@
 #define no 0
 #define on 1
 #define off 0
+#define set 1
 #define clear 0
+#define NULL 0
+#define input 1
+#define output 0
 
 //Heater calibration
 #define notrun 0

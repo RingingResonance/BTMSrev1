@@ -22,6 +22,8 @@ extern void volt_percent(void);
 extern void reset_check(void);
 extern void power_off(void);
 extern float absFloat(float);
+extern void sysReady(void);
+extern void calcAnalog(void);
 
 /* NOTE: Try to keep memory usage below about 75% for the dsPIC30F3011 as the stack can use as much as 15% */
 /*****************************/
@@ -112,9 +114,10 @@ const char V09[] = "A";
 const char V0A[] = "C";
 const char V0D[] = "PWA";
 const char V0E[] = "AA";
-const char V0F[] = "\n\r";  //Newline + Return
+const char V0F[] = "OCV";
+const char V10[] = "\n\r";  //Newline + Return
 
-const char * const Vlookup[] = {VSPC,V01,V02,V03,V04,V05,V06,V07,V08,V09,V0A,V0A,V0A,V0D,V0E,V0F};
+const char * const Vlookup[] = {VSPC,V01,V02,V03,V04,V05,V06,V07,V08,V09,V0A,V0A,V0A,V0D,V0E,V0F,V10};
 
 //Variables that can be sent out the serial port.
 struct dskyvars{
@@ -134,8 +137,9 @@ struct dskyvars{
     float   motor_ctrl_temp;        //C: 7char -00.0C Motor or Motor controller Temperature
     float   peak_pwr_crnt;          //D: 9char -00.0PWA Current at peak output power
     float   battery_crnt_average;   //E: 8char -00.0AA Battery charge/discharge average current
+    float   open_voltage;           //F: 9char -00.0OCV Battery Open Circuit Voltage
 }dsky;
-#define varLimit 0x000F
+#define varLimit 0x0010
 
 // Calculated battery values. These don't need to be saved on shutdown.
 float   chrge_rate = 0;             //calculated charge rate based off temperature
@@ -144,7 +148,6 @@ int     ADCON3upper8 = 0;
 int     ADCON3lower8 = 0;
 /*****************************/
 /* General Vars */
-float open_voltage;           //Battery Open Circuit Voltage
 float voltage_percentage;     //Battery Open Circuit Voltage Percentage.
 float current_compensate;     //Current compensation.
 float dischr_current = 0;

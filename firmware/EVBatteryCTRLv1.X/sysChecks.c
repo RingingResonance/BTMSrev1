@@ -48,8 +48,8 @@ void chargeDetect(void){
             //If partial charge is less than the open circuit voltage of the battery
             //then set partial charge voltage to just above the open circuit voltage
             //so that we don't discharge the battery any while a charger is plugged in.
-            if(dsky.chrg_voltage < open_voltage && CONDbits.got_open_voltage) dsky.chrg_voltage = open_voltage + 0.01;
-            //If it ends up being higher than battery max charge voltage then clamp it.
+            if(dsky.chrg_voltage < dsky.open_voltage && CONDbits.got_open_voltage) dsky.chrg_voltage = dsky.open_voltage + 0.01;
+            //If it ends up being higher than battery rated voltage then clamp it.
             if(dsky.chrg_voltage > sets.battery_rated_voltage) dsky.chrg_voltage = sets.battery_rated_voltage;
         }
         //Do full charge.

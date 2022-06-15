@@ -38,105 +38,8 @@ void __attribute__((interrupt, no_auto_psv)) _INT0Interrupt (void){
 /* Analog Input IRQ */
 void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
     CPUact = on;
-    
-    /* I have left commented out code in this section for showing the process
-     * of converting analog inputs into voltages, currents, and temps.
-     */
     //Get 8 samples for averaging.
-    if (analog_avg_cnt >= 8){
-        //Battery current.
-        avgCurnt /= 8;      //Sample average.
-        avgCurnt -= 32768;    //Set zero point.
-        avgCurnt /= 32768;    //Convert to signed fractional. -1 to 1
-        avgCurnt *= 2.5;      //Convert to +-2.5'volts'. It's still a 0 - 5 volt signal on the analog input. The zero point is at 2.5v
-        dsky.battery_current = (avgCurnt / 0.04) + current_compensate; //Offset for ACS780LLRTR-050B-T Current Sensor.
-        currentCheck();     //Check for over current condition.
-        avgCurnt = 0;       //Clear average.
-
-        //Battery voltage.
-        //avgVolt /= x;      //Sample average.
-        //avgVolt /= 65535;  //Convert to unsigned fractional
-        //avgVolt *= 5;      //Converted to 0 - 5V voltage.
-        //Do it all at once to save time.
-        avgVolt /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
-        dsky.battery_voltage = (avgVolt / vltg_dvid) + sets.bt_vlt_adjst;    //Use resistor divider values to covert to actual voltage.
-        avgVolt = 0;       //Clear average.
-
-        //Battery temperature.
-        //avgBTemp /= x;      //Sample average.
-        //avgBTemp /= 65535;  //Convert to unsigned fractional
-        //avgBTemp *= 5;      //Converted to 0 - 5V voltage.
-        //Do it all at once to save time.
-        avgBTemp /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
-        avgBTemp -= 0.48;   //Offset for LM62 temp sensor.
-        dsky.battery_temp = avgBTemp / 0.0156;    //Convert to Degrees C
-        avgBTemp = 0;       //Clear average.
-
-        //motor controller temperature.
-        //avgMTemp /= x;      //Sample average.
-        //avgMTemp /= 65535;  //Convert to unsigned fractional
-        //avgMTemp *= 5;      //Converted to 0 - 5V voltage.
-        //Do it all at once to save time.
-        avgMTemp /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
-        avgMTemp -= 0.48;   //Offset for LM62 temp sensor.
-        dsky.motor_ctrl_temp = avgMTemp / 0.0156;    //Convert to Degrees C
-        avgMTemp = 0;       //Clear average.
-
-        //Snowman's temperature.
-        //avgSTemp /= x;      //Sample average.
-        //avgSTemp /= 65535;  //Convert to unsigned fractional
-        //avgSTemp *= 5;      //Converted to 0 - 5V voltage.
-        //Do it all at once to save time.
-        avgSTemp /= 104856;   //(13107 * 8)Average and Convert to unsigned fractional, 0v - 5v
-        avgSTemp -= 0.48;   //Offset for LM62 temp sensor.
-        dsky.my_temp = avgSTemp / 0.0156;    //Convert to Degrees C
-        avgSTemp = 0;       //Clear average.
-        
-        //Copy board temp to battery temp and controller temp for now.
-        dsky.motor_ctrl_temp = dsky.my_temp;
-        
-        //Reset analog average count.
-        analog_avg_cnt = 0;
-
-        //Do a battery check after each valid sample.
-        //Check to make sure the battery and other systems are within safe operating conditions.
-        //Shutdown and log the reason why if they aren't safe.
-        if(STINGbits.adc_sample_burn && !STINGbits.fault_shutdown) explody_preventy_check();
-        
-        //Check to see if the system is ready to run.
-        //If there is a fault, keep it from running.
-        if(!STINGbits.deep_sleep && !STINGbits.fault_shutdown){
-            //do heater calibration 
-            if(vars.heat_cal_stage != disabled)heater_calibration();
-            //Do power regulation and heater control.
-            if((vars.heat_cal_stage > calibrating || !vars.heat_cal_stage) && CONDbits.main_power && first_cal == fCalReady){
-                outputReg();    //Output regulation routine
-                chargeReg();    //Charge input regulation routine
-                //Check for fault shutdown.
-                //If there was a fault, shut everything down as fast as possible.
-                //This seems redundant, but it isn't. 
-                //Shuts down a detected fault just after the regulation routine.
-                if(STINGbits.fault_shutdown)io_off();
-                else {
-                    //Set the PWM output to what the variables are during normal operation.
-                    PWMCON1bits.PEN3L = 1;  //Set PWM3 Low side to PWM output.
-                    heatPWM = heat_power;               //set heater control
-                    chrgPWM = charge_power;             //set charge control
-                    outPWM = output_power;             //set output control
-                }
-            }
-            else if (!CONDbits.main_power)io_off();
-        }
-        else io_off();
-        
-        //ADC sample burn check. Only burn once when main power is on.
-        if (!CONDbits.main_power && STINGbits.adc_sample_burn){
-            ADCON1bits.ADON = 0;    // turn ADC off to save power.
-            STINGbits.adc_sample_burn = no;      //Burn the first ADC sample on every power up of ADC.
-        }
-        else STINGbits.adc_sample_burn = yes;      //We have burned the first set.
-    }
-    else {
+    if (analog_avg_cnt < 8){
         //Force use of all 0's if we haven't burned the first ADC sample after a startup.
         //The ADC takes a moment to get correct values but it still sends the IRQs anyways.
         if (STINGbits.adc_sample_burn){
@@ -149,7 +52,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             analog_sanity();
         }
         else{
-            //Burn it to the ground.
+            //Burn the first average.
             avgVolt = 0;
             avgCurnt = 0;
             avgBTemp = 0;
@@ -157,6 +60,27 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             avgSTemp = 0;
         }
         analog_avg_cnt++;
+    }
+    else {
+        calcAnalog(); //Calculate analog inputs.
+        //Get open circuit voltage percentage if current is less than 0.1 amps
+        if(STINGbits.adc_sample_burn)volt_percent();
+        //Copy board temp to battery temp and controller temp for now.
+        dsky.motor_ctrl_temp = dsky.my_temp;
+        //Reset analog average count.
+        analog_avg_cnt = clear;
+        //Do a battery check after each valid sample.
+        //Check to make sure the battery and other systems are within safe operating conditions.
+        //Shutdown and log the reason why if they aren't safe.
+        if(STINGbits.adc_sample_burn && !STINGbits.fault_shutdown) explody_preventy_check();
+        //Check to see if the system is ready to run.
+        sysReady(); //If there is a fault, keep it from running.
+        //ADC sample burn check. Only burn once when main power is on.
+        if (!CONDbits.main_power && STINGbits.adc_sample_burn){
+            ADCON1bits.ADON = off;                // turn ADC off to save power.
+            STINGbits.adc_sample_burn = no;     //Burn the first ADC sample on every power up of ADC.
+        }
+        else STINGbits.adc_sample_burn = yes;      //We have burned the first set.
     } 
     //End IRQ
     IFS0bits.ADIF = 0;
@@ -165,6 +89,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
 /* Heartbeat IRQ, Once every Second. Lots of stuff goes on here. */
 void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     CPUact = on;
+    ADCON1bits.ADON = on;    // turn ADC on to get a sample.
     //Check for receive buffer overflow.
     if(U1STAbits.OERR){
         fault_log(0x2D);
@@ -180,17 +105,12 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         while(U2STAbits.URXDA)garbage = U2RXREG;
         U2STAbits.OERR = 0; //Clear the fault bit so that receiving can continue.
     }
-    ADCON1bits.ADON = on;    // turn ADC on to get a sample.
-    //Get open circuit voltage percentage if current is less than 0.1 amps
-    volt_percent();
-    //Calculate limit currents based on temperature.
-    temperatureCalc();
-    //Initial startup sequence and calibration.
-    initialCal();
     //Main power check
     main_power_check();
     //Charger plug-in check.
     chargeDetect();
+    //Calculate limit currents based on temperature.
+    temperatureCalc();
     /* Power off TIMER stuff. Do this to save power.
      * This is so that this system doesn't drain your 1000wh battery over the 
      * course of a couple weeks while being unplugged from a charger. 
@@ -220,7 +140,6 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         charge_power = 0;
         chrg_check = 0;
     }
-    
     //Fan control
     if(CONDbits.main_power && (dsky.battery_temp > sets.batt_fan_start 
     || dsky.my_temp > sets.ctrlr_fan_start || dsky.motor_ctrl_temp > sets.ctrlr_fan_start))fanRelay = 1;
@@ -276,7 +195,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     //Don't let 'battery_remaining' go above the partial charge percentage when partial charging.
     //To Do: This isn't exactly right because, for example, ~90% Voltage != ~90% total capacity!!! 
     //It's only a few % off so for now it's okay. Will implement real voltage curve calculation later.
-    if(STINGbits.p_charge && (vars.battery_remaining > (vars.battery_capacity * sets.partial_charge)))
+    if(STINGbits.p_charge && (vars.battery_remaining > (vars.battery_capacity * sets.partial_charge))
+    && dsky.battery_vltg_average <= (sets.battery_rated_voltage * sets.partial_charge))
         vars.battery_remaining = (vars.battery_capacity * sets.partial_charge);
     //**************************************************
     //Circuit draw compensation.
@@ -284,7 +204,9 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     if(!CONDbits.main_power) vars.battery_remaining -= (sets.circuit_draw * 0.0002777);
     //Calculate battery %
     dsky.chrg_percent = ((vars.battery_remaining / vars.battery_capacity) * 100);
-/****************************************/
+    /****************************************/
+    //Initial startup sequence and calibration.
+    initialCal();
     /* End the IRQ. */
 	IFS0bits.T1IF = 0;
 }

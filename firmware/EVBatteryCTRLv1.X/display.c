@@ -53,11 +53,11 @@ void pageOut(int pageNum, int serial_port){
             dodispatch[serial_port] = yes; //if we have at least one variable to display then dispatch.
         }
         else if(varNum[serial_port] <= varLimit){
-            if(varNum[serial_port] != 0x0F)load_float(dsky.dskyarrayFloat[varNum[serial_port]], serial_port);   //Load the number.
+            if(varNum[serial_port] != 0x10)load_float(dsky.dskyarrayFloat[varNum[serial_port]], serial_port);   //Load the number.
             Buff_index[serial_port] -= 2;  //Subtract 2 from buffer index.
             if(varNum[serial_port] == 1 || varNum[serial_port] == 8)Buff_index[serial_port] -= 2; //If Speed or Watts variable then remove decimal and last '0'
             load_string(Vlookup[varNum[serial_port]], serial_port);        //Load the number's text.
-            if(varNum[serial_port] != 0x0F)load_string(" ", serial_port);  //Load a space afterwards.
+            if(varNum[serial_port] != 0x10)load_string(" ", serial_port);  //Load a space afterwards.
             dodispatch[serial_port] = yes; //if we have at least one variable to display then dispatch.
         }
     }

@@ -70,11 +70,12 @@ void default_sets(void){
     sets.page[PORT2][0][0] = 0xFC;  //Display Init
     sets.page[PORT2][0][1] = 3;  //V 6char
     sets.page[PORT2][0][2] = 8;  //W 7char
-    sets.page[PORT2][0][3] = 9;  //BT 7char
-    sets.page[PORT2][0][4] = 15; //NEWLINE + RETURN.
-    sets.page[PORT2][0][5] = 2;  //%  6char
-    sets.page[PORT2][1][0] = 1;  //Speed 6char
-    sets.page[PORT2][1][1] = NULL;  //NULL terminator
+    sets.page[PORT2][0][3] = 10;  //BT 7char
+    sets.page[PORT2][0][4] = 16; //NEWLINE + RETURN.
+    sets.page[PORT2][0][5] = 2;  //% 6char
+    sets.page[PORT2][1][0] = 15;  //Open Circuit Voltage //Speed 6char
+    sets.page[PORT2][1][1] = 4;  //Charge Target Voltage 7char
+    sets.page[PORT2][1][2] = NULL;  //NULL terminator
     sets.pageDelay[PORT2][0] = 0;
     sets.pageDelay[PORT2][1] = 4;   //0.5 seconds.
     sets.pageDelay[PORT2][2] = 0;
@@ -97,9 +98,7 @@ void configure_IO(void){
     dsky.my_temp = 0;                //Controller board Temperature
     dsky.motor_ctrl_temp = 0;         //Motor or Motor controller Temperature
     dsky.battery_voltage = 0;        //Battery voltage
-    open_voltage = 0;           //Battery Open Circuit Voltage
     voltage_percentage = 0;     //Battery Voltage Percentage.
-    CONDbits.got_open_voltage = 0;
     dsky.battery_current = 0;        //Battery charge/discharge current
     
     /**************************/

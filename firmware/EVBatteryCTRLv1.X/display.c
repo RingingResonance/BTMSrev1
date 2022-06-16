@@ -119,6 +119,15 @@ void fault_read(int serial_port){
         }
     }
 }
+void get_mem(int serial_port){
+    int data = 0;
+    int addr = 0x00FF & CMD_buff[serial_port][1];   //Get raw 8 bit address data.
+    if(addr < cfg_space) data = sets.settingsArray[addr];
+    else if(addr < cfg_space + vr_space) data = vars.variablesArray[addr - cfg_space];
+    else if(addr < cfg_space + vr_space + dsky_space) data = dsky.dskyarray[addr - (cfg_space + vr_space)];
+    else data = 0xFFFF;
+    load_hex(data, serial_port);
+}
 
 void Command_Interp(int serial_port){
     //Get data. Get allll the data.
@@ -249,6 +258,9 @@ void Command_Interp(int serial_port){
             break;
             case '*':   //Print firmware version.
                 load_string(version, serial_port);
+            break;
+            case '!':
+                get_mem(serial_port); //Gets settings/vars memory address specified and sends back the result in raw.
             break;
             default:
                 if(Lecho[serial_port])load_string("Unknown Command.\n\r", serial_port);

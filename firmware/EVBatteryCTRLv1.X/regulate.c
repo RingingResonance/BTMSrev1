@@ -122,7 +122,7 @@ void chargeReg(void){
         if(chrg_rly_timer == 3)chrg_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
         //Charger timeout check. If charger is plugged in but we aren't getting current then we 
         //need to shutdown and log an error code so we don't run down the battery.
-        if(chrg_check < 10000 && dsky.battery_current < (chrg_current - 0.05) && !keySwitch && 
+        if(chrg_check < 10000 && dsky.battery_current < -0.01 && !keySwitch && 
         dsky.battery_voltage < (dsky.chrg_voltage - 0.05) && !heat_power) chrg_check++;
         else if(chrg_check >= 10000){
             fault_log(0x1B);            //Log insufficient current from charger.

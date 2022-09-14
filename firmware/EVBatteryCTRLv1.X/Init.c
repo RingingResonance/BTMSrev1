@@ -163,6 +163,7 @@ void configure_IO(void){
     U2BRG = BaudCalc(BAUD2, IPS);     //calculate the baud rate.
     //Default power up of UART should be 8n1
 /*****************************/
+//Timer configs at 58,960,000 hz
 /* Configure Timer 1 */
 /* Scan IO every second when KeySwitch is off. */
 /*****************************/
@@ -181,7 +182,7 @@ void configure_IO(void){
     PR2 = 0x383A;     //14,394
     TMR2 = 0x0000;
     T2CON = 0x0000;
-    T2CONbits.TCKPS = 2;        //1:64 prescale
+    T2CONbits.TCKPS = 2;  //1:64 prescale
 
 /*****************************/
 /* Configure Timer 3 */

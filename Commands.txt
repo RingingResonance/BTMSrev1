@@ -30,10 +30,6 @@ E - Local echo on.
 
 e - Local echo off.
 
-H - Test and turn automatic battery heater on.
-
-h - Turn automatic battery heater off.
-
 ~ - Reset Settings to default values stored in program memory.
 
 $ - Generate and Check Program Memory Checksum.

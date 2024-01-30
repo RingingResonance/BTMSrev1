@@ -1,18 +1,22 @@
-/*  Electric Vehicle Battery Monitoring System.>
-    Copyright (C) <2020>  <Jarrett R. Cigainero>
+/*Copyright (c) <2024> <Jarrett Cigainero>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>*/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
 
 #ifndef COMMON_H
 #define	COMMON_H
@@ -40,7 +44,7 @@ struct Settings{
     /*****************************/
     //Battery Ratings and setpoints
     float   partial_charge;             //Percentage of voltage to charge the battery up to. Set to 0 to disable.
-    float   max_battery_voltage;        //Max battery voltage before shutdown.     
+    float   max_battery_voltage;        //Max battery voltage before shutdown.
     float   battery_rated_voltage;      //Target max charge voltage
     float   dischrg_voltage;            //Minimum battery voltage
     float   low_voltage_shutdown;       //Battery Low Total Shutdown Voltage
@@ -165,7 +169,7 @@ char heat_rly_timer = 3;     //3 is resting, setting to 2 starts the countdown, 
 char contact_rly_timer = 3;
 char chrg_rly_timer = 3;
 char curnt_cal_stage = 0;
-/* 0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error. 
+/* 0 - 4, stage 0 = not run, set 1 to start, stage 2 = in progress, stage 3 = completed, 4 is Error.
  */
 char power_session = 1;
 char start_timer = 0;

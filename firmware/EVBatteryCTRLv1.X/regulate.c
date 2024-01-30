@@ -1,18 +1,22 @@
-/*  Electric Vehicle Battery Monitoring System.>
-    Copyright (C) <2020>  <Jarrett R. Cigainero>
+/*Copyright (c) <2024> <Jarrett Cigainero>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>*/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
 
 #ifndef REGULATE_C
 #define REGULATE_C
@@ -33,13 +37,13 @@ float Temperature_I_Calc(float lowTCutout, float lowBeginReduce, float highTCuto
 
 void temperatureCalc(void){
     //Calculate max discharge current based off battery temp and battery remaining.
-    dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining) 
+    dischrg_current = (sets.dischrg_C_rating * vars.battery_remaining)
     * Temperature_I_Calc(sets.dischrg_min_temp, sets.dischrg_reduce_low_temp, sets.dischrg_max_temp, sets.dischrg_reduce_high_temp);
     if(dischrg_current < sets.limp_current) dischrg_current = sets.limp_current;
     //Calculate max charge current based off battery temp and battery remaining.
     chrg_remaining = (vars.battery_capacity - vars.battery_remaining);
     if(chrg_remaining < 0.2) chrg_remaining = 0.2;  //Minimum charge current is 0.2 * charge C rating.
-    chrg_current = (sets.chrg_C_rating * chrg_remaining) 
+    chrg_current = (sets.chrg_C_rating * chrg_remaining)
     * Temperature_I_Calc(sets.chrg_min_temp, sets.chrg_reduce_low_temp, sets.chrg_max_temp, sets.chrg_reduce_high_temp);
 }
 
@@ -53,7 +57,7 @@ void outputReg(void){
             STINGbits.sw_off = off;
         }
         ctRelay = on;          //contactor relay on, but only if fault shutdown is 0
-        AUXrelay = on;         //Turn on AUX 
+        AUXrelay = on;         //Turn on AUX
         if(contact_rly_timer == 3)
             contact_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
 
@@ -73,7 +77,7 @@ void outputReg(void){
             else if(voltage_output < sets.dischrg_voltage){
                 voltage_output = sets.dischrg_voltage;
             }
-            
+
             //Low voltage limiting.
             current_output += analog_smpl_time * ((dsky.battery_voltage - voltage_output) * vltg_proportion);
             if(current_output > dischrg_current){
@@ -82,7 +86,7 @@ void outputReg(void){
             else if(current_output < 0){
                 current_output = 0;
             }
-            
+
             //Current regulation.
             crnt_error = (current_output - absFloat(dsky.battery_current)) * crnt_proportion;
             if(crnt_error > 10000){
@@ -108,21 +112,21 @@ void outputReg(void){
         PWMCON1bits.PEN3L = off;  //Set PWM3 Low side to standard output so that it can be set to 0
         crnt_integral = 0;
         contact_rly_timer = 3; //Reset contactor relay timer
-        AUXrelay = off; //Turn off AUX 
+        AUXrelay = off; //Turn off AUX
         ctRelay = off; //Turn off contactor relay
     }
 }
 
 void chargeReg(void){
-    //Charge current read and target calculation.    
+    //Charge current read and target calculation.
     //// Check for Charger.
     if(chrgSwitch){
         chrgLight = 1;          //charger light on.
         chrgRelay = 1;          //charger relay on, but only if fault shutdown is 0
         if(chrg_rly_timer == 3)chrg_rly_timer = 2;         //wait two 0.125ms cycles before allowing charge regulation to start.
-        //Charger timeout check. If charger is plugged in but we aren't getting current then we 
+        //Charger timeout check. If charger is plugged in but we aren't getting current then we
         //need to shutdown and log an error code so we don't run down the battery.
-        if(chrg_check < 10000 && dsky.battery_current < -0.01 && !keySwitch && 
+        if(chrg_check < 10000 && dsky.battery_current < -0.01 && !keySwitch &&
         dsky.battery_voltage < (dsky.chrg_voltage - 0.05) && !heat_power) chrg_check++;
         else if(chrg_check >= 10000){
             fault_log(0x1B);            //Log insufficient current from charger.
@@ -132,7 +136,7 @@ void chargeReg(void){
             //This usually happens when we detect a charge voltage but the charge regulator isn't passing enough current or it's voltage is below the battery's voltage.
         }
         else if(chrg_check > 0) chrg_check--;
-        
+
         //Run heater if needed, but don't turn it up more than what the charger can handle.
         //This way we don't discharge the battery from trying to run the heater while the charger is plugged in, but
         //not supplying enough current to do both.
@@ -142,9 +146,9 @@ void chargeReg(void){
         //Regulate the charger input.
         if(!chrg_rly_timer){
             // Charge regulation routine. Clean this up, it needs to use integral math for regulation.
-            if(((charge_power > 0) && (dsky.battery_voltage >= (dsky.chrg_voltage))) || 
+            if(((charge_power > 0) && (dsky.battery_voltage >= (dsky.chrg_voltage))) ||
             (dsky.battery_current > (chrg_current + 0.02)))charge_power--;
-            else if(((charge_power < 101) && (dsky.battery_voltage < dsky.chrg_voltage - 0.07)) || 
+            else if(((charge_power < 101) && (dsky.battery_voltage < dsky.chrg_voltage - 0.07)) ||
             (dsky.battery_current < chrg_current))charge_power++;
         }
         else charge_power = 0;       //Inhibit charging if we are in the middle of heater calibration.
@@ -162,7 +166,7 @@ void chargeReg(void){
 //Heater regulation.
 void heat_control(float target_temp){
     /* Heater regulation. Ramp the heater up or down. If the battery temp is out
-     * of range then the target charge or discharge current will be set to 0 and the charge 
+     * of range then the target charge or discharge current will be set to 0 and the charge
      * regulation routine will power the heater without charging the battery.
      */
     if(vars.heat_cal_stage == ready){

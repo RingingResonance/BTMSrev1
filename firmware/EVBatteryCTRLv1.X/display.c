@@ -1,18 +1,22 @@
-/*  Electric Vehicle Battery Monitoring System.>
-    Copyright (C) <2020>  <Jarrett R. Cigainero>
+/*Copyright (c) <2024> <Jarrett Cigainero>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>*/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
 
 #ifndef DKSY_C
 #define DKSY_C
@@ -136,7 +140,7 @@ void Command_Interp(int serial_port){
         if(serial_port)CMD_buff[serial_port][CMD_Point[serial_port]] = U2RXREG;
         else CMD_buff[serial_port][CMD_Point[serial_port]] = U1RXREG;
         //Data echo
-        if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) || 
+        if (Lecho[serial_port] && ((CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0D) ||
         (CMD_buff[serial_port][CMD_Point[serial_port]] != 0x0A))){
             if(serial_port)U2TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
             else U1TXREG = CMD_buff[serial_port][CMD_Point[serial_port]];
@@ -171,7 +175,7 @@ void Command_Interp(int serial_port){
                 cmdRDY[serial_port] = clear;
                 asm("reset");
             break;
-            case '$':       
+            case '$':
                 //Generate flash and chip config checksum and compare it to the old one.
                 load_string("\n\rPRG:\n\rStored:", serial_port);
                 load_hex(sets.flash_chksum_old, serial_port);

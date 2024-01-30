@@ -1,18 +1,22 @@
-/*  Electric Vehicle Battery Monitoring System.>
-    Copyright (C) <2020>  <Jarrett R. Cigainero>
+/*Copyright (c) <2024> <Jarrett Cigainero>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>*/
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. */
 
 #ifndef sysIRQS_C
 #define sysIRQS_C
@@ -81,7 +85,7 @@ void __attribute__((interrupt, no_auto_psv)) _ADCInterrupt (void){
             STINGbits.adc_sample_burn = no;     //Burn the first ADC sample on every power up of ADC.
         }
         else STINGbits.adc_sample_burn = yes;      //We have burned the first set.
-    } 
+    }
     //End IRQ
     IFS0bits.ADIF = 0;
 }
@@ -112,8 +116,8 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     //Calculate limit currents based on temperature.
     temperatureCalc();
     /* Power off TIMER stuff. Do this to save power.
-     * This is so that this system doesn't drain your 1000wh battery over the 
-     * course of a couple weeks while being unplugged from a charger. 
+     * This is so that this system doesn't drain your 1000wh battery over the
+     * course of a couple weeks while being unplugged from a charger.
      * The dsPIC30F3011 is a power hog even in Idle and Sleep modes.
      * For future people, KEEP USING IRQs FOR STUFF!!! Don't make the CPU wait
      * for anything! The dsPIC30F3011 is an impatient hog and will consume all
@@ -141,9 +145,9 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         chrg_check = 0;
     }
     //Fan control
-    if(CONDbits.main_power && (dsky.battery_temp > sets.batt_fan_start 
+    if(CONDbits.main_power && (dsky.battery_temp > sets.batt_fan_start
     || dsky.my_temp > sets.ctrlr_fan_start || dsky.motor_ctrl_temp > sets.ctrlr_fan_start))fanRelay = 1;
-    else if(!CONDbits.main_power || (dsky.battery_temp < (sets.batt_fan_start - 5) 
+    else if(!CONDbits.main_power || (dsky.battery_temp < (sets.batt_fan_start - 5)
     && dsky.my_temp < (sets.ctrlr_fan_start - 5) && dsky.motor_ctrl_temp < (sets.ctrlr_fan_start - 5)))fanRelay = 0;
 
     //Clear fault_shutdown if all power modes are turned off.
@@ -151,7 +155,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
         shutdown_timer = 1;     //Acts like a resettable circuit breaker.
         STINGbits.fault_shutdown = no;
     }
-    
+
     //Blink Check Light if any faults are logged and any power modes are on regardless of what fault_shutdown says.
     if(CONDbits.pwr_detect){
         if(CONDbits.error_blink){
@@ -193,7 +197,7 @@ void __attribute__((interrupt, no_auto_psv)) _T1Interrupt (void){
     //Don't let battery_remaining go above battery capacity.
     if(vars.battery_remaining > vars.battery_capacity) vars.battery_remaining = vars.battery_capacity;
     //Don't let 'battery_remaining' go above the partial charge percentage when partial charging.
-    //To Do: This isn't exactly right because, for example, ~90% Voltage != ~90% total capacity!!! 
+    //To Do: This isn't exactly right because, for example, ~90% Voltage != ~90% total capacity!!!
     //It's only a few % off so for now it's okay. Will implement real voltage curve calculation later.
     if(STINGbits.p_charge && (vars.battery_remaining > (vars.battery_capacity * sets.partial_charge))
     && dsky.battery_vltg_average <= (sets.battery_rated_voltage * sets.partial_charge))
@@ -223,7 +227,7 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
         contact_rly_timer--;
     if(heat_rly_timer > 0 && heat_rly_timer != 3)
         heat_rly_timer--;
-    
+
     //Get average voltage and current.
     if(avg_cnt >= 8){
         bt_crnt_avg_temp /= 8;
@@ -259,10 +263,10 @@ void __attribute__((interrupt, no_auto_psv)) _T2Interrupt (void){
     //*************************************************************
     /****************************************/
     /* End the IRQ. */
-	IFS0bits.T2IF = 0;   
+	IFS0bits.T2IF = 0;
 }
 /****************/
 /* END IRQs     */
-/****************/   
+/****************/
 
 #endif
